@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Windows Support &mdash; Cloud Hypervisor  documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="prev" title="HOWTO VirtioFS rootfs" href="virtiofs-root.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../README.html" class="icon icon-home"> Cloud Hypervisor
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="api.html">Cloud Hypervisor API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="arm64.html">How to build and test Cloud Hypervisor on AArch64</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cpu.html">CPU</a></li>
+<li class="toctree-l1"><a class="reference internal" href="custom-image.html">How to create a custom Ubuntu image</a></li>
+<li class="toctree-l1"><a class="reference internal" href="debug-port.html"><code class="docutils literal notranslate"><span class="pre">cloud-hypervisor</span></code> debug IO port</a></li>
+<li class="toctree-l1"><a class="reference internal" href="device_model.html">Device Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="fs.html">How to use virtio-fs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="fuzzing.html">Fuzzing in Cloud Hypervisor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gdb.html">GDB Support</a></li>
+<li class="toctree-l1"><a class="reference internal" href="hotplug.html">Cloud Hypervisor Hot Plug</a></li>
+<li class="toctree-l1"><a class="reference internal" href="intel_sgx.html">Intel SGX</a></li>
+<li class="toctree-l1"><a class="reference internal" href="intel_tdx.html">Intel TDX</a></li>
+<li class="toctree-l1"><a class="reference internal" href="io_throttling.html">I/O Throttling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="iommu.html">Virtual IOMMU</a></li>
+<li class="toctree-l1"><a class="reference internal" href="live_migration.html">Live Migration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="logging.html">Logging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="macvtap-bridge.html">Using MACVTAP to Bridge onto Host Network</a></li>
+<li class="toctree-l1"><a class="reference internal" href="memory.html">Memory</a></li>
+<li class="toctree-l1"><a class="reference internal" href="profiling.html">Profiling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="seccomp.html">Seccomp filtering</a></li>
+<li class="toctree-l1"><a class="reference internal" href="snapshot_restore.html">Snapshot and Restore</a></li>
+<li class="toctree-l1"><a class="reference internal" href="uefi.html">UEFI Boot</a></li>
+<li class="toctree-l1"><a class="reference internal" href="uefi.html#links">Links</a></li>
+<li class="toctree-l1"><a class="reference internal" href="vfio.html">Cloud Hypervisor VFIO HOWTO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="vfio-user.html">Cloud Hypervisor VFIO-user HOWTO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="vhost-user-blk-testing.html">How to test vhost-user-blk with SPDK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="vhost-user-net-testing.html">How to test Vhost-user net with OpenVSwitch/DPDK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="virtiofs-root.html">HOWTO VirtioFS rootfs</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Windows Support</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#image-preparation">Image Preparation</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#installation-using-the-stock-windows-iso">Installation using the stock Windows ISO</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#image-usage">Image Usage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#image-configuration">Image Configuration</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#device-drivers">Device Drivers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#windows-special-administration-console-sac-enablement">Windows Special Administration Console (SAC) enablement</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#network">Network</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#basic-networking">Basic Networking</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#guest-internet-connectivity">Guest Internet Connectivity</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#remote-desktop-protocol-rdp-enablement">Remote Desktop Protocol (RDP) enablement</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#using-qemu">Using QEMU</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#using-powershell">Using powershell</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#ssh">SSH</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#enable-using-powershell">Enable using powershell</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#hotplug-capability">Hotplug capability</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#debugging">Debugging</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#debugger-and-debuggee">Debugger and Debuggee</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#windbg-vm">WinDbg VM</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#debuggee-vm">Debuggee VM</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#debugging-process">Debugging Process</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#invoke-the-windbg-vm">Invoke the WinDbg VM</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#invoke-the-debuggee-vm">Invoke the Debuggee VM</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#links">Links</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../README.html">Cloud Hypervisor</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../README.html" class="icon icon-home"></a> &raquo;</li>
+      <li>Windows Support</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/docs/windows.md.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section class="tex2jax_ignore mathjax_ignore" id="windows-support">
+<h1>Windows Support<a class="headerlink" href="#windows-support" title="Permalink to this headline"></a></h1>
+<p>Starting with the release version <a class="reference external" href="https://github.com/cloud-hypervisor/cloud-hypervisor/releases/tag/v0.10.0">0.10.0</a>, Cloud Hypervisor supports Windows guests.</p>
+<p><strong>Requirements</strong></p>
+<ul class="simple">
+<li><p>Host with KVM enabled</p></li>
+<li><p><a class="reference internal" href="uefi.html"><span class="doc std std-doc">UEFI</span></a> capable Windows guest image with Virtio drivers integrated</p></li>
+</ul>
+<p>Any modern Windows Server version is compatible. Cloud Hypervisor has been successfully tested with Windows Server 2019 and Windows Server Core 2004.</p>
+<p>At the current stage, only UEFI capable Windows images are supported. This implies the presence of the OVMF firmware during the Windows installation and in any subsequent usage. BIOS boot is not supported.</p>
+<p>The subsequent sections will tell, in detail, how to prepare an appropriate Windows image.</p>
+<section id="image-preparation">
+<h2>Image Preparation<a class="headerlink" href="#image-preparation" title="Permalink to this headline"></a></h2>
+<section id="installation-using-the-stock-windows-iso">
+<h3>Installation using the stock Windows ISO<a class="headerlink" href="#installation-using-the-stock-windows-iso" title="Permalink to this headline"></a></h3>
+<p><strong>Prerequisites</strong></p>
+<ul class="simple">
+<li><p>QEMU, version &gt;=5.0.0 is recommended.</p></li>
+<li><p>Windows installation ISO. Obtained through MSDN, Visual Studio subscription, evaluation center, etc.</p></li>
+<li><p><a class="reference external" href="https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/stable-virtio/">VirtIO driver ISO</a></p></li>
+<li><p>Suitable firmware for Cloud Hypervisor (<code class="docutils literal notranslate"><span class="pre">CLOUDHV.fd</span></code>) and for QEMU (<code class="docutils literal notranslate"><span class="pre">OVMF.fd</span></code>)</p></li>
+<li><p>With the suggested image size of 30G, there should be enough free disk space to hold the installation ISO and any other necessary files</p></li>
+</ul>
+<p>This step currently requires QEMU to install Windows onto the guest. QEMU is only used at the preparation stage, the resulting image is then fully functional with Cloud Hypervisor.</p>
+<p>Preparing several command parts as these will be used in the follow up sections as well.</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="nv">IMG_FILE</span><span class="o">=</span>windows-disk.raw
+<span class="nv">WIN_ISO_FILE</span><span class="o">=</span>en_windows_server_version_2004_updated_may_2020_x64_dvd_1e7f1cfa.iso
+<span class="nv">VIRTIO_ISO_FILE</span><span class="o">=</span>virtio-win-0.1.185.iso
+<span class="nv">OVMF_DIR</span><span class="o">=</span>./FV
+</pre></div>
+</div>
+<p>Create an empty image file, <code class="docutils literal notranslate"><span class="pre">raw</span></code> is supported.</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>qemu-img create -f raw <span class="nv">$IMG_FILE</span> 30G
+</pre></div>
+</div>
+<p>Begin the Windows installation process under QEMU</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>qemu-system-x86_64 <span class="se">\</span>
+	-machine q35,accel<span class="o">=</span>kvm <span class="se">\</span>
+	-cpu host <span class="se">\</span>
+	-m 4G <span class="se">\</span>
+	-bios ./<span class="nv">$OVMF_DIR</span>/OVMF_CODE.fd <span class="se">\</span>
+	-cdrom ./<span class="nv">$WIN_ISO_FILE</span> <span class="se">\</span>
+	-drive <span class="nv">file</span><span class="o">=</span>./<span class="nv">$VIRTIO_ISO_FILE</span>,index<span class="o">=</span><span class="m">0</span>,media<span class="o">=</span>cdrom
+	-drive <span class="k">if</span><span class="o">=</span>none,id<span class="o">=</span>root,file<span class="o">=</span>./<span class="nv">$IMG_FILE</span> <span class="se">\</span>
+	-device virtio-blk-pci,drive<span class="o">=</span>root,disable-legacy<span class="o">=</span>on <span class="se">\</span>
+	-device virtio-net-pci,netdev<span class="o">=</span>mynet0,disable-legacy<span class="o">=</span>on <span class="se">\</span>
+	-netdev user,id<span class="o">=</span>mynet0 <span class="se">\</span>
+	-vga std
+</pre></div>
+</div>
+<p>Before the installation can proceed, point the Windows installation program to the VirtIO disk and install the necessary storage controller drivers. After that, the attached hard drive will become visible and the actual installation can commence.</p>
+<p>After the installation has completed, proceed further to the configuration section. QEMU will be needed at least once more to enable the Windows Special Administration Console (SAC) and to possibly install extra device drivers.</p>
+</section>
+</section>
+<section id="image-usage">
+<h2>Image Usage<a class="headerlink" href="#image-usage" title="Permalink to this headline"></a></h2>
+<p>The basic command to boot a Windows image. The configuration section should be checked before executing it for the first time.</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>cloud-hypervisor <span class="se">\</span>
+	--kernel ./<span class="nv">$OVMF_DIR</span>/CLOUDHV.fd <span class="se">\</span>
+	--disk <span class="nv">path</span><span class="o">=</span>./<span class="nv">$IMG_FILE</span> <span class="se">\</span>
+	--cpus <span class="nv">boot</span><span class="o">=</span><span class="m">1</span>,kvm_hyperv<span class="o">=</span>on <span class="se">\</span>
+	--memory <span class="nv">size</span><span class="o">=</span>4G <span class="se">\</span>
+	--serial tty <span class="se">\</span>
+	--console off <span class="se">\</span>
+	--net <span class="nv">tap</span><span class="o">=</span>
+</pre></div>
+</div>
+<p>It is necessary to always:</p>
+<ul class="simple">
+<li><p>Carry the OVMF firmware in the <code class="docutils literal notranslate"><span class="pre">--kernel</span></code> option</p></li>
+<li><p>Add <code class="docutils literal notranslate"><span class="pre">kvm_hyperv=on</span></code> to the <code class="docutils literal notranslate"><span class="pre">--cpus</span></code> option</p></li>
+</ul>
+<p>In cases where the host processor supports address space &gt; 39 bits, it might be necessary to limit the address space. It can be done by appending the option <code class="docutils literal notranslate"><span class="pre">max_phys_bits=X</span></code> to the <code class="docutils literal notranslate"><span class="pre">--cpus</span></code> parameter, where <code class="docutils literal notranslate"><span class="pre">X</span></code> is the number of bits to be supported. Windows was tested to support at least 39-bit address space.</p>
+<p>To daemonize the Cloud Hypervisor process, <code class="docutils literal notranslate"><span class="pre">nohup</span></code> can be used. Some STDIO redirections might need to be done. In a simple case it is sufficient to just redirect all the output to <code class="docutils literal notranslate"><span class="pre">/dev/null</span></code>.</p>
+</section>
+<section id="image-configuration">
+<h2>Image Configuration<a class="headerlink" href="#image-configuration" title="Permalink to this headline"></a></h2>
+<section id="device-drivers">
+<h3>Device Drivers<a class="headerlink" href="#device-drivers" title="Permalink to this headline"></a></h3>
+<p>After the Windows installation has finished under QEMU, there might be still devices with no drivers installed. This might happen for example, when a device was not used during the installation. In particular it is important to ensure that the VirtIO network device is setup correctly because further steps for the configuration and the usage require network in most case.</p>
+<p>Boot once more under QEMU and use the <a class="reference external" href="https://support.microsoft.com/en-in/help/4028443/windows-10-update-drivers">Device Manager</a>, to ensure all the device drivers, and especially the network card, are installed correctly. Also, as Cloud Hypervisor can introduce new devices, it is advisable to repeat the procedure while booted under Cloud Hypervisor, when the RDP access to the image is functional.</p>
+</section>
+<section id="windows-special-administration-console-sac-enablement">
+<h3>Windows Special Administration Console (SAC) enablement<a class="headerlink" href="#windows-special-administration-console-sac-enablement" title="Permalink to this headline"></a></h3>
+<p>SAC provides a text based console access to the Windows guest. As Cloud Hypervisor doesn’t implement a VGA adaptor, SAC is an important instrument for the Windows guest management.</p>
+<p>Boot the Windows image under QEMU and execute the below commands to permanently enable SAC</p>
+<div class="highlight-cmd notranslate"><div class="highlight"><pre><span></span>bcdedit /emssettings emsport:1 emsbaudrate:115200
+bcdedit /ems on
+bcdedit /bootems on
+</pre></div>
+</div>
+<p>Once SAC is enabled, the image can be booted under Cloud Hypervisor. The SAC prompt will show up</p>
+<pre>
+Computer is booting, SAC started and initialized.                               
+                                                                                
+Use the "ch -?" command for information about using channels.                   
+Use the "?" command for general help.                                           
+                                                                                
+                                                                                
+SAC>
+</pre>
+<p>To open a console on the guest, the command sequence below can be used</p>
+<pre>
+SAC>cmd
+The Command Prompt session was successfully launched.
+SAC>
+EVENT:   A new channel has been created.  Use "ch -?" for channel help.
+Channel: Cmd0001
+SAC>ch -si 1
+</pre>
+<p>See also the <a class="reference external" href="#Links">links</a> section for a more extended SAC documentation.</p>
+</section>
+</section>
+<section id="network">
+<h2>Network<a class="headerlink" href="#network" title="Permalink to this headline"></a></h2>
+<p>This section illustrates the Windows specific corner points for the VM network configuration. For the extended networking guide, including bridging for multiple VMs, follow <span class="xref myst">networking.md</span>.</p>
+<section id="basic-networking">
+<h3>Basic Networking<a class="headerlink" href="#basic-networking" title="Permalink to this headline"></a></h3>
+<p>As the simplest option, using <code class="docutils literal notranslate"><span class="pre">--net</span> <span class="pre">tap=</span></code> in the Cloud Hypervisor command line will create a <code class="docutils literal notranslate"><span class="pre">vmtapX</span></code> device on the host with the default IPv4 adress <code class="docutils literal notranslate"><span class="pre">192.168.249.1</span></code>. After SAC becomes available, the guest configuration can be set with</p>
+<pre>
+SAC>i 10 192.168.249.2 255.255.255.0 192.168.249.1
+</pre> 
+<p>Where <code class="docutils literal notranslate"><span class="pre">10</span></code> is the device index as shown by the <code class="docutils literal notranslate"><span class="pre">i</span></code> command.</p>
+</section>
+<section id="guest-internet-connectivity">
+<h3>Guest Internet Connectivity<a class="headerlink" href="#guest-internet-connectivity" title="Permalink to this headline"></a></h3>
+<p>Additional steps are necessary to provide the guest with internet access.</p>
+<ul class="simple">
+<li><p>On the guest, add the DNS server either by using <code class="docutils literal notranslate"><span class="pre">netsh</span></code> or by opening <code class="docutils literal notranslate"><span class="pre">Network</span> <span class="pre">and</span> <span class="pre">Connectivity</span> <span class="pre">Center</span></code> and editing the adapter properties.</p></li>
+<li><p>On the host, configure the traffic forwarding. Replace the <code class="docutils literal notranslate"><span class="pre">NET_DEV</span></code> with the name of your network device.</p></li>
+</ul>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="nv">NET_DEV</span><span class="o">=</span>wlp3s0
+sysctl -w net.ipv4.ip_forward<span class="o">=</span><span class="m">1</span>
+iptables -t nat -A POSTROUTING -o <span class="nv">$NET_DEV</span> -j MASQUERADE
+</pre></div>
+</div>
+</section>
+<section id="remote-desktop-protocol-rdp-enablement">
+<h3>Remote Desktop Protocol (RDP) enablement<a class="headerlink" href="#remote-desktop-protocol-rdp-enablement" title="Permalink to this headline"></a></h3>
+<section id="using-qemu">
+<h4>Using QEMU<a class="headerlink" href="#using-qemu" title="Permalink to this headline"></a></h4>
+<ul class="simple">
+<li><p>Execute <code class="docutils literal notranslate"><span class="pre">SystemPropertiesRemote</span></code></p></li>
+<li><p>In the properties window, choose “Allow remote connections to this computer”</p></li>
+<li><p>Click “Select Users” and add some user to the allow list</p></li>
+</ul>
+</section>
+<section id="using-powershell">
+<h4>Using powershell<a class="headerlink" href="#using-powershell" title="Permalink to this headline"></a></h4>
+<div class="highlight-powershell notranslate"><div class="highlight"><pre><span></span><span class="nb">Set-ItemProperty</span> <span class="s2">&quot;HKLM:\SYSTEM\CurrentControlSet\Control\Terminal Server\&quot;</span> <span class="n">-Name</span> <span class="s2">&quot;fDenyTSConnections&quot;</span> <span class="n">-Value</span> <span class="n">0</span>
+<span class="nb">Enable-NetFirewallRule</span> <span class="n">-DisplayGroup</span> <span class="s2">&quot;Remote Desktop&quot;</span>
+<span class="nb">Add-LocalGroupMember</span> <span class="n">-Group</span> <span class="s2">&quot;Remote Desktop Users&quot;</span> <span class="n">-Member</span> <span class="n">someuser</span>
+</pre></div>
+</div>
+<p>Administrators can always RDP, non administrator users have to be explicitly enabled.</p>
+<p>Once the configuration is set, RDP clients can connect to <code class="docutils literal notranslate"><span class="pre">192.168.249.2</span></code>.</p>
+</section>
+</section>
+<section id="ssh">
+<h3>SSH<a class="headerlink" href="#ssh" title="Permalink to this headline"></a></h3>
+<section id="enable-using-powershell">
+<h4>Enable using powershell<a class="headerlink" href="#enable-using-powershell" title="Permalink to this headline"></a></h4>
+<div class="highlight-powershell notranslate"><div class="highlight"><pre><span></span>Add-WindowsCapability -Online -Name OpenSSH.Server~~~~0.0.1.0
+Start-Service sshd
+Set-Service -Name sshd -StartupType ‘Automatic’
+</pre></div>
+</div>
+<p>This allows for SSH login from a remote machine, for example through the <code class="docutils literal notranslate"><span class="pre">administrator</span></code> user: <code class="docutils literal notranslate"><span class="pre">ssh</span> <span class="pre">administrator&#64;192.168.249.2</span></code>. For a more detailed OpenSSH guide, please follow the MSDN article from the <a class="reference external" href="#links">links</a> section.</p>
+</section>
+</section>
+</section>
+<section id="hotplug-capability">
+<h2>Hotplug capability<a class="headerlink" href="#hotplug-capability" title="Permalink to this headline"></a></h2>
+<p>CPU hotplug is supported. The VM operating system needs to support hotplug and be appropriately licensed. SKU limitations like constraints on the number of cores are to be taken into consideration. Note, that Windows doesn’t support CPU hot-remove. When <code class="docutils literal notranslate"><span class="pre">ch-remote</span></code> is invoked to reduce the number of CPUs, the result will be visible after the OS reboot within the same hypervisor instance.</p>
+<p>RAM hotplug is supported. Note, that while the <code class="docutils literal notranslate"><span class="pre">pnpmem.sys</span></code> driver in use supports RAM hot-remove, the RAM being unplugged has to be not in use and have no reserved pages. In most cases it means, hot-remove won’t work. Same as with the CPU hot-remove, when <code class="docutils literal notranslate"><span class="pre">ch-remote</span></code> is invoked to reduce the RAM size, the result will be visible after the OS reboot.</p>
+<p>Network device hotplug and hot-remove are supported.</p>
+<p>Disk hotplug and hot-remove are supported. After the device has been hotplugged, it will need to be onlined from within the guest. Among other tools, powershell applets <code class="docutils literal notranslate"><span class="pre">Get-Disk</span></code> and <code class="docutils literal notranslate"><span class="pre">Set-Disk</span></code> can be used for the disk configuration and activation.</p>
+</section>
+<section id="debugging">
+<h2>Debugging<a class="headerlink" href="#debugging" title="Permalink to this headline"></a></h2>
+<p>The Windows guest debugging process relies heavily on QEMU and <a class="reference external" href="http://www.dest-unreach.org/socat/">socat</a>. The procedure requires two Windows VMs:</p>
+<ul class="simple">
+<li><p>A debugger VM running under QEMU.</p></li>
+<li><p>A debuggee, a Windows VM that has been created in the previous steps, running under Cloud Hypervisor or QEMU.</p></li>
+</ul>
+<p>The connection between both guests happens over TCP, whereby on the guest side it is automatically translated to a COM port. Because the VMs are connected through TCP, the debugging infrastructure can be distributed over the network. The serial port, while slowly transferring data, is common enough to support a wide range of cases and tools.</p>
+<p>In this excercise, <a class="reference external" href="https://docs.microsoft.com/en-us/windows-hardware/drivers/debugger/">WinDbg</a> is used. Any other debugger of choice with the ability to use serial connection can be used instead.</p>
+<section id="debugger-and-debuggee">
+<h3>Debugger and Debuggee<a class="headerlink" href="#debugger-and-debuggee" title="Permalink to this headline"></a></h3>
+<section id="windbg-vm">
+<h4>WinDbg VM<a class="headerlink" href="#windbg-vm" title="Permalink to this headline"></a></h4>
+<p>For simplicity, the debugger VM is supposed to be only running under QEMU. It will require VGA and doesn’t neccessarily depend on UEFI. As an OS, it can carry any supported Windows OS where the debugger of choice can be installed. The simplest way is to follow the image preparation instructions from the previous chapter, but avoid using the OVMF firmware. It is also not required to use VirtIO drivers, whereby it might be useful in some case. Though, while creating the image file for the debugger VM, be sure to choose a sufficient disk size that counts in the need to save the corresponding debug symbols and sources.</p>
+<p>To create the debugger Windows VM, the following command can be used:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>qemu-system-x86_64 <span class="se">\</span>
+	-machine q35,accel<span class="o">=</span>kvm <span class="se">\</span>
+	-cpu host <span class="se">\</span>
+	-smp <span class="m">1</span> <span class="se">\</span>
+	-m 4G <span class="se">\</span>
+	-cdrom ./<span class="nv">$WIN_ISO_FILE</span> <span class="se">\</span>
+	-drive <span class="nv">file</span><span class="o">=</span>./<span class="nv">$VIRTIO_ISO_FILE</span>,index<span class="o">=</span><span class="m">0</span>,media<span class="o">=</span>cdrom
+	-drive <span class="k">if</span><span class="o">=</span>none,id<span class="o">=</span>root,file<span class="o">=</span>./windbg-disk.raw <span class="se">\</span>
+	-device virtio-blk-pci,drive<span class="o">=</span>root,disable-legacy<span class="o">=</span>on <span class="se">\</span>
+	-device virtio-net-pci,netdev<span class="o">=</span>mynet0,disable-legacy<span class="o">=</span>on <span class="se">\</span>
+	-netdev user,id<span class="o">=</span>mynet0,net<span class="o">=</span><span class="m">192</span>.168.178.0/24,host<span class="o">=</span><span class="m">192</span>.168.178.1,dhcpstart<span class="o">=</span><span class="m">192</span>.168.178.64,hostname<span class="o">=</span>windbg-host <span class="se">\</span>
+	-vga std
+</pre></div>
+</div>
+<p>A non server Windows OS like Windows 10 can be used to carry the debugging tools in the debugger VM.</p>
+</section>
+<section id="debuggee-vm">
+<h4>Debuggee VM<a class="headerlink" href="#debuggee-vm" title="Permalink to this headline"></a></h4>
+<p>The debuggee VM is the one that we’ve learned to configure and run in the first section. There might be various reasons to debug. For example, there could be an issue in the Windows guest with an emulated device or an included driver. Or, we might want to develop a custom feature like a kernel driver to be available in the guest.</p>
+<p>Note, that there are several ways to debug Windows, not all of them need to be enabled at the same time. For example, if developing a kernel module, the only useful options would be to configure for the serial debugging and enable the kernel debug. In that case, any crash or misbehavior in the boot loader or kernel would be ignored. The commands below must be run as administrator on the debuggee guest VM.</p>
+<section id="turn-on-serial-debugging">
+<h5>Turn On Serial Debugging<a class="headerlink" href="#turn-on-serial-debugging" title="Permalink to this headline"></a></h5>
+<p>This will configure the debugging to be enabled and instruct to use the serial port for it.</p>
+<div class="highlight-cmd notranslate"><div class="highlight"><pre><span></span>bcdedit /dbgsettings serial debugport:1 baudrate:115200
+</pre></div>
+</div>
+</section>
+<section id="turn-on-kernel-debuging">
+<h5>Turn On Kernel Debuging<a class="headerlink" href="#turn-on-kernel-debuging" title="Permalink to this headline"></a></h5>
+<div class="highlight-cmd notranslate"><div class="highlight"><pre><span></span>bcdedit /debug on
+</pre></div>
+</div>
+</section>
+<section id="turn-on-boot-loader-debug">
+<h5>Turn On Boot Loader Debug<a class="headerlink" href="#turn-on-boot-loader-debug" title="Permalink to this headline"></a></h5>
+<div class="highlight-cmd notranslate"><div class="highlight"><pre><span></span>bcdedit /bootdebug on
+</pre></div>
+</div>
+</section>
+<section id="turn-on-boot-manager-debug">
+<h5>Turn on boot manager debug<a class="headerlink" href="#turn-on-boot-manager-debug" title="Permalink to this headline"></a></h5>
+<div class="highlight-cmd notranslate"><div class="highlight"><pre><span></span>bcdedit /set {bootmgr} bootdebug on
+</pre></div>
+</div>
+</section>
+<section id="disable-recovery-screen-on-boot-failure">
+<h5>Disable Recovery Screen On Boot Failure<a class="headerlink" href="#disable-recovery-screen-on-boot-failure" title="Permalink to this headline"></a></h5>
+<p>There could be a situation, where a crash is debugged. In such cases, the guest could be left in an inconsistent state. The default Windows behavior would be to boot into the recovery screen, however in some cases it might be not desired. To make Windows ignore failures and always proceed to booting the OS, use the command below:</p>
+<div class="highlight-cmd notranslate"><div class="highlight"><pre><span></span>bcdedit /set {default} bootstatuspolicy ignoreallfailures
+</pre></div>
+</div>
+</section>
+</section>
+</section>
+<section id="debugging-process">
+<h3>Debugging Process<a class="headerlink" href="#debugging-process" title="Permalink to this headline"></a></h3>
+<section id="invoke-the-windbg-vm">
+<h4>Invoke the WinDbg VM<a class="headerlink" href="#invoke-the-windbg-vm" title="Permalink to this headline"></a></h4>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>qemu-system-x86_64 <span class="se">\</span>
+	-machine q35,accel<span class="o">=</span>kvm <span class="se">\</span>
+	-cpu host <span class="se">\</span>
+	-smp <span class="m">1</span> <span class="se">\</span>
+	-m 4G <span class="se">\</span>
+	-drive <span class="k">if</span><span class="o">=</span>none,id<span class="o">=</span>root,file<span class="o">=</span>./windbg-disk.raw <span class="se">\</span>
+	-device virtio-blk-pci,drive<span class="o">=</span>root,disable-legacy<span class="o">=</span>on <span class="se">\</span>
+	-serial tcp::4445,server,nowait <span class="se">\</span>
+	-device virtio-net-pci,netdev<span class="o">=</span>mynet0,disable-legacy<span class="o">=</span>on <span class="se">\</span>
+	-netdev user,id<span class="o">=</span>mynet0,net<span class="o">=</span><span class="m">192</span>.168.178.0/24,host<span class="o">=</span><span class="m">192</span>.168.178.1,dhcpstart<span class="o">=</span><span class="m">192</span>.168.178.64,hostname<span class="o">=</span>windbg-host <span class="se">\</span>
+	-vga std
+</pre></div>
+</div>
+<p>Note, this VM has the networking enabled. It is needed, because symbols and sources might need to be fetched from a network location.</p>
+<p>Also, notice the <code class="docutils literal notranslate"><span class="pre">-serial</span></code> parameter - that’s what does the magic on exposing the serial port to the guest while connecting the debugger VM with a client VM through the network. SAC/EMS needs to be disabled in the debugger VM, as otherwise the COM device might be blocked.</p>
+<p>Hereafter, WinDbg can be started using a command below:</p>
+<div class="highlight-cmd notranslate"><div class="highlight"><pre><span></span>set _NT_DEBUG_PORT=com1
+set _NT_DEBUG_BAUD_RATE=115200
+
+windbg -v -d -k
+</pre></div>
+</div>
+<p>Once started, WinDbg will wait for an incoming connection which is going to be initialized by the debuggee VM started in the next section.</p>
+</section>
+<section id="invoke-the-debuggee-vm">
+<h4>Invoke the Debuggee VM<a class="headerlink" href="#invoke-the-debuggee-vm" title="Permalink to this headline"></a></h4>
+<section id="under-qemu">
+<h5>Under QEMU<a class="headerlink" href="#under-qemu" title="Permalink to this headline"></a></h5>
+<p>Essentially it would be the command like depicted in the guest preparation sections, with a few modifications:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>qemu-system-x86_64 <span class="se">\</span>
+	-machine q35,accel<span class="o">=</span>kvm <span class="se">\</span>
+	-cpu host <span class="se">\</span>
+	-m 4G <span class="se">\</span>
+	-bios ./<span class="nv">$OVMF_DIR</span>/OVMF_CODE.fd <span class="se">\</span>
+	-cdrom ./<span class="nv">$WIN_ISO_FILE</span> <span class="se">\</span>
+	-drive <span class="nv">file</span><span class="o">=</span>./<span class="nv">$VIRTIO_ISO_FILE</span>,index<span class="o">=</span><span class="m">0</span>,media<span class="o">=</span>cdrom
+	-drive <span class="k">if</span><span class="o">=</span>none,id<span class="o">=</span>root,file<span class="o">=</span>./<span class="nv">$IMG_FILE</span> <span class="se">\</span>
+	-device virtio-blk-pci,drive<span class="o">=</span>root,disable-legacy<span class="o">=</span>on <span class="se">\</span>
+	-device virtio-net-pci,netdev<span class="o">=</span>mynet0,disable-legacy<span class="o">=</span>on <span class="se">\</span>
+	-netdev user,id<span class="o">=</span>mynet0 <span class="se">\</span>
+	-serial tcp:127.0.0.1:4445 <span class="se">\</span>
+	-vga std
+</pre></div>
+</div>
+<p>It is to see, that <code class="docutils literal notranslate"><span class="pre">-serial</span></code> parameter is used here, to establish the connection with the debugger VM.</p>
+<p>To disable HPET, attach <code class="docutils literal notranslate"><span class="pre">--no-hpet</span></code>. To enable hypervisor reference timer, use <code class="docutils literal notranslate"><span class="pre">-cpu</span> <span class="pre">host,hv-time</span></code>. These and other options can be used to achieve better <a class="reference external" href="https://archive.fosdem.org/2019/schedule/event/vai_enlightening_kvm/attachments/slides/2860/export/events/attachments/vai_enlightening_kvm/slides/2860/vkuznets_fosdem2019_enlightening_kvm.pdf">Hyper-V compatibility</a>.</p>
+</section>
+<section id="cloud-hypervisor">
+<h5>Cloud Hypervisor<a class="headerlink" href="#cloud-hypervisor" title="Permalink to this headline"></a></h5>
+<p>The <code class="docutils literal notranslate"><span class="pre">socat</span></code> tool is used to establish the QEMU compatible behavior. Here as well, the Cloud Hypervisor command used to run the Windows guest is to be used. Put the command into a shell script:</p>
+<p><code class="docutils literal notranslate"><span class="pre">socat</span> <span class="pre">SYSTEM:&quot;./ch-script&quot;,openpty,raw,echo=0</span> <span class="pre">TCP:localhost:4445</span></code></p>
+<p>The reason to pack the command into the shell script is that the command might contain a comma. When using SYSTEM, the shell command can’t contain <code class="docutils literal notranslate"><span class="pre">,</span></code> or <code class="docutils literal notranslate"><span class="pre">!!</span></code>.</p>
+</section>
+</section>
+</section>
+</section>
+<section id="links">
+<h2>Links<a class="headerlink" href="#links" title="Permalink to this headline"></a></h2>
+<ul class="simple">
+<li><p><a class="reference external" href="https://docs.fedoraproject.org/en-US/quick-docs/creating-windows-virtual-machines-using-virtio-drivers/">Fedora VirtIO guide for Windows</a></p></li>
+<li><p><a class="reference external" href="https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/stable-virtio/">VirtIO driver binaries</a></p></li>
+<li><p><a class="reference external" href="https://github.com/virtio-win/kvm-guest-drivers-windows">VirtIO driver sources</a></p></li>
+<li><p><a class="reference external" href="https://docs.microsoft.com/en-us/previous-versions/windows/it-pro/windows-server-2003/cc787940(v=ws.10)">Emergency Management Services</a></p></li>
+<li><p><a class="reference external" href="https://docs.microsoft.com/en-us/windows-server/administration/openssh/openssh_install_firstuse">OpenSSH server/client configuration</a></p></li>
+<li><p><a class="reference external" href="https://www.linux-kvm.org/page/WindowsGuestDrivers/GuestDebugging">Windows guest debugging under KVM</a></p></li>
+<li><p><a class="reference external" href="https://archive.fosdem.org/2019/schedule/event/vai_enlightening_kvm/attachments/slides/2860/export/events/attachments/vai_enlightening_kvm/slides/2860/vkuznets_fosdem2019_enlightening_kvm.pdf">“ENLIGHTENING” KVM</a></p></li>
+</ul>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="virtiofs-root.html" class="btn btn-neutral float-left" title="HOWTO VirtioFS rootfs" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, various.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

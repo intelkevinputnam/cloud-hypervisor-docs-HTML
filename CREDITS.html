@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cloud Hypervisor Credits and Thanks &mdash; Cloud Hypervisor  documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="README.html" class="icon icon-home"> Cloud Hypervisor
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="docs/api.html">Cloud Hypervisor API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="docs/arm64.html">How to build and test Cloud Hypervisor on AArch64</a></li>
+<li class="toctree-l1"><a class="reference internal" href="docs/cpu.html">CPU</a></li>
+<li class="toctree-l1"><a class="reference internal" href="docs/custom-image.html">How to create a custom Ubuntu image</a></li>
+<li class="toctree-l1"><a class="reference internal" href="docs/debug-port.html"><code class="docutils literal notranslate"><span class="pre">cloud-hypervisor</span></code> debug IO port</a></li>
+<li class="toctree-l1"><a class="reference internal" href="docs/device_model.html">Device Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="docs/fs.html">How to use virtio-fs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="docs/fuzzing.html">Fuzzing in Cloud Hypervisor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="docs/gdb.html">GDB Support</a></li>
+<li class="toctree-l1"><a class="reference internal" href="docs/hotplug.html">Cloud Hypervisor Hot Plug</a></li>
+<li class="toctree-l1"><a class="reference internal" href="docs/intel_sgx.html">Intel SGX</a></li>
+<li class="toctree-l1"><a class="reference internal" href="docs/intel_tdx.html">Intel TDX</a></li>
+<li class="toctree-l1"><a class="reference internal" href="docs/io_throttling.html">I/O Throttling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="docs/iommu.html">Virtual IOMMU</a></li>
+<li class="toctree-l1"><a class="reference internal" href="docs/live_migration.html">Live Migration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="docs/logging.html">Logging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="docs/macvtap-bridge.html">Using MACVTAP to Bridge onto Host Network</a></li>
+<li class="toctree-l1"><a class="reference internal" href="docs/memory.html">Memory</a></li>
+<li class="toctree-l1"><a class="reference internal" href="docs/profiling.html">Profiling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="docs/seccomp.html">Seccomp filtering</a></li>
+<li class="toctree-l1"><a class="reference internal" href="docs/snapshot_restore.html">Snapshot and Restore</a></li>
+<li class="toctree-l1"><a class="reference internal" href="docs/uefi.html">UEFI Boot</a></li>
+<li class="toctree-l1"><a class="reference internal" href="docs/uefi.html#links">Links</a></li>
+<li class="toctree-l1"><a class="reference internal" href="docs/vfio.html">Cloud Hypervisor VFIO HOWTO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="docs/vfio-user.html">Cloud Hypervisor VFIO-user HOWTO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="docs/vhost-user-blk-testing.html">How to test vhost-user-blk with SPDK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="docs/vhost-user-net-testing.html">How to test Vhost-user net with OpenVSwitch/DPDK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="docs/virtiofs-root.html">HOWTO VirtioFS rootfs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="docs/windows.html">Windows Support</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="README.html">Cloud Hypervisor</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="README.html" class="icon icon-home"></a> &raquo;</li>
+      <li>Cloud Hypervisor Credits and Thanks</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/CREDITS.md.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section class="tex2jax_ignore mathjax_ignore" id="cloud-hypervisor-credits-and-thanks">
+<h1>Cloud Hypervisor Credits and Thanks<a class="headerlink" href="#cloud-hypervisor-credits-and-thanks" title="Permalink to this headline"></a></h1>
+<p>The Cloud Hypervisor code is based on the <a class="reference external" href="https://github.com/rust-vmm">rust-vmm</a>, <a class="reference external" href="https://firecracker-microvm.github.io/">Firecracker</a> and <a class="reference external" href="https://chromium.googlesource.com/chromiumos/platform/crosvm/">crosvm</a>
+projects implementations.</p>
+<p>Our thanks go to the contributors of those projects:</p>
+<section id="crosvm">
+<h2>crosvm<a class="headerlink" href="#crosvm" title="Permalink to this headline"></a></h2>
+<ul class="simple">
+<li><p><a class="reference external" href="https://github.com/zachreizner">Zach Reizner</a> <a class="reference external" href="mailto:zachr&#37;&#52;&#48;chromium&#46;org">mailto:zachr<span>&#64;</span>chromium<span>&#46;</span>org</a></p></li>
+<li><p><a class="reference external" href="https://github.com/dgreid">Dylan Reid</a> <a class="reference external" href="mailto:dgreid&#37;&#52;&#48;chromium&#46;org">mailto:dgreid<span>&#64;</span>chromium<span>&#46;</span>org</a></p></li>
+<li><p><a class="reference external" href="https://github.com/danielverkamp">Daniel Verkamp</a> <a class="reference external" href="mailto:dverkamp&#37;&#52;&#48;chromium&#46;org">mailto:dverkamp<span>&#64;</span>chromium<span>&#46;</span>org</a></p></li>
+<li><p><a class="reference external" href="https://github.com/smibarber">Stephen Barber</a> <a class="reference external" href="mailto:smbarber&#37;&#52;&#48;chromium&#46;org">mailto:smbarber<span>&#64;</span>chromium<span>&#46;</span>org</a></p></li>
+<li><p><a class="reference external" href="https://github.com/jynnantonix">Chirantan Ekbote</a> <a class="reference external" href="mailto:chirantan&#37;&#52;&#48;chromium&#46;org">mailto:chirantan<span>&#64;</span>chromium<span>&#46;</span>org</a></p></li>
+<li><p><a class="reference external" href="https://github.com/jclinton">Jason D. Clinton</a> <a class="reference external" href="mailto:jclinton&#37;&#52;&#48;chromium&#46;org">mailto:jclinton<span>&#64;</span>chromium<span>&#46;</span>org</a></p></li>
+<li><p>Sonny Rao <a class="reference external" href="mailto:sonnyrao&#37;&#52;&#48;chromium&#46;org">mailto:sonnyrao<span>&#64;</span>chromium<span>&#46;</span>org</a></p></li>
+</ul>
+</section>
+<section id="firecracker">
+<h2>Firecracker<a class="headerlink" href="#firecracker" title="Permalink to this headline"></a></h2>
+<p>See the <a class="reference external" href="https://github.com/firecracker-microvm/firecracker/blob/master/CREDITS.md">Firecracker CREDITS</a>.</p>
+</section>
+<section id="rust-vmm">
+<h2>rust-vmm<a class="headerlink" href="#rust-vmm" title="Permalink to this headline"></a></h2>
+<ul class="simple">
+<li><p><a class="reference external" href="https://github.com/andreeaflorescu">Andreea Florescu</a> &lt;<a class="reference external" href="mailto:fandree&#37;&#52;&#48;amazon&#46;com">mailto:fandree<span>&#64;</span>amazon<span>&#46;</span>com</a>&gt;</p></li>
+<li><p><a class="reference external" href="https://github.com/zachreizner">Paolo Bonzini</a> <a class="reference external" href="mailto:pbonzini&#37;&#52;&#48;redhat&#46;com">mailto:pbonzini<span>&#64;</span>redhat<span>&#46;</span>com</a></p></li>
+<li><p><a class="reference external" href="https://github.com/jiangliu">Jiang Liu</a> <a class="reference external" href="mailto:gerry&#37;&#52;&#48;linux&#46;alibaba&#46;com">mailto:gerry<span>&#64;</span>linux<span>&#46;</span>alibaba<span>&#46;</span>com</a></p></li>
+</ul>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, various.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

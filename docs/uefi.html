@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>UEFI Boot &mdash; Cloud Hypervisor  documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Cloud Hypervisor VFIO HOWTO" href="vfio.html" />
+    <link rel="prev" title="Snapshot and Restore" href="snapshot_restore.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../README.html" class="icon icon-home"> Cloud Hypervisor
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="api.html">Cloud Hypervisor API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="arm64.html">How to build and test Cloud Hypervisor on AArch64</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cpu.html">CPU</a></li>
+<li class="toctree-l1"><a class="reference internal" href="custom-image.html">How to create a custom Ubuntu image</a></li>
+<li class="toctree-l1"><a class="reference internal" href="debug-port.html"><code class="docutils literal notranslate"><span class="pre">cloud-hypervisor</span></code> debug IO port</a></li>
+<li class="toctree-l1"><a class="reference internal" href="device_model.html">Device Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="fs.html">How to use virtio-fs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="fuzzing.html">Fuzzing in Cloud Hypervisor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gdb.html">GDB Support</a></li>
+<li class="toctree-l1"><a class="reference internal" href="hotplug.html">Cloud Hypervisor Hot Plug</a></li>
+<li class="toctree-l1"><a class="reference internal" href="intel_sgx.html">Intel SGX</a></li>
+<li class="toctree-l1"><a class="reference internal" href="intel_tdx.html">Intel TDX</a></li>
+<li class="toctree-l1"><a class="reference internal" href="io_throttling.html">I/O Throttling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="iommu.html">Virtual IOMMU</a></li>
+<li class="toctree-l1"><a class="reference internal" href="live_migration.html">Live Migration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="logging.html">Logging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="macvtap-bridge.html">Using MACVTAP to Bridge onto Host Network</a></li>
+<li class="toctree-l1"><a class="reference internal" href="memory.html">Memory</a></li>
+<li class="toctree-l1"><a class="reference internal" href="profiling.html">Profiling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="seccomp.html">Seccomp filtering</a></li>
+<li class="toctree-l1"><a class="reference internal" href="snapshot_restore.html">Snapshot and Restore</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">UEFI Boot</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#building-uefi-firmware">Building UEFI Firmware</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#using-ovmf-binaries">Using OVMF Binaries</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="#links">Links</a></li>
+<li class="toctree-l1"><a class="reference internal" href="vfio.html">Cloud Hypervisor VFIO HOWTO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="vfio-user.html">Cloud Hypervisor VFIO-user HOWTO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="vhost-user-blk-testing.html">How to test vhost-user-blk with SPDK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="vhost-user-net-testing.html">How to test Vhost-user net with OpenVSwitch/DPDK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="virtiofs-root.html">HOWTO VirtioFS rootfs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="windows.html">Windows Support</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../README.html">Cloud Hypervisor</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../README.html" class="icon icon-home"></a> &raquo;</li>
+      <li>UEFI Boot</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/docs/uefi.md.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section class="tex2jax_ignore mathjax_ignore" id="uefi-boot">
+<h1>UEFI Boot<a class="headerlink" href="#uefi-boot" title="Permalink to this headline"></a></h1>
+<p>Cloud Hypervisor supports UEFI boot through the utilization of the EDK II based UEFI firmware.</p>
+<section id="building-uefi-firmware">
+<h2>Building UEFI Firmware<a class="headerlink" href="#building-uefi-firmware" title="Permalink to this headline"></a></h2>
+<p>To avoid any unnecessary issues, it is recommended to use Ubuntu 18.04 and its default toolset. Any other compatible Linux distribution is otherwise suitable, however it is suggested to use a temporary Docker container with Ubuntu 18.04 for a quick build on an existing Linux machine.</p>
+<p>The commands below will compile an OVMF firmware suitable for Cloud Hypervisor.</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>sudo apt-get update
+sudo apt-get install uuid-dev nasm iasl build-essential python3-distutils git
+
+git clone https://github.com/cloud-hypervisor/edk2 -b ch
+<span class="nb">cd</span> edk2
+. edksetup.sh
+git submodule update --init
+
+<span class="nb">echo</span> <span class="s2">&quot;ACTIVE_PLATFORM=OvmfPkg/CloudHv/CloudHvX64.dsc&quot;</span> &gt;&gt; Conf/target.txt
+<span class="nb">echo</span> <span class="s2">&quot;TARGET_ARCH=X64&quot;</span> &gt;&gt; Conf/target.txt
+<span class="nb">echo</span> <span class="s2">&quot;TOOL_CHAIN_TAG=GCC5&quot;</span> &gt;&gt; Conf/target.txt
+
+make -C ./BaseTools
+build
+</pre></div>
+</div>
+<p>After the successful build, the resulting firmware binaries are available under <code class="docutils literal notranslate"><span class="pre">Build/CloudHvX64/DEBUG_GCC5/FV</span></code> underneath the edk2 checkout.</p>
+</section>
+<section id="using-ovmf-binaries">
+<h2>Using OVMF Binaries<a class="headerlink" href="#using-ovmf-binaries" title="Permalink to this headline"></a></h2>
+<p>Any UEFI capable image can be booted using the Cloud Hypervisor specific firmware. Windows guests under Cloud Hypervisor only support UEFI boot, therefore OVMF is mandatory there.</p>
+<p>To make Cloud Hypervisor use UEFI boot, pass the <code class="docutils literal notranslate"><span class="pre">CLOUDHV.fd</span></code> file path as an argument to the <code class="docutils literal notranslate"><span class="pre">--kernel</span></code> option. The firmware file will be opened in read only mode.</p>
+</section>
+</section>
+<section class="tex2jax_ignore mathjax_ignore" id="links">
+<h1>Links<a class="headerlink" href="#links" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p><a class="reference external" href="https://github.com/tianocore/tianocore.github.io/wiki/OVMF">OVMF wiki</a></p></li>
+<li><p><a class="reference external" href="https://github.com/cloud-hypervisor/edk2/tree/ch">Cloud Hypervisor specific tree</a></p></li>
+</ul>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="snapshot_restore.html" class="btn btn-neutral float-left" title="Snapshot and Restore" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="vfio.html" class="btn btn-neutral float-right" title="Cloud Hypervisor VFIO HOWTO" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, various.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

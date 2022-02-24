@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Contributing to Cloud Hypervisor &mdash; Cloud Hypervisor  documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="README.html" class="icon icon-home"> Cloud Hypervisor
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="docs/api.html">Cloud Hypervisor API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="docs/arm64.html">How to build and test Cloud Hypervisor on AArch64</a></li>
+<li class="toctree-l1"><a class="reference internal" href="docs/cpu.html">CPU</a></li>
+<li class="toctree-l1"><a class="reference internal" href="docs/custom-image.html">How to create a custom Ubuntu image</a></li>
+<li class="toctree-l1"><a class="reference internal" href="docs/debug-port.html"><code class="docutils literal notranslate"><span class="pre">cloud-hypervisor</span></code> debug IO port</a></li>
+<li class="toctree-l1"><a class="reference internal" href="docs/device_model.html">Device Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="docs/fs.html">How to use virtio-fs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="docs/fuzzing.html">Fuzzing in Cloud Hypervisor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="docs/gdb.html">GDB Support</a></li>
+<li class="toctree-l1"><a class="reference internal" href="docs/hotplug.html">Cloud Hypervisor Hot Plug</a></li>
+<li class="toctree-l1"><a class="reference internal" href="docs/intel_sgx.html">Intel SGX</a></li>
+<li class="toctree-l1"><a class="reference internal" href="docs/intel_tdx.html">Intel TDX</a></li>
+<li class="toctree-l1"><a class="reference internal" href="docs/io_throttling.html">I/O Throttling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="docs/iommu.html">Virtual IOMMU</a></li>
+<li class="toctree-l1"><a class="reference internal" href="docs/live_migration.html">Live Migration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="docs/logging.html">Logging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="docs/macvtap-bridge.html">Using MACVTAP to Bridge onto Host Network</a></li>
+<li class="toctree-l1"><a class="reference internal" href="docs/memory.html">Memory</a></li>
+<li class="toctree-l1"><a class="reference internal" href="docs/profiling.html">Profiling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="docs/seccomp.html">Seccomp filtering</a></li>
+<li class="toctree-l1"><a class="reference internal" href="docs/snapshot_restore.html">Snapshot and Restore</a></li>
+<li class="toctree-l1"><a class="reference internal" href="docs/uefi.html">UEFI Boot</a></li>
+<li class="toctree-l1"><a class="reference internal" href="docs/uefi.html#links">Links</a></li>
+<li class="toctree-l1"><a class="reference internal" href="docs/vfio.html">Cloud Hypervisor VFIO HOWTO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="docs/vfio-user.html">Cloud Hypervisor VFIO-user HOWTO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="docs/vhost-user-blk-testing.html">How to test vhost-user-blk with SPDK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="docs/vhost-user-net-testing.html">How to test Vhost-user net with OpenVSwitch/DPDK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="docs/virtiofs-root.html">HOWTO VirtioFS rootfs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="docs/windows.html">Windows Support</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="README.html">Cloud Hypervisor</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="README.html" class="icon icon-home"></a> &raquo;</li>
+      <li>Contributing to Cloud Hypervisor</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/CONTRIBUTING.md.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section class="tex2jax_ignore mathjax_ignore" id="contributing-to-cloud-hypervisor">
+<h1>Contributing to Cloud Hypervisor<a class="headerlink" href="#contributing-to-cloud-hypervisor" title="Permalink to this headline"></a></h1>
+<p>Cloud Hypervisor is an open source project licensed under the <a class="reference external" href="https://opensource.org/licenses/Apache-2.0">Apache v2
+License</a> and the <a class="reference external" href="https://opensource.org/licenses/BSD-3-Clause">BSD 3
+Clause</a> license. Contributions
+can be made under either license or both. Individual files contain details of
+their licensing and changes to that file are under the same license unless the
+contribution changes the license of the file. When importing code from a third
+party project (e.g. Firecracker or CrosVM) please respect the license of those
+projects.</p>
+<section id="coding-style">
+<h2>Coding Style<a class="headerlink" href="#coding-style" title="Permalink to this headline"></a></h2>
+<p>We follow the <a class="reference external" href="https://github.com/rust-dev-tools/fmt-rfcs/blob/master/guide/guide.md">Rust Style</a>
+convention and enforce it through the Continuous Integration (CI) process calling into <code class="docutils literal notranslate"><span class="pre">rustfmt</span></code>
+for each submitted Pull Request (PR).</p>
+</section>
+<section id="certificate-of-origin">
+<h2>Certificate of Origin<a class="headerlink" href="#certificate-of-origin" title="Permalink to this headline"></a></h2>
+<p>In order to get a clear contribution chain of trust we use the <a class="reference external" href="https://01.org/community/signed-process">signed-off-by language</a>
+used by the Linux kernel project.</p>
+</section>
+<section id="patch-format">
+<h2>Patch format<a class="headerlink" href="#patch-format" title="Permalink to this headline"></a></h2>
+<p>Beside the signed-off-by footer, we expect each patch to comply with the following format:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">component</span><span class="o">&gt;</span><span class="p">:</span> <span class="n">Change</span> <span class="n">summary</span>
+
+<span class="n">More</span> <span class="n">detailed</span> <span class="n">explanation</span> <span class="n">of</span> <span class="n">your</span> <span class="n">changes</span><span class="p">:</span> <span class="n">Why</span> <span class="ow">and</span> <span class="n">how</span><span class="o">.</span>
+<span class="n">Wrap</span> <span class="n">it</span> <span class="n">to</span> <span class="mi">72</span> <span class="n">characters</span><span class="o">.</span>
+<span class="n">See</span> <span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="n">chris</span><span class="o">.</span><span class="n">beams</span><span class="o">.</span><span class="n">io</span><span class="o">/</span><span class="n">posts</span><span class="o">/</span><span class="n">git</span><span class="o">-</span><span class="n">commit</span><span class="o">/</span>
+<span class="k">for</span> <span class="n">some</span> <span class="n">more</span> <span class="n">good</span> <span class="n">pieces</span> <span class="n">of</span> <span class="n">advice</span><span class="o">.</span>
+
+<span class="n">Signed</span><span class="o">-</span><span class="n">off</span><span class="o">-</span><span class="n">by</span><span class="p">:</span> <span class="o">&lt;</span><span class="n">contributor</span><span class="nd">@foo</span><span class="o">.</span><span class="n">com</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+<p>For example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">vm</span><span class="o">-</span><span class="n">virtio</span><span class="p">:</span> <span class="n">Reset</span> <span class="n">underlying</span> <span class="n">device</span> <span class="n">on</span> <span class="n">driver</span> <span class="n">request</span>
+    
+<span class="n">If</span> <span class="n">the</span> <span class="n">driver</span> <span class="n">triggers</span> <span class="n">a</span> <span class="n">reset</span> <span class="n">by</span> <span class="n">writing</span> <span class="n">zero</span> <span class="n">into</span> <span class="n">the</span> <span class="n">status</span> <span class="n">register</span>
+<span class="n">then</span> <span class="n">reset</span> <span class="n">the</span> <span class="n">underlying</span> <span class="n">device</span> <span class="k">if</span> <span class="n">supported</span><span class="o">.</span> <span class="n">A</span> <span class="n">device</span> <span class="n">reset</span> <span class="n">also</span>
+<span class="n">requires</span> <span class="n">resetting</span> <span class="n">various</span> <span class="n">aspects</span> <span class="n">of</span> <span class="n">the</span> <span class="n">queue</span><span class="o">.</span>
+    
+<span class="n">In</span> <span class="n">order</span> <span class="n">to</span> <span class="n">be</span> <span class="n">able</span> <span class="n">to</span> <span class="n">do</span> <span class="n">a</span> <span class="n">subsequent</span> <span class="n">reactivate</span> <span class="n">it</span> <span class="ow">is</span> <span class="n">required</span> <span class="n">to</span>
+<span class="n">reclaim</span> <span class="n">certain</span> <span class="n">resources</span> <span class="p">(</span><span class="n">interrupt</span> <span class="ow">and</span> <span class="n">queue</span> <span class="n">EventFDs</span><span class="o">.</span><span class="p">)</span> <span class="n">If</span> <span class="n">a</span> <span class="n">device</span>
+<span class="n">reset</span> <span class="ow">is</span> <span class="n">requested</span> <span class="n">by</span> <span class="n">the</span> <span class="n">driver</span> <span class="n">but</span> <span class="n">the</span> <span class="n">underlying</span> <span class="n">device</span> <span class="n">does</span> <span class="ow">not</span>
+<span class="n">support</span> <span class="n">it</span> <span class="n">then</span> <span class="n">generate</span> <span class="n">an</span> <span class="n">error</span> <span class="k">as</span> <span class="n">the</span> <span class="n">driver</span> <span class="n">would</span> <span class="ow">not</span> <span class="n">be</span> <span class="n">able</span> <span class="n">to</span>
+<span class="n">configure</span> <span class="n">it</span> <span class="n">anyway</span><span class="o">.</span>
+    
+<span class="n">Signed</span><span class="o">-</span><span class="n">off</span><span class="o">-</span><span class="n">by</span><span class="p">:</span> <span class="n">Rob</span> <span class="n">Bradford</span> <span class="o">&lt;</span><span class="n">robert</span><span class="o">.</span><span class="n">bradford</span><span class="nd">@intel</span><span class="o">.</span><span class="n">com</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+</section>
+<section id="pull-requests">
+<h2>Pull requests<a class="headerlink" href="#pull-requests" title="Permalink to this headline"></a></h2>
+<p>Cloud Hypervisor uses the “fork-and-pull” development model. Follow these steps if
+you want to merge your changes to <code class="docutils literal notranslate"><span class="pre">cloud-hypervisor</span></code>:</p>
+<ol class="simple">
+<li><p>Fork the <a class="reference external" href="https://github.com/cloud-hypervisor/cloud-hypervisor">cloud-hypervisor</a> project
+into your github organization.</p></li>
+<li><p>Within your fork, create a branch for your contribution.</p></li>
+<li><p><a class="reference external" href="https://help.github.com/articles/creating-a-pull-request-from-a-fork/">Create a pull request</a>
+against the main branch of the Cloud Hypervisor repository.</p></li>
+<li><p>Add reviewers to your pull request and then work with your reviewers to address
+any comments and obtain minimum of 2 <a class="reference internal" href="MAINTAINERS.html"><span class="doc std std-doc">maintainers</span></a> approvals.
+To update your pull request amend existing commits whenever applicable and
+then push the new changes to your pull request branch.</p></li>
+<li><p>Once the pull request is approved, one of the maintainers will merge it.</p></li>
+</ol>
+</section>
+<section id="issue-tracking">
+<h2>Issue tracking<a class="headerlink" href="#issue-tracking" title="Permalink to this headline"></a></h2>
+<p>If you have a problem, please let us know. We recommend using
+<a class="reference external" href="https://github.com/cloud-hypervisor/cloud-hypervisor/issues/new">github issues</a> for formally
+reporting and documenting them.</p>
+<p>To quickly and informally bring something up to us, you can also reach out on <a class="reference external" href="https://cloud-hypervisor.slack.com">Slack</a>.</p>
+</section>
+<section id="closing-issues">
+<h2>Closing issues<a class="headerlink" href="#closing-issues" title="Permalink to this headline"></a></h2>
+<p>You can either close issues manually by adding the fixing commit SHA1 to the issue
+comments or by adding the <code class="docutils literal notranslate"><span class="pre">Fixes</span></code> keyword to your commit message:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">serial</span><span class="p">:</span> <span class="n">Set</span> <span class="n">terminal</span> <span class="ow">in</span> <span class="n">raw</span> <span class="n">mode</span>
+    
+<span class="n">In</span> <span class="n">order</span> <span class="n">to</span> <span class="n">have</span> <span class="n">proper</span> <span class="n">output</span> <span class="kn">from</span> <span class="nn">the</span> <span class="n">serial</span><span class="p">,</span> <span class="n">we</span> <span class="n">need</span> <span class="n">to</span> <span class="n">setup</span> <span class="n">the</span>
+<span class="n">terminal</span> <span class="ow">in</span> <span class="n">raw</span> <span class="n">mode</span><span class="o">.</span> <span class="n">When</span> <span class="n">the</span> <span class="n">VM</span> <span class="ow">is</span> <span class="n">shutting</span> <span class="n">down</span><span class="p">,</span> <span class="n">it</span> <span class="ow">is</span> <span class="n">also</span> <span class="n">the</span>
+<span class="n">VMM</span> <span class="n">responsibility</span> <span class="n">to</span> <span class="nb">set</span> <span class="n">the</span> <span class="n">terminal</span> <span class="n">back</span> <span class="n">into</span> <span class="n">canonical</span> <span class="n">mode</span> <span class="k">if</span> <span class="n">we</span>
+<span class="n">don</span><span class="s1">&#39;t want to get any weird behavior from the shell.</span>
+    
+<span class="n">Fixes</span> <span class="c1">#88</span>
+	
+<span class="n">Signed</span><span class="o">-</span><span class="n">off</span><span class="o">-</span><span class="n">by</span><span class="p">:</span> <span class="n">Sebastien</span> <span class="n">Boeuf</span> <span class="o">&lt;</span><span class="n">sebastien</span><span class="o">.</span><span class="n">boeuf</span><span class="nd">@intel</span><span class="o">.</span><span class="n">com</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+<p>Then, after the corresponding PR is merged, Github will automatically close that issue when parsing the
+<a class="reference external" href="https://help.github.com/articles/closing-issues-via-commit-messages/">commit message</a>.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, various.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

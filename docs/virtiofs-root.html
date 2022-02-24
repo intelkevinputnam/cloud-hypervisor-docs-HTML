@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HOWTO VirtioFS rootfs &mdash; Cloud Hypervisor  documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Windows Support" href="windows.html" />
+    <link rel="prev" title="How to test Vhost-user net with OpenVSwitch/DPDK" href="vhost-user-net-testing.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../README.html" class="icon icon-home"> Cloud Hypervisor
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="api.html">Cloud Hypervisor API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="arm64.html">How to build and test Cloud Hypervisor on AArch64</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cpu.html">CPU</a></li>
+<li class="toctree-l1"><a class="reference internal" href="custom-image.html">How to create a custom Ubuntu image</a></li>
+<li class="toctree-l1"><a class="reference internal" href="debug-port.html"><code class="docutils literal notranslate"><span class="pre">cloud-hypervisor</span></code> debug IO port</a></li>
+<li class="toctree-l1"><a class="reference internal" href="device_model.html">Device Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="fs.html">How to use virtio-fs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="fuzzing.html">Fuzzing in Cloud Hypervisor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gdb.html">GDB Support</a></li>
+<li class="toctree-l1"><a class="reference internal" href="hotplug.html">Cloud Hypervisor Hot Plug</a></li>
+<li class="toctree-l1"><a class="reference internal" href="intel_sgx.html">Intel SGX</a></li>
+<li class="toctree-l1"><a class="reference internal" href="intel_tdx.html">Intel TDX</a></li>
+<li class="toctree-l1"><a class="reference internal" href="io_throttling.html">I/O Throttling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="iommu.html">Virtual IOMMU</a></li>
+<li class="toctree-l1"><a class="reference internal" href="live_migration.html">Live Migration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="logging.html">Logging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="macvtap-bridge.html">Using MACVTAP to Bridge onto Host Network</a></li>
+<li class="toctree-l1"><a class="reference internal" href="memory.html">Memory</a></li>
+<li class="toctree-l1"><a class="reference internal" href="profiling.html">Profiling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="seccomp.html">Seccomp filtering</a></li>
+<li class="toctree-l1"><a class="reference internal" href="snapshot_restore.html">Snapshot and Restore</a></li>
+<li class="toctree-l1"><a class="reference internal" href="uefi.html">UEFI Boot</a></li>
+<li class="toctree-l1"><a class="reference internal" href="uefi.html#links">Links</a></li>
+<li class="toctree-l1"><a class="reference internal" href="vfio.html">Cloud Hypervisor VFIO HOWTO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="vfio-user.html">Cloud Hypervisor VFIO-user HOWTO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="vhost-user-blk-testing.html">How to test vhost-user-blk with SPDK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="vhost-user-net-testing.html">How to test Vhost-user net with OpenVSwitch/DPDK</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">HOWTO VirtioFS rootfs</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#prerequisites">Prerequisites</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#to-create-the-vm-rootfs">To create the VM rootfs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#to-run-the-vm">To run the VM</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#message-from-the-author">Message from the author</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="windows.html">Windows Support</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../README.html">Cloud Hypervisor</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../README.html" class="icon icon-home"></a> &raquo;</li>
+      <li>HOWTO VirtioFS rootfs</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/docs/virtiofs-root.md.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section class="tex2jax_ignore mathjax_ignore" id="howto-virtiofs-rootfs">
+<h1>HOWTO VirtioFS rootfs<a class="headerlink" href="#howto-virtiofs-rootfs" title="Permalink to this headline"></a></h1>
+<p>A quick guide for using virtiofs as a cloud-hypervisor guest’s rootfs (i.e.
+with no root block device). This document is a quick getting started guide.
+There are many more steps to take to make this a production ready, secure
+setup.</p>
+<section id="prerequisites">
+<h2>Prerequisites<a class="headerlink" href="#prerequisites" title="Permalink to this headline"></a></h2>
+<ol class="simple">
+<li><p>virtiofsd from the qemu project</p>
+<ul class="simple">
+<li><p>We are using the Qemu version for now</p></li>
+<li><p>There is a Rust version being worked on that may be a better option in the future</p></li>
+<li><p>Part of the qemu-system-common package on Ubuntu</p></li>
+<li><p>Part of the qemu-common package on Fedora</p></li>
+</ul>
+</li>
+<li><p>cloud-hypervisor - the newer the better, but I tested with 0.12</p></li>
+<li><p>a rootfs - This howto uses an alpine rootfs available here:</p>
+<ul class="simple">
+<li><p>https://dl-cdn.alpinelinux.org/alpine/v3.13/releases/x86_64/alpine-minirootfs-3.13.2-x86_64.tar.gz</p></li>
+<li><p>Others should work</p></li>
+</ul>
+</li>
+</ol>
+</section>
+<section id="to-create-the-vm-rootfs">
+<h2>To create the VM rootfs<a class="headerlink" href="#to-create-the-vm-rootfs" title="Permalink to this headline"></a></h2>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>mkdir rootfs/
+<span class="nb">cd</span> rootfs
+<span class="c1"># this needs sudo to be able to set root permissions on fs components</span>
+sudo tar -xf /path/to/alpine-minirootfs-3.13.1-x86_64.tar.gz
+<span class="c1"># this will get created when the VM actually boots by the dhcp client</span>
+<span class="c1"># but we need it in the chroot to download packages</span>
+sudo cp /etc/resolv.conf etc/
+<span class="c1"># the alpine mini rootfs is meant for docker containers, we need a few extra</span>
+<span class="c1"># things for a working rootfs</span>
+sudo chroot <span class="nv">$PWD</span> apk add openrc busybox-initscripts
+<span class="c1"># we are using the paravirt console in cloud-hypervisor, so enable it in init</span>
+<span class="c1"># append it after the other console since it doesn&#39;t work just appending it</span>
+sudo sed -i <span class="s1">&#39;/vt100/a \n# paravirt console\nhvc0::respawn:/sbin/getty -L hvc0 115200 vt100&#39;</span> etc/inittab
+<span class="c1"># set no password for root user... you obviously don&#39;t want to do this for</span>
+<span class="c1"># any sort of production setup</span>
+sudo sed -i <span class="s1">&#39;s/root:!::0:::::/root:::0:::::/&#39;</span> etc/shadow
+<span class="c1"># set up init scripts</span>
+<span class="k">for</span> i <span class="k">in</span> acpid crond
+    sudo ln -sf /etc/init.d/<span class="nv">$i</span> etc/runlevels/default/<span class="nv">$i</span>
+end
+<span class="k">for</span> i <span class="k">in</span> bootmisc hostname hwclock loadkmap modules networking swap sysctl syslog urandom
+    sudo ln -sf /etc/init.d/<span class="nv">$i</span> etc/runlevels/boot/<span class="nv">$i</span>
+end
+
+<span class="k">for</span> i <span class="k">in</span> killprocs mount-ro savecache
+    sudo ln -sf /etc/init.d/<span class="nv">$i</span> etc/runlevels/shutdown/<span class="nv">$i</span>
+end
+
+<span class="k">for</span> i <span class="k">in</span> devfs dmesg hwdrivers mdev
+    sudo ln -sf /etc/init.d/<span class="nv">$i</span> etc/runlevels/sysinit/<span class="nv">$i</span>
+end
+<span class="c1"># setup network config</span>
+<span class="nb">echo</span> <span class="s1">&#39;auto lo</span>
+<span class="s1">iface lo inet loopback</span>
+
+<span class="s1">auto eth0</span>
+<span class="s1">iface eth0 inet dhcp</span>
+<span class="s1">&#39;</span> <span class="p">|</span> sudo tee etc/network/interfaces
+</pre></div>
+</div>
+</section>
+<section id="to-run-the-vm">
+<h2>To run the VM<a class="headerlink" href="#to-run-the-vm" title="Permalink to this headline"></a></h2>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># starting in the directory above rootfs</span>
+sudo virtiofsd --socket-path<span class="o">=</span><span class="nv">$PWD</span>/virtiofs-rootfs.sock --shared-dir<span class="o">=</span><span class="nv">$PWD</span>/rootfs --cache<span class="o">=</span>never <span class="p">&amp;</span>
+sudo cloud-hypervisor <span class="se">\</span>
+    --cpus <span class="nv">boot</span><span class="o">=</span><span class="m">1</span>,max<span class="o">=</span><span class="m">1</span> <span class="se">\</span>
+    --kernel vmlinux <span class="se">\</span>
+    --fs <span class="nv">tag</span><span class="o">=</span>/dev/root,socket<span class="o">=</span><span class="nv">$PWD</span>/virtiofs-rootfs.sock <span class="se">\</span>
+    --memory <span class="nv">size</span><span class="o">=</span>2G,shared<span class="o">=</span>on <span class="se">\</span>
+    --cmdline <span class="s2">&quot;console=hvc0 rootfstype=virtiofs root=/dev/root ro debug&quot;</span> <span class="se">\</span>
+    --api-socket <span class="nv">$PWD</span>/ch.sock <span class="se">\</span>
+    --rng <span class="se">\</span>
+    --net ...
+</pre></div>
+</div>
+<p>Note: an important part of the above is the <code class="docutils literal notranslate"><span class="pre">tag=/dev/root</span></code> and
+<code class="docutils literal notranslate"><span class="pre">root=/dev/root</span></code> parts. For whatever reason, it would only work with that as
+the tag.</p>
+<p>Note: another important bit is that the memory is shared. This is required for
+virtiofs</p>
+</section>
+<section id="message-from-the-author">
+<h2>Message from the author<a class="headerlink" href="#message-from-the-author" title="Permalink to this headline"></a></h2>
+<p>If you find any issues or have suggestions, feel free to reach out to &#64;iggy on
+the cloud-hypervisor slack. Also if this works for you, I’d like to know as
+well. It would also be nice to get steps for preparing other distribution root
+filesystems.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="vhost-user-net-testing.html" class="btn btn-neutral float-left" title="How to test Vhost-user net with OpenVSwitch/DPDK" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="windows.html" class="btn btn-neutral float-right" title="Windows Support" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, various.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

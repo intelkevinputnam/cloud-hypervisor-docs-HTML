@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Virtual IOMMU &mdash; Cloud Hypervisor  documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Live Migration" href="live_migration.html" />
+    <link rel="prev" title="I/O Throttling" href="io_throttling.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../README.html" class="icon icon-home"> Cloud Hypervisor
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="api.html">Cloud Hypervisor API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="arm64.html">How to build and test Cloud Hypervisor on AArch64</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cpu.html">CPU</a></li>
+<li class="toctree-l1"><a class="reference internal" href="custom-image.html">How to create a custom Ubuntu image</a></li>
+<li class="toctree-l1"><a class="reference internal" href="debug-port.html"><code class="docutils literal notranslate"><span class="pre">cloud-hypervisor</span></code> debug IO port</a></li>
+<li class="toctree-l1"><a class="reference internal" href="device_model.html">Device Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="fs.html">How to use virtio-fs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="fuzzing.html">Fuzzing in Cloud Hypervisor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gdb.html">GDB Support</a></li>
+<li class="toctree-l1"><a class="reference internal" href="hotplug.html">Cloud Hypervisor Hot Plug</a></li>
+<li class="toctree-l1"><a class="reference internal" href="intel_sgx.html">Intel SGX</a></li>
+<li class="toctree-l1"><a class="reference internal" href="intel_tdx.html">Intel TDX</a></li>
+<li class="toctree-l1"><a class="reference internal" href="io_throttling.html">I/O Throttling</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Virtual IOMMU</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#rationales">Rationales</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#protect-nested-virtual-machines">Protect nested virtual machines</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#achieve-vfio-nested">Achieve VFIO nested</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#why-virtio-iommu">Why virtio-iommu?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#pre-requisites">Pre-requisites</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#kernel">Kernel</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#usage">Usage</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#work-with-fdt-on-aarch64">Work with FDT on AArch64</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#faster-mappings">Faster mappings</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#basic-usage">Basic usage</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#nested-usage">Nested usage</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="live_migration.html">Live Migration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="logging.html">Logging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="macvtap-bridge.html">Using MACVTAP to Bridge onto Host Network</a></li>
+<li class="toctree-l1"><a class="reference internal" href="memory.html">Memory</a></li>
+<li class="toctree-l1"><a class="reference internal" href="profiling.html">Profiling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="seccomp.html">Seccomp filtering</a></li>
+<li class="toctree-l1"><a class="reference internal" href="snapshot_restore.html">Snapshot and Restore</a></li>
+<li class="toctree-l1"><a class="reference internal" href="uefi.html">UEFI Boot</a></li>
+<li class="toctree-l1"><a class="reference internal" href="uefi.html#links">Links</a></li>
+<li class="toctree-l1"><a class="reference internal" href="vfio.html">Cloud Hypervisor VFIO HOWTO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="vfio-user.html">Cloud Hypervisor VFIO-user HOWTO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="vhost-user-blk-testing.html">How to test vhost-user-blk with SPDK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="vhost-user-net-testing.html">How to test Vhost-user net with OpenVSwitch/DPDK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="virtiofs-root.html">HOWTO VirtioFS rootfs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="windows.html">Windows Support</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../README.html">Cloud Hypervisor</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../README.html" class="icon icon-home"></a> &raquo;</li>
+      <li>Virtual IOMMU</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/docs/iommu.md.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section class="tex2jax_ignore mathjax_ignore" id="virtual-iommu">
+<h1>Virtual IOMMU<a class="headerlink" href="#virtual-iommu" title="Permalink to this headline"></a></h1>
+<section id="rationales">
+<h2>Rationales<a class="headerlink" href="#rationales" title="Permalink to this headline"></a></h2>
+<p>Having the possibility to expose a virtual IOMMU to the guest can be
+interesting to support specific use cases. That being said, it is always
+important to keep in mind a virtual IOMMU can impact the performance of the
+attached devices, which is the reason why one should be careful when enabling
+this feature.</p>
+<section id="protect-nested-virtual-machines">
+<h3>Protect nested virtual machines<a class="headerlink" href="#protect-nested-virtual-machines" title="Permalink to this headline"></a></h3>
+<p>The first reason why one might want to expose a virtual IOMMU to the guest is
+to increase the security regarding the memory accesses performed by the virtual
+devices (VIRTIO devices), on behalf of the guest drivers.</p>
+<p>With a virtual IOMMU, the VMM stands between the guest driver and its device
+counterpart, validating and translating every address before to try accessing
+the guest memory. This is standard interposition that is performed here by the
+VMM.</p>
+<p>The increased security does not apply for a simple case where we have one VM
+per VMM. Because the guest cannot be trusted, as we always consider it could
+be malicious and gain unauthorized privileges inside the VM, preventing some
+devices from accessing the entire guest memory is pointless.</p>
+<p>But let’s take the interesting case of nested virtualization, and let’s assume
+we have a VMM running a first layer VM. This L1 guest is fully trusted as the
+user intends to run multiple VMs from this L1. We can end up with multiple L2
+VMs running on a single L1 VM. In this particular case, and without exposing a
+virtual IOMMU to the L1 guest, it would be possible for any L2 guest to use the
+device implementation from the host VMM to access the entire guest L1 memory.
+The virtual IOMMU prevents from this kind of trouble as it will validate the
+addresses the device is authorized to access.</p>
+</section>
+<section id="achieve-vfio-nested">
+<h3>Achieve VFIO nested<a class="headerlink" href="#achieve-vfio-nested" title="Permalink to this headline"></a></h3>
+<p>Another reason for having a virtual IOMMU is to allow passing physical devices
+from the host through multiple layers of virtualization. Let’s take as example
+a system with a physical IOMMU running a VM with a virtual IOMMU. The
+implementation of the virtual IOMMU is responsible for updating the physical
+DMA Remapping table (DMAR) everytime the DMA mapping changes. This must happen
+through the VFIO framework on the host as this is the only userspace interface
+to interact with a physical IOMMU.</p>
+<p>Relying on this update mechanism, it is possible to attach physical devices to
+the virtual IOMMU, which allows these devices to be passed from L1 to another
+layer of virtualization.</p>
+</section>
+</section>
+<section id="why-virtio-iommu">
+<h2>Why virtio-iommu?<a class="headerlink" href="#why-virtio-iommu" title="Permalink to this headline"></a></h2>
+<p>The Cloud Hypervisor project decided to implement the brand new virtio-iommu
+device in order to provide a virtual IOMMU to its users. The reason being the
+simplicity brought by the paravirtualization solution. By having one side
+handled from the guest itself, it removes the complexity of trapping memory
+page accesses and shadowing them. This is why the project will not try to
+implement a full emulation of a physical IOMMU.</p>
+</section>
+<section id="pre-requisites">
+<h2>Pre-requisites<a class="headerlink" href="#pre-requisites" title="Permalink to this headline"></a></h2>
+<section id="kernel">
+<h3>Kernel<a class="headerlink" href="#kernel" title="Permalink to this headline"></a></h3>
+<p>Since virtio-iommu has landed partially into the version 5.3 of the Linux
+kernel, a special branch is needed to get things working with Cloud Hypervisor.
+By partially, we are talking about x86 specifically, as it is already fully
+functional for ARM architectures.</p>
+</section>
+</section>
+<section id="usage">
+<h2>Usage<a class="headerlink" href="#usage" title="Permalink to this headline"></a></h2>
+<p>In order to expose a virtual IOMMU to the guest, it is required to create a
+virtio-iommu device and expose it through the ACPI IORT table. This can be
+simply achieved by attaching at least one device to the virtual IOMMU.</p>
+<p>The way to expose to the guest a specific device as sitting behind this IOMMU
+is to explicitly tag it from the command line with the option <code class="docutils literal notranslate"><span class="pre">iommu=on</span></code>.</p>
+<p>Not all devices support this extra option, and the default value will always
+be <code class="docutils literal notranslate"><span class="pre">off</span></code> since we want to avoid the performance impact for most users who don’t
+need this.</p>
+<p>Refer to the command line <code class="docutils literal notranslate"><span class="pre">--help</span></code> to find out which device support to be
+attached to the virtual IOMMU.</p>
+<p>Below is a simple example exposing the <code class="docutils literal notranslate"><span class="pre">virtio-blk</span></code> device as attached to the
+virtual IOMMU:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>./cloud-hypervisor <span class="se">\</span>
+    --cpus <span class="nv">boot</span><span class="o">=</span><span class="m">1</span> <span class="se">\</span>
+    --memory <span class="nv">size</span><span class="o">=</span>512M <span class="se">\</span>
+    --disk <span class="nv">path</span><span class="o">=</span>focal-server-cloudimg-amd64.raw,iommu<span class="o">=</span>on <span class="se">\</span>
+    --kernel custom-vmlinux <span class="se">\</span>
+    --cmdline <span class="s2">&quot;console=ttyS0 console=hvc0 root=/dev/vda1 rw&quot;</span> <span class="se">\</span>
+</pre></div>
+</div>
+<p>From a guest perspective, it is easy to verify if the device is protected by
+the virtual IOMMU. Check the directories listed under
+<code class="docutils literal notranslate"><span class="pre">/sys/kernel/iommu_groups</span></code>:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ls /sys/kernel/iommu_groups
+<span class="m">0</span>
+</pre></div>
+</div>
+<p>In this case, only one IOMMU group should be created. Under this group, it is
+possible to find out the b/d/f of the device(s) part of this group.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ls /sys/kernel/iommu_groups/0/devices/
+<span class="m">0000</span>:00:03.0
+</pre></div>
+</div>
+<p>And you can validate the device is the one we expect running <code class="docutils literal notranslate"><span class="pre">lspci</span></code>:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>lspci
+<span class="m">00</span>:00.0 Host bridge: Intel Corporation Device 0d57
+<span class="m">00</span>:01.0 Unassigned class <span class="o">[</span>ffff<span class="o">]</span>: Red Hat, Inc. Device <span class="m">1057</span>
+<span class="m">00</span>:02.0 Unassigned class <span class="o">[</span>ffff<span class="o">]</span>: Red Hat, Inc. Virtio console
+<span class="m">00</span>:03.0 Mass storage controller: Red Hat, Inc. Virtio block device
+<span class="m">00</span>:04.0 Unassigned class <span class="o">[</span>ffff<span class="o">]</span>: Red Hat, Inc. Virtio RNG
+</pre></div>
+</div>
+<section id="work-with-fdt-on-aarch64">
+<h3>Work with FDT on AArch64<a class="headerlink" href="#work-with-fdt-on-aarch64" title="Permalink to this headline"></a></h3>
+<p>On AArch64 architecture, the virtual IOMMU can still be used even if ACPI is not
+enabled. But the effect is different with what the aforementioned test showed.</p>
+<p>When ACPI is disabled, virtual IOMMU is supported through Flattened Device Tree
+(FDT). In this case, the guest kernel can not tell which device should be
+IOMMU-attached and which should not. No matter how many devices you attached to
+the virtual IOMMU by setting <code class="docutils literal notranslate"><span class="pre">iommu=on</span></code> option, all the devices on the PCI bus
+will be attached to the virtual IOMMU (except the IOMMU itself). Each of the
+devices will be added into a IOMMU group.</p>
+<p>As a result, the directory content of <code class="docutils literal notranslate"><span class="pre">/sys/kernel/iommu_groups</span></code> would be:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ls /sys/kernel/iommu_groups/0/devices/
+<span class="m">0000</span>:00:02.0
+ls /sys/kernel/iommu_groups/1/devices/
+<span class="m">0000</span>:00:03.0
+ls /sys/kernel/iommu_groups/2/devices/
+<span class="m">0000</span>:00:04.0
+</pre></div>
+</div>
+</section>
+</section>
+<section id="faster-mappings">
+<h2>Faster mappings<a class="headerlink" href="#faster-mappings" title="Permalink to this headline"></a></h2>
+<p>By default, the guest memory is mapped with 4k pages and no huge pages, which
+causes the virtual IOMMU device to be asked for 4k mappings only. This
+configuration slows down the setup of the physical IOMMU as an important number
+of requests need to be issued in order to create large mappings.</p>
+<p>One use case is even more impacted by the slowdown, the nested VFIO case. When
+passing a device through a L2 guest, the VFIO driver running in L1 will update
+the DMAR entries for the specific device. Because VFIO pins the entire guest
+memory, this means the entire mapping of the L2 guest need to be stored into
+multiple 4k mappings. Obviously, the bigger the L2 guest RAM is, the longer the
+update of the mappings will last. There is an additional problem happening in
+this case, if the L2 guest RAM is quite large, it will require a large number
+of mappings, which might exceed the VFIO limit set on the host. The default
+value is 65536, which can simply be reached with a 256MiB sized RAM.</p>
+<p>The way to solve both problems, the slowdown and the limit being exceeded, is
+to reduce the amount of requests to describe those same large mappings. This
+can be achieved by using 2MiB pages, known as huge pages. By seeing the guest
+RAM as larger pages, and because the virtual IOMMU device supports it, the
+guest will require less mappings, which will prevent the limit from being
+exceeded, but also will take less time to process them on the host. That’s
+how using huge pages as much as possible can speed up VM boot time.</p>
+<section id="basic-usage">
+<h3>Basic usage<a class="headerlink" href="#basic-usage" title="Permalink to this headline"></a></h3>
+<p>Let’s look at an example of how to run a guest with huge pages.</p>
+<p>First, make sure your system has enough pages to cover the entire guest RAM:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># This example creates 4096 hugepages</span>
+<span class="nb">echo</span> <span class="m">4096</span> &gt; /proc/sys/vm/nr_hugepages
+</pre></div>
+</div>
+<p>Next step is simply to create the VM. Two things are important, first we want
+the VM RAM to be mapped on huge pages by backing it with <code class="docutils literal notranslate"><span class="pre">/dev/hugepages</span></code>. And
+second thing, we need to create some huge pages in the guest itself so they can
+be consumed.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>./cloud-hypervisor <span class="se">\</span>
+    --cpus <span class="nv">boot</span><span class="o">=</span><span class="m">1</span> <span class="se">\</span>
+    --memory <span class="nv">size</span><span class="o">=</span>8G,hugepages<span class="o">=</span>on <span class="se">\</span>
+    --disk <span class="nv">path</span><span class="o">=</span>focal-server-cloudimg-amd64.raw <span class="se">\</span>
+    --kernel custom-vmlinux <span class="se">\</span>
+    --cmdline <span class="s2">&quot;console=ttyS0 console=hvc0 root=/dev/vda1 rw hugepagesz=2M hugepages=2048&quot;</span> <span class="se">\</span>
+    --net <span class="nv">tap</span><span class="o">=</span>,mac<span class="o">=</span>,iommu<span class="o">=</span>on
+</pre></div>
+</div>
+</section>
+<section id="nested-usage">
+<h3>Nested usage<a class="headerlink" href="#nested-usage" title="Permalink to this headline"></a></h3>
+<p>Let’s now look at the specific example of nested virtualization. In order to
+reach optimized performances, the L2 guest also need to be mapped based on
+huge pages. Here is how to achieve this, assuming the physical device you are
+passing through is <code class="docutils literal notranslate"><span class="pre">0000:00:01.0</span></code>.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>./cloud-hypervisor <span class="se">\</span>
+    --cpus <span class="nv">boot</span><span class="o">=</span><span class="m">1</span> <span class="se">\</span>
+    --memory <span class="nv">size</span><span class="o">=</span>8G,hugepages<span class="o">=</span>on <span class="se">\</span>
+    --disk <span class="nv">path</span><span class="o">=</span>focal-server-cloudimg-amd64.raw <span class="se">\</span>
+    --kernel custom-vmlinux <span class="se">\</span>
+    --cmdline <span class="s2">&quot;console=ttyS0 console=hvc0 root=/dev/vda1 rw kvm-intel.nested=1 vfio_iommu_type1.allow_unsafe_interrupts rw hugepagesz=2M hugepages=2048&quot;</span> <span class="se">\</span>
+    --device <span class="nv">path</span><span class="o">=</span>/sys/bus/pci/devices/0000:00:01.0,iommu<span class="o">=</span>on
+</pre></div>
+</div>
+<p>Once the L1 VM is running, unbind the device from the default driver in the
+guest, and bind it to VFIO (it should appear as <code class="docutils literal notranslate"><span class="pre">0000:00:04.0</span></code>).</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">echo</span> <span class="m">0000</span>:00:04.0 &gt; /sys/bus/pci/devices/0000<span class="se">\:</span><span class="m">00</span><span class="se">\:</span><span class="m">04</span>.0/driver/unbind
+<span class="nb">echo</span> <span class="m">8086</span> <span class="m">1502</span> &gt; /sys/bus/pci/drivers/vfio-pci/new_id
+<span class="nb">echo</span> <span class="m">0000</span>:00:04.0 &gt; /sys/bus/pci/drivers/vfio-pci/bind
+</pre></div>
+</div>
+<p>Last thing is to start the L2 guest with the huge pages memory backend.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>./cloud-hypervisor <span class="se">\</span>
+    --cpus <span class="nv">boot</span><span class="o">=</span><span class="m">1</span> <span class="se">\</span>
+    --memory <span class="nv">size</span><span class="o">=</span>4G,hugepages<span class="o">=</span>on <span class="se">\</span>
+    --disk <span class="nv">path</span><span class="o">=</span>focal-server-cloudimg-amd64.raw <span class="se">\</span>
+    --kernel custom-vmlinux <span class="se">\</span>
+    --cmdline <span class="s2">&quot;console=ttyS0 console=hvc0 root=/dev/vda1 rw&quot;</span> <span class="se">\</span>
+    --device <span class="nv">path</span><span class="o">=</span>/sys/bus/pci/devices/0000:00:04.0
+</pre></div>
+</div>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="io_throttling.html" class="btn btn-neutral float-left" title="I/O Throttling" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="live_migration.html" class="btn btn-neutral float-right" title="Live Migration" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, various.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

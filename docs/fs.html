@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>How to use virtio-fs &mdash; Cloud Hypervisor  documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Fuzzing in Cloud Hypervisor" href="fuzzing.html" />
+    <link rel="prev" title="Device Model" href="device_model.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../README.html" class="icon icon-home"> Cloud Hypervisor
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="api.html">Cloud Hypervisor API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="arm64.html">How to build and test Cloud Hypervisor on AArch64</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cpu.html">CPU</a></li>
+<li class="toctree-l1"><a class="reference internal" href="custom-image.html">How to create a custom Ubuntu image</a></li>
+<li class="toctree-l1"><a class="reference internal" href="debug-port.html"><code class="docutils literal notranslate"><span class="pre">cloud-hypervisor</span></code> debug IO port</a></li>
+<li class="toctree-l1"><a class="reference internal" href="device_model.html">Device Model</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">How to use virtio-fs</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#pre-requisites">Pre-requisites</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#the-daemon">The daemon</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#kernel-support">Kernel support</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#how-to-share-directories-with-cloud-hypervisor">How to share directories with cloud-hypervisor</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#start-the-vm">Start the VM</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#mount-the-shared-directory">Mount the shared directory</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="fuzzing.html">Fuzzing in Cloud Hypervisor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gdb.html">GDB Support</a></li>
+<li class="toctree-l1"><a class="reference internal" href="hotplug.html">Cloud Hypervisor Hot Plug</a></li>
+<li class="toctree-l1"><a class="reference internal" href="intel_sgx.html">Intel SGX</a></li>
+<li class="toctree-l1"><a class="reference internal" href="intel_tdx.html">Intel TDX</a></li>
+<li class="toctree-l1"><a class="reference internal" href="io_throttling.html">I/O Throttling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="iommu.html">Virtual IOMMU</a></li>
+<li class="toctree-l1"><a class="reference internal" href="live_migration.html">Live Migration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="logging.html">Logging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="macvtap-bridge.html">Using MACVTAP to Bridge onto Host Network</a></li>
+<li class="toctree-l1"><a class="reference internal" href="memory.html">Memory</a></li>
+<li class="toctree-l1"><a class="reference internal" href="profiling.html">Profiling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="seccomp.html">Seccomp filtering</a></li>
+<li class="toctree-l1"><a class="reference internal" href="snapshot_restore.html">Snapshot and Restore</a></li>
+<li class="toctree-l1"><a class="reference internal" href="uefi.html">UEFI Boot</a></li>
+<li class="toctree-l1"><a class="reference internal" href="uefi.html#links">Links</a></li>
+<li class="toctree-l1"><a class="reference internal" href="vfio.html">Cloud Hypervisor VFIO HOWTO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="vfio-user.html">Cloud Hypervisor VFIO-user HOWTO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="vhost-user-blk-testing.html">How to test vhost-user-blk with SPDK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="vhost-user-net-testing.html">How to test Vhost-user net with OpenVSwitch/DPDK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="virtiofs-root.html">HOWTO VirtioFS rootfs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="windows.html">Windows Support</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../README.html">Cloud Hypervisor</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../README.html" class="icon icon-home"></a> &raquo;</li>
+      <li>How to use virtio-fs</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/docs/fs.md.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section class="tex2jax_ignore mathjax_ignore" id="how-to-use-virtio-fs">
+<h1>How to use virtio-fs<a class="headerlink" href="#how-to-use-virtio-fs" title="Permalink to this headline"></a></h1>
+<p>In the context of virtualization, it is always convenient to be able to share a directory from the host with the guest.</p>
+<p><strong>virtio-fs</strong>, also known as <strong>vhost-user-fs</strong> is a virtual device defined by the VIRTIO specification which allows any VMM to perform filesystem sharing.</p>
+<section id="pre-requisites">
+<h2>Pre-requisites<a class="headerlink" href="#pre-requisites" title="Permalink to this headline"></a></h2>
+<section id="the-daemon">
+<h3>The daemon<a class="headerlink" href="#the-daemon" title="Permalink to this headline"></a></h3>
+<p>This virtual device relies on the <em>vhost-user</em> protocol, which assumes the backend (device emulation) is handled by a dedicated process running on the host. This daemon is called <strong>virtiofsd</strong> and needs to be present on the host.</p>
+<p><em>Build virtiofsd</em></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git clone https://gitlab.com/virtio-fs/virtiofsd
+<span class="nb">pushd</span> virtiofsd
+cargo build --release
+sudo setcap cap_sys_admin+epi target/release/virtiofsd
+</pre></div>
+</div>
+<p><em>Create shared directory</em></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>mkdir /tmp/shared_dir
+</pre></div>
+</div>
+<p><em>Run virtiofsd</em></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>./virtiofsd <span class="se">\</span>
+    -d <span class="se">\</span>
+    --socket-path<span class="o">=</span>/tmp/virtiofs <span class="se">\</span>
+    --shared-dir<span class="o">=</span>/tmp/shared_dir <span class="se">\</span>
+    --cache<span class="o">=</span>never
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">cache=never</span></code> option should be the default when using <code class="docutils literal notranslate"><span class="pre">virtiofsd</span></code> with the <strong>cloud-hypervisor</strong> VMM. This prevents from using the guest page cache, which reduces the memory footprint of the guest. When running multiple virtual machines on the same host, this will let the host deal with page cache, which will increase the density of virtual machines which can be launched.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">cache=always</span></code> option will allow for the guest page cache to be used, which will increase the memory footprint of the guest. This option should be used only for specific use cases where a single VM is going to be running on a host.</p>
+</section>
+<section id="kernel-support">
+<h3>Kernel support<a class="headerlink" href="#kernel-support" title="Permalink to this headline"></a></h3>
+<p>Modern Linux kernels starting (at least v5.10) have support for virtio-fs. Use
+of older kernels, with additional patches, are not supported.</p>
+</section>
+</section>
+<section id="how-to-share-directories-with-cloud-hypervisor">
+<h2>How to share directories with cloud-hypervisor<a class="headerlink" href="#how-to-share-directories-with-cloud-hypervisor" title="Permalink to this headline"></a></h2>
+<section id="start-the-vm">
+<h3>Start the VM<a class="headerlink" href="#start-the-vm" title="Permalink to this headline"></a></h3>
+<p>Once the daemon is running, the option <code class="docutils literal notranslate"><span class="pre">--fs</span></code> from <strong>cloud-hypervisor</strong> needs to be used.</p>
+<p>Direct kernel boot is the preferred option, but we can boot from an EFI cloud image if it contains a recent enough kernel.</p>
+<p>Because <em>vhost-user</em> expects a dedicated process (<strong>virtiofsd</strong> in this case) to be able to access the guest RAM to communicate through the <em>virtqueues</em> with the driver running in the guest, <code class="docutils literal notranslate"><span class="pre">--memory</span></code> option needs to be slightly modified. It must specify <code class="docutils literal notranslate"><span class="pre">shared=on</span></code> to share the memory pages so that an external process can access them.</p>
+<p>Assuming you have <code class="docutils literal notranslate"><span class="pre">focal-server-cloudimg-amd64.raw</span></code> and <code class="docutils literal notranslate"><span class="pre">vmlinux</span></code> on your system, here is the <strong>cloud-hypervisor</strong> command you need to run:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>./cloud-hypervisor <span class="se">\</span>
+    --cpus <span class="nv">boot</span><span class="o">=</span><span class="m">1</span> <span class="se">\</span>
+    --memory <span class="nv">size</span><span class="o">=</span>1G,shared<span class="o">=</span>on <span class="se">\</span>
+    --disk <span class="nv">path</span><span class="o">=</span>focal-server-cloudimg-amd64.raw <span class="se">\</span>
+    --kernel vmlinux <span class="se">\</span>
+    --cmdline <span class="s2">&quot;console=hvc0 root=/dev/vda1 rw&quot;</span> <span class="se">\</span>
+    --fs <span class="nv">tag</span><span class="o">=</span>myfs,socket<span class="o">=</span>/tmp/virtiofs,num_queues<span class="o">=</span><span class="m">1</span>,queue_size<span class="o">=</span><span class="m">512</span>
+</pre></div>
+</div>
+<p>By default, DAX is enabled with a cache window of 8GiB. You can specify a custom size (let’s say 4GiB for this example) for the cache by explicitly setting DAX and the cache size:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>--fs <span class="nv">tag</span><span class="o">=</span>myfs,socket<span class="o">=</span>/tmp/virtiofs,num_queues<span class="o">=</span><span class="m">1</span>,queue_size<span class="o">=</span><span class="m">512</span>,dax<span class="o">=</span>on,cache_size<span class="o">=</span>4G
+</pre></div>
+</div>
+<p>In case you don’t want to use a shared window of cache to pass the shared files content, this means you will have to explicitly disable DAX with <code class="docutils literal notranslate"><span class="pre">dax=off</span></code>. Note that in this case, the <code class="docutils literal notranslate"><span class="pre">cache_size</span></code> parameter will be ignored.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>--fs <span class="nv">tag</span><span class="o">=</span>myfs,socket<span class="o">=</span>/tmp/virtiofs,num_queues<span class="o">=</span><span class="m">1</span>,queue_size<span class="o">=</span><span class="m">512</span>,dax<span class="o">=</span>off
+</pre></div>
+</div>
+</section>
+<section id="mount-the-shared-directory">
+<h3>Mount the shared directory<a class="headerlink" href="#mount-the-shared-directory" title="Permalink to this headline"></a></h3>
+<p>The last step is to mount the shared directory inside the guest, using the <code class="docutils literal notranslate"><span class="pre">virtiofs</span></code> filesystem type.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>mkdir mount_dir
+mount -t virtiofs -o dax myfs mount_dir/
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">tag</span></code> needs to be consistent with what has been provided through the <strong>cloud-hypervisor</strong> command line, which happens to be <code class="docutils literal notranslate"><span class="pre">myfs</span></code> in this example.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">-o</span> <span class="pre">dax</span></code> option must be removed in case the shared cache region is not enabled from the VMM.</p>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="device_model.html" class="btn btn-neutral float-left" title="Device Model" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="fuzzing.html" class="btn btn-neutral float-right" title="Fuzzing in Cloud Hypervisor" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, various.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cloud Hypervisor VFIO HOWTO &mdash; Cloud Hypervisor  documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Cloud Hypervisor VFIO-user HOWTO" href="vfio-user.html" />
+    <link rel="prev" title="UEFI Boot" href="uefi.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../README.html" class="icon icon-home"> Cloud Hypervisor
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="api.html">Cloud Hypervisor API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="arm64.html">How to build and test Cloud Hypervisor on AArch64</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cpu.html">CPU</a></li>
+<li class="toctree-l1"><a class="reference internal" href="custom-image.html">How to create a custom Ubuntu image</a></li>
+<li class="toctree-l1"><a class="reference internal" href="debug-port.html"><code class="docutils literal notranslate"><span class="pre">cloud-hypervisor</span></code> debug IO port</a></li>
+<li class="toctree-l1"><a class="reference internal" href="device_model.html">Device Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="fs.html">How to use virtio-fs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="fuzzing.html">Fuzzing in Cloud Hypervisor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gdb.html">GDB Support</a></li>
+<li class="toctree-l1"><a class="reference internal" href="hotplug.html">Cloud Hypervisor Hot Plug</a></li>
+<li class="toctree-l1"><a class="reference internal" href="intel_sgx.html">Intel SGX</a></li>
+<li class="toctree-l1"><a class="reference internal" href="intel_tdx.html">Intel TDX</a></li>
+<li class="toctree-l1"><a class="reference internal" href="io_throttling.html">I/O Throttling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="iommu.html">Virtual IOMMU</a></li>
+<li class="toctree-l1"><a class="reference internal" href="live_migration.html">Live Migration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="logging.html">Logging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="macvtap-bridge.html">Using MACVTAP to Bridge onto Host Network</a></li>
+<li class="toctree-l1"><a class="reference internal" href="memory.html">Memory</a></li>
+<li class="toctree-l1"><a class="reference internal" href="profiling.html">Profiling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="seccomp.html">Seccomp filtering</a></li>
+<li class="toctree-l1"><a class="reference internal" href="snapshot_restore.html">Snapshot and Restore</a></li>
+<li class="toctree-l1"><a class="reference internal" href="uefi.html">UEFI Boot</a></li>
+<li class="toctree-l1"><a class="reference internal" href="uefi.html#links">Links</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Cloud Hypervisor VFIO HOWTO</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#direct-device-assignment-with-cloud-hypervisor">Direct Device Assignment with Cloud Hypervisor</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#example">Example</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#multiple-devices-in-the-same-iommu-group">Multiple devices in the same IOMMU group</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="vfio-user.html">Cloud Hypervisor VFIO-user HOWTO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="vhost-user-blk-testing.html">How to test vhost-user-blk with SPDK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="vhost-user-net-testing.html">How to test Vhost-user net with OpenVSwitch/DPDK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="virtiofs-root.html">HOWTO VirtioFS rootfs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="windows.html">Windows Support</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../README.html">Cloud Hypervisor</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../README.html" class="icon icon-home"></a> &raquo;</li>
+      <li>Cloud Hypervisor VFIO HOWTO</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/docs/vfio.md.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section class="tex2jax_ignore mathjax_ignore" id="cloud-hypervisor-vfio-howto">
+<h1>Cloud Hypervisor VFIO HOWTO<a class="headerlink" href="#cloud-hypervisor-vfio-howto" title="Permalink to this headline"></a></h1>
+<p>VFIO (Virtual Function I/O) is a kernel framework that exposes direct device
+access to userspace. <code class="docutils literal notranslate"><span class="pre">cloud-hypervisor</span></code>, as many VMMs do, uses the VFIO
+framework to directly assign host physical devices to the guest workloads.</p>
+<section id="direct-device-assignment-with-cloud-hypervisor">
+<h2>Direct Device Assignment with Cloud Hypervisor<a class="headerlink" href="#direct-device-assignment-with-cloud-hypervisor" title="Permalink to this headline"></a></h2>
+<p>To assign a device to a <code class="docutils literal notranslate"><span class="pre">cloud-hypervisor</span></code> guest, the device needs to be managed
+by the VFIO kernel drivers. However, by default, a host device will be bound to
+its native driver, which is not the VFIO one.</p>
+<p>As a consequence, a device must be unbound from its native driver before passing
+it to <code class="docutils literal notranslate"><span class="pre">cloud-hypervisor</span></code> for assigning it to a guest.</p>
+<section id="example">
+<h3>Example<a class="headerlink" href="#example" title="Permalink to this headline"></a></h3>
+<p>In this example we’re going to assign a PCI memory card (SD, MMC, etc) reader
+from the host in a cloud hypervisor guest.</p>
+<p><code class="docutils literal notranslate"><span class="pre">cloud-hypervisor</span></code> only supports assigning PCI devices to its guests. <code class="docutils literal notranslate"><span class="pre">lspci</span></code>
+helps with identifying PCI devices on the host:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ lspci
+[...]
+01:00.0 Unassigned class [ff00]: Realtek Semiconductor Co., Ltd. RTS525A PCI Express Card Reader (rev 01)
+[...]
+</pre></div>
+</div>
+<p>Here we see that our device is on bus 1, slot 0 and function 0 (<code class="docutils literal notranslate"><span class="pre">01:00.0</span></code>).</p>
+<p>Now that we have identified the device, we must unbind it from its native driver
+(<code class="docutils literal notranslate"><span class="pre">rtsx_pci</span></code>) and bind it to the VFIO driver instead (<code class="docutils literal notranslate"><span class="pre">vfio_pci</span></code>).</p>
+<p>First we add VFIO support to the host:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># modprobe -r vfio_pci</span>
+<span class="c1"># modprobe -r vfio_iommu_type1</span>
+<span class="c1"># modprobe vfio_iommu_type1 allow_unsafe_interrupts</span>
+<span class="c1"># modprobe vfio_pci</span>
+</pre></div>
+</div>
+<p>In case the VFIO drivers are built-in, enable unsafe interrupts with:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># echo 1 &gt; /sys/module/vfio_iommu_type1/parameters/allow_unsafe_interrupts</span>
+</pre></div>
+</div>
+<p>Then we unbind it from its native driver:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># echo 0000:01:00.0 &gt; /sys/bus/pci/devices/0000\:01\:00.0/driver/unbind</span>
+</pre></div>
+</div>
+<p>And finally we bind it to the VFIO driver. To do that we first need to get the
+device’s VID (Vendor ID) and PID (Product ID):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ lspci -n -s 01:00.0
+01:00.0 ff00: 10ec:525a (rev 01)
+
+# echo 10ec 525a &gt; /sys/bus/pci/drivers/vfio-pci/new_id
+</pre></div>
+</div>
+<p>If you have more than one device with the same <code class="docutils literal notranslate"><span class="pre">vendorID</span></code>/<code class="docutils literal notranslate"><span class="pre">deviceID</span></code>, starting
+with the second device, the binding is performed as follows:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># echo 0000:02:00.0 &gt; /sys/bus/pci/drivers/vfio-pci/bind</span>
+</pre></div>
+</div>
+<p>Now the device is managed by the VFIO framework.</p>
+<p>The final step is to give that device to <code class="docutils literal notranslate"><span class="pre">cloud-hypervisor</span></code> to assign it to the
+guest. This is done by using the <code class="docutils literal notranslate"><span class="pre">--device</span></code> command line option. This option
+takes the device’s sysfs path as an argument. In our example it is
+<code class="docutils literal notranslate"><span class="pre">/sys/bus/pci/devices/0000:01:00.0/</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">./</span><span class="n">target</span><span class="o">/</span><span class="n">debug</span><span class="o">/</span><span class="n">cloud</span><span class="o">-</span><span class="n">hypervisor</span> \
+    <span class="o">--</span><span class="n">kernel</span> <span class="o">~/</span><span class="n">vmlinux</span> \
+    <span class="o">--</span><span class="n">disk</span> <span class="n">path</span><span class="o">=~/</span><span class="n">focal</span><span class="o">-</span><span class="n">server</span><span class="o">-</span><span class="n">cloudimg</span><span class="o">-</span><span class="n">amd64</span><span class="o">.</span><span class="n">raw</span> \
+    <span class="o">--</span><span class="n">console</span> <span class="n">off</span> \
+    <span class="o">--</span><span class="n">serial</span> <span class="n">tty</span> \
+    <span class="o">--</span><span class="n">cmdline</span> <span class="s2">&quot;console=ttyS0 root=/dev/vda1 rw&quot;</span> \
+    <span class="o">--</span><span class="n">cpus</span> <span class="mi">4</span> \
+    <span class="o">--</span><span class="n">memory</span> <span class="n">size</span><span class="o">=</span><span class="mi">512</span><span class="n">M</span> \
+    <span class="o">--</span><span class="n">device</span> <span class="n">path</span><span class="o">=/</span><span class="n">sys</span><span class="o">/</span><span class="n">bus</span><span class="o">/</span><span class="n">pci</span><span class="o">/</span><span class="n">devices</span><span class="o">/</span><span class="mi">0000</span><span class="p">:</span><span class="mi">01</span><span class="p">:</span><span class="mf">00.0</span><span class="o">/</span>
+</pre></div>
+</div>
+<p>The guest kernel will then detect the card reader on its PCI bus and provided
+that support for this device is enabled, it will probe and enable it for the
+guest to use.</p>
+<p>In case you want to pass multiple devices, here is the correct syntax:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">--</span><span class="n">device</span> <span class="n">path</span><span class="o">=/</span><span class="n">sys</span><span class="o">/</span><span class="n">bus</span><span class="o">/</span><span class="n">pci</span><span class="o">/</span><span class="n">devices</span><span class="o">/</span><span class="mi">0000</span><span class="p">:</span><span class="mi">01</span><span class="p">:</span><span class="mf">00.0</span><span class="o">/</span> <span class="n">path</span><span class="o">=/</span><span class="n">sys</span><span class="o">/</span><span class="n">bus</span><span class="o">/</span><span class="n">pci</span><span class="o">/</span><span class="n">devices</span><span class="o">/</span><span class="mi">0000</span><span class="p">:</span><span class="mi">02</span><span class="p">:</span><span class="mf">00.0</span><span class="o">/</span>
+</pre></div>
+</div>
+</section>
+<section id="multiple-devices-in-the-same-iommu-group">
+<h3>Multiple devices in the same IOMMU group<a class="headerlink" href="#multiple-devices-in-the-same-iommu-group" title="Permalink to this headline"></a></h3>
+<p>There are cases where multiple devices can be found under the same IOMMU group.
+This happens often with graphics card embedding an audio controller.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ lspci
+[...]
+01:00.0 VGA compatible controller: NVIDIA Corporation GK208B [GeForce GT 710] (rev a1)
+01:00.1 Audio device: NVIDIA Corporation GK208 HDMI/DP Audio Controller (rev a1)
+[...]
+</pre></div>
+</div>
+<p>This is usually exposed as follows through <code class="docutils literal notranslate"><span class="pre">sysfs</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ ls /sys/kernel/iommu_groups/22/devices/
+0000:01:00.0  0000:01:00.1
+</pre></div>
+</div>
+<p>This means these two devices are under the same IOMMU group 22. In such case,
+it is important to bind both devices to VFIO and pass them both through the
+VM, otherwise this could cause some functional and security issues.</p>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="uefi.html" class="btn btn-neutral float-left" title="UEFI Boot" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="vfio-user.html" class="btn btn-neutral float-right" title="Cloud Hypervisor VFIO-user HOWTO" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, various.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Seccomp filtering &mdash; Cloud Hypervisor  documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Snapshot and Restore" href="snapshot_restore.html" />
+    <link rel="prev" title="Profiling" href="profiling.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../README.html" class="icon icon-home"> Cloud Hypervisor
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="api.html">Cloud Hypervisor API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="arm64.html">How to build and test Cloud Hypervisor on AArch64</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cpu.html">CPU</a></li>
+<li class="toctree-l1"><a class="reference internal" href="custom-image.html">How to create a custom Ubuntu image</a></li>
+<li class="toctree-l1"><a class="reference internal" href="debug-port.html"><code class="docutils literal notranslate"><span class="pre">cloud-hypervisor</span></code> debug IO port</a></li>
+<li class="toctree-l1"><a class="reference internal" href="device_model.html">Device Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="fs.html">How to use virtio-fs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="fuzzing.html">Fuzzing in Cloud Hypervisor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gdb.html">GDB Support</a></li>
+<li class="toctree-l1"><a class="reference internal" href="hotplug.html">Cloud Hypervisor Hot Plug</a></li>
+<li class="toctree-l1"><a class="reference internal" href="intel_sgx.html">Intel SGX</a></li>
+<li class="toctree-l1"><a class="reference internal" href="intel_tdx.html">Intel TDX</a></li>
+<li class="toctree-l1"><a class="reference internal" href="io_throttling.html">I/O Throttling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="iommu.html">Virtual IOMMU</a></li>
+<li class="toctree-l1"><a class="reference internal" href="live_migration.html">Live Migration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="logging.html">Logging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="macvtap-bridge.html">Using MACVTAP to Bridge onto Host Network</a></li>
+<li class="toctree-l1"><a class="reference internal" href="memory.html">Memory</a></li>
+<li class="toctree-l1"><a class="reference internal" href="profiling.html">Profiling</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Seccomp filtering</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#what-is-seccomp-filtering">What is seccomp filtering</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#how-does-it-apply-to-cloud-hypervisor">How does it apply to Cloud Hypervisor</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#disabling-seccomp-filters">Disabling seccomp filters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#logging-prohibited-system-calls">Logging prohibited system calls</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#further-debug-with-strace">Further debug with <code class="docutils literal notranslate"><span class="pre">strace</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="snapshot_restore.html">Snapshot and Restore</a></li>
+<li class="toctree-l1"><a class="reference internal" href="uefi.html">UEFI Boot</a></li>
+<li class="toctree-l1"><a class="reference internal" href="uefi.html#links">Links</a></li>
+<li class="toctree-l1"><a class="reference internal" href="vfio.html">Cloud Hypervisor VFIO HOWTO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="vfio-user.html">Cloud Hypervisor VFIO-user HOWTO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="vhost-user-blk-testing.html">How to test vhost-user-blk with SPDK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="vhost-user-net-testing.html">How to test Vhost-user net with OpenVSwitch/DPDK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="virtiofs-root.html">HOWTO VirtioFS rootfs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="windows.html">Windows Support</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../README.html">Cloud Hypervisor</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../README.html" class="icon icon-home"></a> &raquo;</li>
+      <li>Seccomp filtering</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/docs/seccomp.md.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section class="tex2jax_ignore mathjax_ignore" id="seccomp-filtering">
+<h1>Seccomp filtering<a class="headerlink" href="#seccomp-filtering" title="Permalink to this headline"></a></h1>
+<p>As a means to harden Cloud Hypervisor’s security, the project leverages seccomp
+filtering.</p>
+<section id="what-is-seccomp-filtering">
+<h2>What is seccomp filtering<a class="headerlink" href="#what-is-seccomp-filtering" title="Permalink to this headline"></a></h2>
+<p>A seccomp filter is a way for a process to tell the kernel which system calls
+are authorized.
+In case this process calls into a prohibited system call, the kernel will kill
+the process right away.</p>
+</section>
+<section id="how-does-it-apply-to-cloud-hypervisor">
+<h2>How does it apply to Cloud Hypervisor<a class="headerlink" href="#how-does-it-apply-to-cloud-hypervisor" title="Permalink to this headline"></a></h2>
+<p>Cloud Hypervisor is a multi threaded application. It spawns dedicated threads
+for virtual CPUs, virtio devices and HTTP server, along with the main thread
+representing the VMM.</p>
+<p>Each of these threads has a limited scope of what it is expected to perform,
+which is why different filters are applied to each of them.</p>
+<p>By default, Cloud Hypervisor enables seccomp filtering as the project believes
+that security should not be an option.</p>
+<p>For development and debugging purposes, one might want to disable this feature
+or log the faulty system call.</p>
+<section id="disabling-seccomp-filters">
+<h3>Disabling seccomp filters<a class="headerlink" href="#disabling-seccomp-filters" title="Permalink to this headline"></a></h3>
+<p>Append <code class="docutils literal notranslate"><span class="pre">--seccomp</span> <span class="pre">false</span></code> to Cloud Hypervisor’s command line to prevent seccomp
+filtering from being applied.</p>
+</section>
+<section id="logging-prohibited-system-calls">
+<h3>Logging prohibited system calls<a class="headerlink" href="#logging-prohibited-system-calls" title="Permalink to this headline"></a></h3>
+<p>In the context of debug, one alternative to disabling seccomp filtering is to
+log faulty system calls that would have caused the application to be killed by
+the kernel.</p>
+<p>Append <code class="docutils literal notranslate"><span class="pre">--seccomp</span> <span class="pre">log</span></code> to Cloud Hypervisor’s command line to enable faulty
+system calls to be logged.</p>
+<p>The kernel running on the host machine must have the <code class="docutils literal notranslate"><span class="pre">audit</span></code> parameter enabled.
+If this is not the case, update kernel boot options by appending <code class="docutils literal notranslate"><span class="pre">audit=1</span></code>.</p>
+<p>Unauthorized system calls will be logged to the journal similarly to the
+following example</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">type</span><span class="o">=</span><span class="n">SECCOMP</span> <span class="n">msg</span><span class="o">=</span><span class="n">audit</span><span class="p">(</span><span class="mf">1423263412.694</span><span class="p">:</span><span class="mi">7878</span><span class="p">):</span> <span class="n">auid</span><span class="o">=</span><span class="mi">1000</span> <span class="n">uid</span><span class="o">=</span><span class="mi">1000</span> <span class="n">gid</span><span class="o">=</span><span class="mi">1000</span> <span class="n">ses</span><span class="o">=</span><span class="mi">3</span> <span class="n">subj</span><span class="o">=</span><span class="n">unconfined_u</span><span class="p">:</span><span class="n">unconfined_r</span><span class="p">:</span><span class="n">cloud_hypervisor</span><span class="p">:</span><span class="n">s0</span><span class="o">-</span><span class="n">s0</span><span class="p">:</span><span class="n">c0</span><span class="o">.</span><span class="n">c1023</span> <span class="n">pid</span><span class="o">=</span><span class="mi">1193</span> <span class="n">comm</span><span class="o">=</span><span class="s2">&quot;cloud-hypervisor&quot;</span> <span class="n">exe</span><span class="o">=</span><span class="s2">&quot;/usr/bin/cloud-hypervisor&quot;</span> <span class="n">sig</span><span class="o">=</span><span class="mi">0</span> <span class="n">arch</span><span class="o">=</span><span class="n">c000003e</span> <span class="n">syscall</span><span class="o">=</span><span class="mi">47</span> <span class="n">compat</span><span class="o">=</span><span class="mi">0</span> <span class="n">ip</span><span class="o">=</span><span class="mh">0x7f4f63982604</span> <span class="n">code</span><span class="o">=</span><span class="mh">0x50000</span>
+</pre></div>
+</div>
+<p>Provided <code class="docutils literal notranslate"><span class="pre">ausyscall</span></code> has been installed on the host, the system call can be
+identified with</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ ausyscall 47
+recvmsg
+</pre></div>
+</div>
+</section>
+<section id="further-debug-with-strace">
+<h3>Further debug with <code class="docutils literal notranslate"><span class="pre">strace</span></code><a class="headerlink" href="#further-debug-with-strace" title="Permalink to this headline"></a></h3>
+<p>One more way of debugging seccomp related issues is to use the <code class="docutils literal notranslate"><span class="pre">strace</span></code> tool as
+it will log every system call issued by the process. It is important to use
+<code class="docutils literal notranslate"><span class="pre">-f</span></code> option in order to trace each and every thread belonging to the process.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">strace</span> <span class="o">-</span><span class="n">f</span> <span class="o">./</span><span class="n">cloud</span><span class="o">-</span><span class="n">hypervisor</span> <span class="o">...</span>
+</pre></div>
+</div>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="profiling.html" class="btn btn-neutral float-left" title="Profiling" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="snapshot_restore.html" class="btn btn-neutral float-right" title="Snapshot and Restore" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, various.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

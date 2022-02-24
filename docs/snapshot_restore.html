@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Snapshot and Restore &mdash; Cloud Hypervisor  documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="UEFI Boot" href="uefi.html" />
+    <link rel="prev" title="Seccomp filtering" href="seccomp.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../README.html" class="icon icon-home"> Cloud Hypervisor
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="api.html">Cloud Hypervisor API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="arm64.html">How to build and test Cloud Hypervisor on AArch64</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cpu.html">CPU</a></li>
+<li class="toctree-l1"><a class="reference internal" href="custom-image.html">How to create a custom Ubuntu image</a></li>
+<li class="toctree-l1"><a class="reference internal" href="debug-port.html"><code class="docutils literal notranslate"><span class="pre">cloud-hypervisor</span></code> debug IO port</a></li>
+<li class="toctree-l1"><a class="reference internal" href="device_model.html">Device Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="fs.html">How to use virtio-fs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="fuzzing.html">Fuzzing in Cloud Hypervisor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gdb.html">GDB Support</a></li>
+<li class="toctree-l1"><a class="reference internal" href="hotplug.html">Cloud Hypervisor Hot Plug</a></li>
+<li class="toctree-l1"><a class="reference internal" href="intel_sgx.html">Intel SGX</a></li>
+<li class="toctree-l1"><a class="reference internal" href="intel_tdx.html">Intel TDX</a></li>
+<li class="toctree-l1"><a class="reference internal" href="io_throttling.html">I/O Throttling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="iommu.html">Virtual IOMMU</a></li>
+<li class="toctree-l1"><a class="reference internal" href="live_migration.html">Live Migration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="logging.html">Logging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="macvtap-bridge.html">Using MACVTAP to Bridge onto Host Network</a></li>
+<li class="toctree-l1"><a class="reference internal" href="memory.html">Memory</a></li>
+<li class="toctree-l1"><a class="reference internal" href="profiling.html">Profiling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="seccomp.html">Seccomp filtering</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Snapshot and Restore</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#snapshot-a-cloud-hypervisor-vm">Snapshot a Cloud Hypervisor VM</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#restore-a-cloud-hypervisor-vm">Restore a Cloud Hypervisor VM</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#limitations">Limitations</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="uefi.html">UEFI Boot</a></li>
+<li class="toctree-l1"><a class="reference internal" href="uefi.html#links">Links</a></li>
+<li class="toctree-l1"><a class="reference internal" href="vfio.html">Cloud Hypervisor VFIO HOWTO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="vfio-user.html">Cloud Hypervisor VFIO-user HOWTO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="vhost-user-blk-testing.html">How to test vhost-user-blk with SPDK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="vhost-user-net-testing.html">How to test Vhost-user net with OpenVSwitch/DPDK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="virtiofs-root.html">HOWTO VirtioFS rootfs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="windows.html">Windows Support</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../README.html">Cloud Hypervisor</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../README.html" class="icon icon-home"></a> &raquo;</li>
+      <li>Snapshot and Restore</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/docs/snapshot_restore.md.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section class="tex2jax_ignore mathjax_ignore" id="snapshot-and-restore">
+<h1>Snapshot and Restore<a class="headerlink" href="#snapshot-and-restore" title="Permalink to this headline"></a></h1>
+<p>The goal for the snapshot/restore feature is to provide the user with the
+ability to take a snapshot of a previously paused virtual machine. This
+snapshot can be used as the base for creating new identical virtual machines,
+without the need to boot them from scratch. The restore codepath takes the
+snapshot and creates the exact same virtual machine, restoring the previously
+saved states. The new virtual machine is restored in a paused state, as it was
+before the snapshot was performed.</p>
+<section id="snapshot-a-cloud-hypervisor-vm">
+<h2>Snapshot a Cloud Hypervisor VM<a class="headerlink" href="#snapshot-a-cloud-hypervisor-vm" title="Permalink to this headline"></a></h2>
+<p>First thing, we must run a Cloud Hypervisor VM:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>./cloud-hypervisor <span class="se">\</span>
+    --api-socket /tmp/cloud-hypervisor.sock <span class="se">\</span>
+    --cpus <span class="nv">boot</span><span class="o">=</span><span class="m">4</span> <span class="se">\</span>
+    --memory <span class="nv">size</span><span class="o">=</span>4G <span class="se">\</span>
+    --kernel vmlinux <span class="se">\</span>
+    --cmdline <span class="s2">&quot;root=/dev/vda1 console=hvc0 rw&quot;</span> <span class="se">\</span>
+    --disk <span class="nv">path</span><span class="o">=</span>focal-server-cloudimg-amd64.raw
+</pre></div>
+</div>
+<p>At any point in time when the VM is running, one might choose to pause it:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>./ch-remote --api-socket<span class="o">=</span>/tmp/cloud-hypervisor.sock pause
+</pre></div>
+</div>
+<p>Once paused, the VM can be safely snapshot into the specified directory and
+using the following command:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>./ch-remote --api-socket<span class="o">=</span>/tmp/cloud-hypervisor.sock snapshot file:///home/foo/snapshot
+</pre></div>
+</div>
+<p>Given the directory was present on the system, the snapshot will succeed and
+it should contain the following files:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ll /home/foo/snapshot/
+total <span class="m">4194536</span>
+drwxrwxr-x  <span class="m">2</span> foo bar       <span class="m">4096</span> Jul <span class="m">22</span> <span class="m">11</span>:50 ./
+drwxr-xr-x <span class="m">47</span> foo bar       <span class="m">4096</span> Jul <span class="m">22</span> <span class="m">11</span>:47 ../
+-rw-------  <span class="m">1</span> foo bar       <span class="m">1084</span> Jul <span class="m">22</span> <span class="m">11</span>:19 config.json
+-rw-------  <span class="m">1</span> foo bar <span class="m">4294967296</span> Jul <span class="m">22</span> <span class="m">11</span>:19 memory-ranges
+-rw-------  <span class="m">1</span> foo bar     <span class="m">217853</span> Jul <span class="m">22</span> <span class="m">11</span>:19 state.json
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">config.json</span></code> contains the virtual machine configuration. It is used to create
+a similar virtual machine with the correct amount of CPUs, RAM, and other
+expected devices. It is stored in a human readable format so that it could be
+modified between the snapshot and restore phases to achieve some very special
+use cases. But for most cases, manually modifying the configuration should not
+be needed.</p>
+<p><code class="docutils literal notranslate"><span class="pre">memory-ranges</span></code> stores the content of the guest RAM.</p>
+<p><code class="docutils literal notranslate"><span class="pre">state.json</span></code> contains the virtual machine state. It is used to restore each
+component in the state it was left before the snapshot occurred.</p>
+</section>
+<section id="restore-a-cloud-hypervisor-vm">
+<h2>Restore a Cloud Hypervisor VM<a class="headerlink" href="#restore-a-cloud-hypervisor-vm" title="Permalink to this headline"></a></h2>
+<p>Given that one has access to an existing snapshot in <code class="docutils literal notranslate"><span class="pre">/home/foo/snapshot</span></code>,
+it is possible to create a new VM based on this snapshot with the following
+command:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>./cloud-hypervisor <span class="se">\</span>
+    --api-socket /tmp/cloud-hypervisor.sock <span class="se">\</span>
+    --restore <span class="nv">source_url</span><span class="o">=</span>file:///home/foo/snapshot
+</pre></div>
+</div>
+<p>Or using two different commands from two terminals:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># First terminal</span>
+./cloud-hypervisor --api-socket /tmp/cloud-hypervisor.sock
+
+<span class="c1"># Second terminal</span>
+./ch-remote --api-socket<span class="o">=</span>/tmp/cloud-hypervisor.sock restore <span class="nv">source_url</span><span class="o">=</span>file:///home/foo/snapshot
+</pre></div>
+</div>
+<p>Remember the VM is restored in a <code class="docutils literal notranslate"><span class="pre">paused</span></code> state, which was the VM’s state when
+it was snapshot. For this reason, one must explicitly <code class="docutils literal notranslate"><span class="pre">resume</span></code> the VM before to
+start using it.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>./ch-remote --api-socket<span class="o">=</span>/tmp/cloud-hypervisor.sock resume
+</pre></div>
+</div>
+<p>At this point, the VM is fully restored and is identical to the VM which was
+snapshot earlier.</p>
+</section>
+<section id="limitations">
+<h2>Limitations<a class="headerlink" href="#limitations" title="Permalink to this headline"></a></h2>
+<p>VFIO devices and Intel SGX are out of scope.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="seccomp.html" class="btn btn-neutral float-left" title="Seccomp filtering" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="uefi.html" class="btn btn-neutral float-right" title="UEFI Boot" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, various.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

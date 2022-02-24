@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>How to test vhost-user-blk with SPDK &mdash; Cloud Hypervisor  documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="How to test Vhost-user net with OpenVSwitch/DPDK" href="vhost-user-net-testing.html" />
+    <link rel="prev" title="Cloud Hypervisor VFIO-user HOWTO" href="vfio-user.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../README.html" class="icon icon-home"> Cloud Hypervisor
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="api.html">Cloud Hypervisor API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="arm64.html">How to build and test Cloud Hypervisor on AArch64</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cpu.html">CPU</a></li>
+<li class="toctree-l1"><a class="reference internal" href="custom-image.html">How to create a custom Ubuntu image</a></li>
+<li class="toctree-l1"><a class="reference internal" href="debug-port.html"><code class="docutils literal notranslate"><span class="pre">cloud-hypervisor</span></code> debug IO port</a></li>
+<li class="toctree-l1"><a class="reference internal" href="device_model.html">Device Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="fs.html">How to use virtio-fs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="fuzzing.html">Fuzzing in Cloud Hypervisor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gdb.html">GDB Support</a></li>
+<li class="toctree-l1"><a class="reference internal" href="hotplug.html">Cloud Hypervisor Hot Plug</a></li>
+<li class="toctree-l1"><a class="reference internal" href="intel_sgx.html">Intel SGX</a></li>
+<li class="toctree-l1"><a class="reference internal" href="intel_tdx.html">Intel TDX</a></li>
+<li class="toctree-l1"><a class="reference internal" href="io_throttling.html">I/O Throttling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="iommu.html">Virtual IOMMU</a></li>
+<li class="toctree-l1"><a class="reference internal" href="live_migration.html">Live Migration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="logging.html">Logging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="macvtap-bridge.html">Using MACVTAP to Bridge onto Host Network</a></li>
+<li class="toctree-l1"><a class="reference internal" href="memory.html">Memory</a></li>
+<li class="toctree-l1"><a class="reference internal" href="profiling.html">Profiling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="seccomp.html">Seccomp filtering</a></li>
+<li class="toctree-l1"><a class="reference internal" href="snapshot_restore.html">Snapshot and Restore</a></li>
+<li class="toctree-l1"><a class="reference internal" href="uefi.html">UEFI Boot</a></li>
+<li class="toctree-l1"><a class="reference internal" href="uefi.html#links">Links</a></li>
+<li class="toctree-l1"><a class="reference internal" href="vfio.html">Cloud Hypervisor VFIO HOWTO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="vfio-user.html">Cloud Hypervisor VFIO-user HOWTO</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">How to test vhost-user-blk with SPDK</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#framework">Framework</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#prerequisites">Prerequisites</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#test-environment">Test environment</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#the-hugepages-settings-on-the-host">The hugepages settings on the host</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#download-the-spdk-code">Download the SPDK code</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#create-the-build-dep">Create the build dep</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#build-spdk">Build SPDK</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#set-the-spdk-environment">Set the SPDK environment</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#create-512m-block-device">Create 512M block device</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#launch-the-vm">Launch the VM</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="vhost-user-net-testing.html">How to test Vhost-user net with OpenVSwitch/DPDK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="virtiofs-root.html">HOWTO VirtioFS rootfs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="windows.html">Windows Support</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../README.html">Cloud Hypervisor</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../README.html" class="icon icon-home"></a> &raquo;</li>
+      <li>How to test vhost-user-blk with SPDK</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/docs/vhost-user-blk-testing.md.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section class="tex2jax_ignore mathjax_ignore" id="how-to-test-vhost-user-blk-with-spdk">
+<h1>How to test vhost-user-blk with SPDK<a class="headerlink" href="#how-to-test-vhost-user-blk-with-spdk" title="Permalink to this headline"></a></h1>
+<p>The purpose of this document is to illustrate how to test vhost-user-blk in Cloud Hypervisor with SPDK as the backend.</p>
+<section id="framework">
+<h2>Framework<a class="headerlink" href="#framework" title="Permalink to this headline"></a></h2>
+<p>It’s a simple test to validate the block read/write between VM and block backend.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>             <span class="o">+----+----------+</span>          <span class="o">+-------------+-----------+</span>
+             <span class="o">|</span>    <span class="o">|</span>          <span class="o">|</span>          <span class="o">|</span>             <span class="o">|</span>           <span class="o">|</span>
+             <span class="o">|</span>    <span class="o">|</span><span class="n">vhost</span><span class="o">-</span><span class="n">user</span><span class="o">|----------|</span> <span class="n">vhost</span><span class="o">-</span><span class="n">user</span>  <span class="o">|</span>    <span class="n">dpdk</span>   <span class="o">|</span>
+             <span class="o">|</span>    <span class="o">|</span><span class="n">blk</span> <span class="n">device</span><span class="o">|</span>          <span class="o">|</span> <span class="n">port</span> <span class="mi">1</span>      <span class="o">|</span>           <span class="o">|</span>
+             <span class="o">|</span>    <span class="o">|</span>          <span class="o">|</span>          <span class="o">|</span>             <span class="o">|</span>           <span class="o">|</span>
+             <span class="o">|</span>    <span class="o">+----------+</span>          <span class="o">+-------------+-----------+</span>
+             <span class="o">|</span>               <span class="o">|</span>          <span class="o">|</span>                         <span class="o">|</span>
+             <span class="o">|</span>      <span class="n">vm</span>       <span class="o">|</span>          <span class="o">|</span>           <span class="n">spdk</span>          <span class="o">|</span>
+             <span class="o">|</span>               <span class="o">|</span>          <span class="o">|</span>                         <span class="o">|</span>
+          <span class="o">+--+----------------------------------------------------+--+</span>
+          <span class="o">|</span>  <span class="o">|</span>                  <span class="n">hugepages</span>                         <span class="o">|</span>  <span class="o">|</span>
+          <span class="o">|</span>  <span class="o">+----------------------------------------------------+</span>  <span class="o">|</span>
+          <span class="o">|</span>                                                          <span class="o">|</span>
+          <span class="o">|</span>                       <span class="n">host</span>                               <span class="o">|</span>
+          <span class="o">|</span>                                                          <span class="o">|</span>
+          <span class="o">+----------------------------------------------------------+</span>
+</pre></div>
+</div>
+</section>
+<section id="prerequisites">
+<h2>Prerequisites<a class="headerlink" href="#prerequisites" title="Permalink to this headline"></a></h2>
+<p>Prior to running the test, the following steps need to be performed.</p>
+<ul class="simple">
+<li><p>Enable hugepages</p></li>
+<li><p>Install SPDK</p></li>
+</ul>
+<p>Here are some good references for detailing them.</p>
+<ul class="simple">
+<li><p>spdk</p>
+<ul>
+<li><p>https://spdk.io/doc/</p></li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="test-environment">
+<h2>Test environment<a class="headerlink" href="#test-environment" title="Permalink to this headline"></a></h2>
+<p>The below test environment is based on Ubuntu release (20.04.1 LTS), as for other system, please check related documents.
+This test runs with multiple queue (MQ) support enabled, using 4 queues defined for both SPDK and the virtual machine.
+Here are the detailed instructions.</p>
+<section id="the-hugepages-settings-on-the-host">
+<h3>The hugepages settings on the host<a class="headerlink" href="#the-hugepages-settings-on-the-host" title="Permalink to this headline"></a></h3>
+<p>Allocate enough persistent huge pages (e.g. 2GiB) on the host:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Assume the default hugepage size is 2MiB</span>
+<span class="nb">echo</span> <span class="m">1024</span> <span class="p">|</span> sudo tee /proc/sys/vm/nr_hugepages
+<span class="c1"># Confirm the value of &quot;Hugepagesize&quot; and &quot;HugePages_Total&quot;</span>
+cat /proc/meminfo <span class="p">|</span> grep -i huge
+</pre></div>
+</div>
+</section>
+<section id="download-the-spdk-code">
+<h3>Download the SPDK code<a class="headerlink" href="#download-the-spdk-code" title="Permalink to this headline"></a></h3>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git clone https://github.com/spdk/spdk
+<span class="nb">cd</span> spdk
+git submodule update --init
+</pre></div>
+</div>
+</section>
+<section id="create-the-build-dep">
+<h3>Create the build dep<a class="headerlink" href="#create-the-build-dep" title="Permalink to this headline"></a></h3>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>./scripts/pkgdep.sh
+</pre></div>
+</div>
+</section>
+<section id="build-spdk">
+<h3>Build SPDK<a class="headerlink" href="#build-spdk" title="Permalink to this headline"></a></h3>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>./configure
+make
+</pre></div>
+</div>
+</section>
+<section id="set-the-spdk-environment">
+<h3>Set the SPDK environment<a class="headerlink" href="#set-the-spdk-environment" title="Permalink to this headline"></a></h3>
+<p>Run SPDK vhost target with 2 CPU cores, i.e., core 0 and 1.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo <span class="nv">HUGEMEM</span><span class="o">=</span><span class="m">2048</span> scripts/setup.sh
+sudo ./build/bin/vhost -S /var/tmp -s <span class="m">1024</span> -m 0x3 <span class="p">&amp;</span>
+</pre></div>
+</div>
+</section>
+<section id="create-512m-block-device">
+<h3>Create 512M block device<a class="headerlink" href="#create-512m-block-device" title="Permalink to this headline"></a></h3>
+<p>Create a 512M (first parameter) block device with 512 bytes (second parameter) block size.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo scripts/rpc.py bdev_malloc_create <span class="m">512</span> <span class="m">512</span> -b Malloc0
+sudo scripts/rpc.py vhost_create_blk_controller --cpumask 0x1 vhost.1 Malloc0
+</pre></div>
+</div>
+</section>
+<section id="launch-the-vm">
+<h3>Launch the VM<a class="headerlink" href="#launch-the-vm" title="Permalink to this headline"></a></h3>
+<p>VMs run in client mode. They connect to the socket created by the <code class="docutils literal notranslate"><span class="pre">dpdkvhostuser</span></code> in the SPDK backend.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># From the test terminal. We need to create one vhost-user-blk device for the --disk.</span>
+./cloud-hypervisor <span class="se">\</span>
+        --cpus <span class="nv">boot</span><span class="o">=</span><span class="m">4</span> <span class="se">\</span>
+        --memory <span class="nv">size</span><span class="o">=</span>1024M,hugepages<span class="o">=</span>on,shared<span class="o">=</span><span class="nb">true</span> <span class="se">\</span>
+        --kernel linux/arch/x86/boot/compressed/vmlinux.bin <span class="se">\</span>
+        --cmdline <span class="s2">&quot;console=ttyS0 root=/dev/vda1 rw iommu=off&quot;</span> <span class="se">\</span>
+        --disk <span class="nv">path</span><span class="o">=</span>images/focal-server-cloudimg-amd64.raw <span class="nv">vhost_user</span><span class="o">=</span>true,socket<span class="o">=</span>/var/tmp/vhost.1,num_queues<span class="o">=</span><span class="m">4</span>,queue_size<span class="o">=</span><span class="m">128</span> <span class="se">\</span>
+        --console off <span class="se">\</span>
+        --serial tty <span class="se">\</span>
+        --rng
+</pre></div>
+</div>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># How to test the vhost-user-blk device with SPDK backend</span>
+login <span class="k">in</span> guest
+
+<span class="c1"># Use lsblk command to find out vhost-user-blk device</span>
+lsblk
+NAME    MAJ:MIN RM  SIZE RO TYPE MOUNTPOINT
+vda     <span class="m">252</span>:0    <span class="m">0</span>  <span class="m">2</span>.2G  <span class="m">0</span> disk
+├─vda1  <span class="m">252</span>:1    <span class="m">0</span>  <span class="m">2</span>.1G  <span class="m">0</span> part /
+├─vda14 <span class="m">252</span>:14   <span class="m">0</span>    4M  <span class="m">0</span> part
+└─vda15 <span class="m">252</span>:15   <span class="m">0</span>  106M  <span class="m">0</span> part /boot/efi
+vdb    <span class="m">253</span>:16   <span class="m">0</span>  512M  <span class="m">0</span> disk
+
+The vhost-user-blk device is /dev/vdb
+
+<span class="c1"># How to do simple read/write test</span>
+dd <span class="k">if</span><span class="o">=</span>/dev/vdb <span class="nv">of</span><span class="o">=</span>/dev/null <span class="nv">bs</span><span class="o">=</span>2M <span class="nv">iflag</span><span class="o">=</span>direct
+dd <span class="nv">of</span><span class="o">=</span>/dev/vdb <span class="k">if</span><span class="o">=</span>/dev/zero <span class="nv">bs</span><span class="o">=</span>2M <span class="nv">oflag</span><span class="o">=</span>direct <span class="nv">count</span><span class="o">=</span><span class="m">256</span>
+
+If you want to <span class="k">do</span> fio test, please install fio binary into guest. The detailed info is not listed here.
+</pre></div>
+</div>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="vfio-user.html" class="btn btn-neutral float-left" title="Cloud Hypervisor VFIO-user HOWTO" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="vhost-user-net-testing.html" class="btn btn-neutral float-right" title="How to test Vhost-user net with OpenVSwitch/DPDK" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, various.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>cloud-hypervisor debug IO port &mdash; Cloud Hypervisor  documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Device Model" href="device_model.html" />
+    <link rel="prev" title="How to create a custom Ubuntu image" href="custom-image.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../README.html" class="icon icon-home"> Cloud Hypervisor
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="api.html">Cloud Hypervisor API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="arm64.html">How to build and test Cloud Hypervisor on AArch64</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cpu.html">CPU</a></li>
+<li class="toctree-l1"><a class="reference internal" href="custom-image.html">How to create a custom Ubuntu image</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#"><code class="docutils literal notranslate"><span class="pre">cloud-hypervisor</span></code> debug IO port</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#logging">Logging</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="device_model.html">Device Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="fs.html">How to use virtio-fs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="fuzzing.html">Fuzzing in Cloud Hypervisor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gdb.html">GDB Support</a></li>
+<li class="toctree-l1"><a class="reference internal" href="hotplug.html">Cloud Hypervisor Hot Plug</a></li>
+<li class="toctree-l1"><a class="reference internal" href="intel_sgx.html">Intel SGX</a></li>
+<li class="toctree-l1"><a class="reference internal" href="intel_tdx.html">Intel TDX</a></li>
+<li class="toctree-l1"><a class="reference internal" href="io_throttling.html">I/O Throttling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="iommu.html">Virtual IOMMU</a></li>
+<li class="toctree-l1"><a class="reference internal" href="live_migration.html">Live Migration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="logging.html">Logging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="macvtap-bridge.html">Using MACVTAP to Bridge onto Host Network</a></li>
+<li class="toctree-l1"><a class="reference internal" href="memory.html">Memory</a></li>
+<li class="toctree-l1"><a class="reference internal" href="profiling.html">Profiling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="seccomp.html">Seccomp filtering</a></li>
+<li class="toctree-l1"><a class="reference internal" href="snapshot_restore.html">Snapshot and Restore</a></li>
+<li class="toctree-l1"><a class="reference internal" href="uefi.html">UEFI Boot</a></li>
+<li class="toctree-l1"><a class="reference internal" href="uefi.html#links">Links</a></li>
+<li class="toctree-l1"><a class="reference internal" href="vfio.html">Cloud Hypervisor VFIO HOWTO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="vfio-user.html">Cloud Hypervisor VFIO-user HOWTO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="vhost-user-blk-testing.html">How to test vhost-user-blk with SPDK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="vhost-user-net-testing.html">How to test Vhost-user net with OpenVSwitch/DPDK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="virtiofs-root.html">HOWTO VirtioFS rootfs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="windows.html">Windows Support</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../README.html">Cloud Hypervisor</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../README.html" class="icon icon-home"></a> &raquo;</li>
+      <li><code class="docutils literal notranslate"><span class="pre">cloud-hypervisor</span></code> debug IO port</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/docs/debug-port.md.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section class="tex2jax_ignore mathjax_ignore" id="cloud-hypervisor-debug-io-port">
+<h1><code class="docutils literal notranslate"><span class="pre">cloud-hypervisor</span></code> debug IO port<a class="headerlink" href="#cloud-hypervisor-debug-io-port" title="Permalink to this headline"></a></h1>
+<p><code class="docutils literal notranslate"><span class="pre">cloud-hypervisor</span></code> uses the <a class="reference external" href="https://www.intel.com/content/www/us/en/support/articles/000005500/boards-and-kits.html"><code class="docutils literal notranslate"><span class="pre">0x80</span></code></a>
+I/O port to trace user defined guest events.</p>
+<p>Whenever the guest write one byte between <code class="docutils literal notranslate"><span class="pre">0x0</span></code> and <code class="docutils literal notranslate"><span class="pre">0xF</span></code> on this particular
+I/O port, <code class="docutils literal notranslate"><span class="pre">cloud-hypervisor</span></code> will log and timestamp that event at the <code class="docutils literal notranslate"><span class="pre">debug</span></code>
+log level.</p>
+<p>It is up to the guest stack to decide when and what to write to the 0x80 port
+in order to signal the host about specific events and have <code class="docutils literal notranslate"><span class="pre">cloud-hypervisor</span></code>
+log it.</p>
+<p><code class="docutils literal notranslate"><span class="pre">cloud-hypervisor</span></code> defines several debug port code ranges that should be used
+for debugging specific components of the guest software stack. When logging a
+write of one of those codes to the debug port, <code class="docutils literal notranslate"><span class="pre">cloud-hypervisor</span></code> adds a
+pre-defined string to the logs.</p>
+<table border="1" class="docutils">
+<thead>
+<tr>
+<th>Code Range</th>
+<th>Component</th>
+<th>Log string</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>0x00</code> to <code>0x1f</code></td>
+<td>Firmware</td>
+<td><code>Firmware</code></td>
+</tr>
+<tr>
+<td><code>0x20</code> to <code>0x3f</code></td>
+<td>Bootloader</td>
+<td><code>Bootloader</code></td>
+</tr>
+<tr>
+<td><code>0x40</code> to <code>0x5f</code></td>
+<td>Kernel</td>
+<td><code>Kernel</code></td>
+</tr>
+<tr>
+<td><code>0x60</code> to <code>0x7f</code></td>
+<td>Userspace</td>
+<td><code>Userspace</code></td>
+</tr>
+<tr>
+<td><code>0x80</code> to <code>0xff</code></td>
+<td>Custom</td>
+<td><code>Custom</code></td>
+</tr>
+</tbody>
+</table>
+<p>One typical use case is guest boot time measurement and tracing. By writing
+different values to the debug I/O port at different boot process steps, the
+guest will have <code class="docutils literal notranslate"><span class="pre">cloud-hypervisor</span></code> generate timestamped logs of all those steps.
+That provides a basic but convenient way of measuring not only the overall guest
+boot time but all intermediate steps as well.</p>
+<section id="logging">
+<h2>Logging<a class="headerlink" href="#logging" title="Permalink to this headline"></a></h2>
+<p>Assuming parts of the guest software stack have been instrumented to use the
+<code class="docutils literal notranslate"><span class="pre">cloud-hypervisor</span></code> debug I/O port, we may want to gather the related logs.</p>
+<p>To do so we need to start <code class="docutils literal notranslate"><span class="pre">cloud-hypervisor</span></code> with the right debug level
+(<code class="docutils literal notranslate"><span class="pre">-vvv</span></code>). It is also recommended to have it log into a dedicated file in order
+to easily grep for the tracing logs (e.g.
+<code class="docutils literal notranslate"><span class="pre">--log-file</span> <span class="pre">/tmp/cloud-hypervisor.log</span></code>):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">./</span><span class="n">target</span><span class="o">/</span><span class="n">debug</span><span class="o">/</span><span class="n">cloud</span><span class="o">-</span><span class="n">hypervisor</span> \
+    <span class="o">--</span><span class="n">kernel</span> <span class="o">~/</span><span class="n">rust</span><span class="o">-</span><span class="n">hypervisor</span><span class="o">-</span><span class="n">firmware</span><span class="o">/</span><span class="n">target</span><span class="o">/</span><span class="n">target</span><span class="o">/</span><span class="n">release</span><span class="o">/</span><span class="n">hypervisor</span><span class="o">-</span><span class="n">fw</span> \
+    <span class="o">--</span><span class="n">disk</span> <span class="n">path</span><span class="o">=~/</span><span class="n">hypervisor</span><span class="o">/</span><span class="n">images</span><span class="o">/</span><span class="n">focal</span><span class="o">-</span><span class="n">server</span><span class="o">-</span><span class="n">cloudimg</span><span class="o">-</span><span class="n">amd64</span><span class="o">.</span><span class="n">raw</span> \
+    <span class="o">--</span><span class="n">cpus</span> <span class="mi">4</span> \
+    <span class="o">--</span><span class="n">memory</span> <span class="n">size</span><span class="o">=</span><span class="mi">1024</span><span class="n">M</span> \
+    <span class="o">--</span><span class="n">rng</span> \
+    <span class="o">--</span><span class="n">log</span><span class="o">-</span><span class="n">file</span> <span class="o">/</span><span class="n">tmp</span><span class="o">/</span><span class="n">ch</span><span class="o">-</span><span class="n">fw</span><span class="o">.</span><span class="n">log</span> \
+    <span class="o">-</span><span class="n">vvv</span>
+</pre></div>
+</div>
+<p>After booting the guest, we then have to grep for the debug I/O port traces in
+the log file:</p>
+<div class="highlight-Shell notranslate"><div class="highlight"><pre><span></span>$ grep <span class="s2">&quot;Debug I/O port&quot;</span> /tmp/ch-fw.log
+cloud-hypervisor: <span class="m">19</span>.762449ms: DEBUG:vmm/src/vm.rs:510 -- <span class="o">[</span>Debug I/O port: Firmware code 0x0<span class="o">]</span> <span class="m">0</span>.019004 seconds
+cloud-hypervisor: <span class="m">403</span>.499628ms: DEBUG:vmm/src/vm.rs:510 -- <span class="o">[</span>Debug I/O port: Firmware code 0x1<span class="o">]</span> <span class="m">0</span>.402744 seconds
+</pre></div>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="custom-image.html" class="btn btn-neutral float-left" title="How to create a custom Ubuntu image" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="device_model.html" class="btn btn-neutral float-right" title="Device Model" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, various.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

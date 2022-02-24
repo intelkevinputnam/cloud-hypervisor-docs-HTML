@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cloud Hypervisor API &mdash; Cloud Hypervisor  documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="How to build and test Cloud Hypervisor on AArch64" href="arm64.html" />
+    <link rel="prev" title="Cloud Hypervisor" href="../README.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../README.html" class="icon icon-home"> Cloud Hypervisor
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Cloud Hypervisor API</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#external-api">External API</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#rest-api">REST API</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#location-and-availability">Location and availability</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#endpoints">Endpoints</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#virtual-machine-manager-vmm-actions">Virtual Machine Manager (VMM) Actions</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#virtual-machine-vm-actions">Virtual Machine (VM) Actions</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#rest-api-examples">REST API Examples</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#create-a-virtual-machine">Create a Virtual Machine</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#boot-a-virtual-machine">Boot a Virtual Machine</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#dump-a-virtual-machine-information">Dump a Virtual Machine Information</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#reboot-a-virtual-machine">Reboot a Virtual Machine</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#shut-a-virtual-machine-down">Shut a Virtual Machine Down</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#command-line-interface">Command Line Interface</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#rest-api-and-cli-architectural-relationship">REST API and CLI Architectural Relationship</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#internal-api">Internal API</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#goals-and-design">Goals and Design</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#end-to-end-example">End to End Example</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="arm64.html">How to build and test Cloud Hypervisor on AArch64</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cpu.html">CPU</a></li>
+<li class="toctree-l1"><a class="reference internal" href="custom-image.html">How to create a custom Ubuntu image</a></li>
+<li class="toctree-l1"><a class="reference internal" href="debug-port.html"><code class="docutils literal notranslate"><span class="pre">cloud-hypervisor</span></code> debug IO port</a></li>
+<li class="toctree-l1"><a class="reference internal" href="device_model.html">Device Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="fs.html">How to use virtio-fs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="fuzzing.html">Fuzzing in Cloud Hypervisor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gdb.html">GDB Support</a></li>
+<li class="toctree-l1"><a class="reference internal" href="hotplug.html">Cloud Hypervisor Hot Plug</a></li>
+<li class="toctree-l1"><a class="reference internal" href="intel_sgx.html">Intel SGX</a></li>
+<li class="toctree-l1"><a class="reference internal" href="intel_tdx.html">Intel TDX</a></li>
+<li class="toctree-l1"><a class="reference internal" href="io_throttling.html">I/O Throttling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="iommu.html">Virtual IOMMU</a></li>
+<li class="toctree-l1"><a class="reference internal" href="live_migration.html">Live Migration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="logging.html">Logging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="macvtap-bridge.html">Using MACVTAP to Bridge onto Host Network</a></li>
+<li class="toctree-l1"><a class="reference internal" href="memory.html">Memory</a></li>
+<li class="toctree-l1"><a class="reference internal" href="profiling.html">Profiling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="seccomp.html">Seccomp filtering</a></li>
+<li class="toctree-l1"><a class="reference internal" href="snapshot_restore.html">Snapshot and Restore</a></li>
+<li class="toctree-l1"><a class="reference internal" href="uefi.html">UEFI Boot</a></li>
+<li class="toctree-l1"><a class="reference internal" href="uefi.html#links">Links</a></li>
+<li class="toctree-l1"><a class="reference internal" href="vfio.html">Cloud Hypervisor VFIO HOWTO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="vfio-user.html">Cloud Hypervisor VFIO-user HOWTO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="vhost-user-blk-testing.html">How to test vhost-user-blk with SPDK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="vhost-user-net-testing.html">How to test Vhost-user net with OpenVSwitch/DPDK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="virtiofs-root.html">HOWTO VirtioFS rootfs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="windows.html">Windows Support</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../README.html">Cloud Hypervisor</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../README.html" class="icon icon-home"></a> &raquo;</li>
+      <li>Cloud Hypervisor API</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/docs/api.md.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <ul class="simple">
+<li><p><a class="reference external" href="#cloud-hypervisor-api">Cloud Hypervisor API</a></p>
+<ul>
+<li><p><a class="reference external" href="#external-api">External API</a></p>
+<ul>
+<li><p><a class="reference external" href="#rest-api">REST API</a></p>
+<ul>
+<li><p><a class="reference external" href="#location-and-availability">Location and availability</a></p></li>
+<li><p><a class="reference external" href="#endpoints">Endpoints</a></p>
+<ul>
+<li><p><a class="reference external" href="#virtual-machine-manager-vmm-actions">Virtual Machine Manager (VMM) Actions</a></p></li>
+<li><p><a class="reference external" href="#virtual-machine-vm-actions">Virtual Machine (VM) Actions</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference external" href="#rest-api-examples">REST API Examples</a></p>
+<ul>
+<li><p><a class="reference external" href="#create-a-virtual-machine">Create a Virtual Machine</a></p></li>
+<li><p><a class="reference external" href="#boot-a-virtual-machine">Boot a Virtual Machine</a></p></li>
+<li><p><a class="reference external" href="#dump-a-virtual-machine-information">Dump a Virtual Machine Information</a></p></li>
+<li><p><a class="reference external" href="#reboot-a-virtual-machine">Reboot a Virtual Machine</a></p></li>
+<li><p><a class="reference external" href="#shut-a-virtual-machine-down">Shut a Virtual Machine Down</a></p></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p><a class="reference external" href="#command-line-interface">Command Line Interface</a></p></li>
+<li><p><a class="reference external" href="#rest-api-and-cli-architectural-relationship">REST API and CLI Architectural Relationship</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference external" href="#internal-api">Internal API</a></p>
+<ul>
+<li><p><a class="reference external" href="#goals-and-design">Goals and Design</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference external" href="#end-to-end-example">End to End Example</a></p></li>
+</ul>
+</li>
+</ul>
+<section class="tex2jax_ignore mathjax_ignore" id="cloud-hypervisor-api">
+<h1>Cloud Hypervisor API<a class="headerlink" href="#cloud-hypervisor-api" title="Permalink to this headline"></a></h1>
+<p>The Cloud Hypervisor API is made of 2 distinct interfaces:</p>
+<ol class="simple">
+<li><p><strong>The external API</strong>. This is the user facing API. Users and operators can
+control and manage Cloud Hypervisor through either a REST API or a Command
+Line Interface (CLI).</p></li>
+<li><p><strong>The internal API</strong>, based on <a class="reference external" href="https://doc.rust-lang.org/std/sync/mpsc/">rust’s Multi-Producer, Single-Consumer (MPSC)</a>
+module. This API is used internally by the Cloud Hypervisor threads to
+communicate between each others.</p></li>
+</ol>
+<p>The goal of this document is to describe the Cloud Hypervisor API as a whole,
+and to outline how the internal and external APIs are architecturally related.</p>
+<section id="external-api">
+<h2>External API<a class="headerlink" href="#external-api" title="Permalink to this headline"></a></h2>
+<section id="rest-api">
+<h3>REST API<a class="headerlink" href="#rest-api" title="Permalink to this headline"></a></h3>
+<p>The Cloud Hypervisor <a class="reference external" href="https://en.wikipedia.org/wiki/Representational_state_transfer">REST</a>
+API triggers VM and VMM specific actions, and as such it is designed as a
+collection of RPC-style, static methods.</p>
+<p>The API is <a class="reference external" href="https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.0.md">OpenAPI 3.0</a>
+compliant. Please consult the <a class="reference external" href="https://raw.githubusercontent.com/cloud-hypervisor/cloud-hypervisor/master/vmm/src/api/openapi/cloud-hypervisor.yaml">Cloud Hypervisor API</a>
+document for more details about the API payloads and responses.</p>
+</section>
+<section id="location-and-availability">
+<h3>Location and availability<a class="headerlink" href="#location-and-availability" title="Permalink to this headline"></a></h3>
+<p>The REST API is available as soon as the Cloud Hypervisor binary is started,
+through a local UNIX socket.
+By default, it is located at <code class="docutils literal notranslate"><span class="pre">/run/user/{user</span> <span class="pre">ID}/cloud-hypervisor.{Cloud</span> <span class="pre">Hypervisor</span> <span class="pre">PID}</span></code>.
+For example, if you launched Cloud Hypervisor as user ID 1000 and its PID is
+123456, the Cloud Hypervisor REST API will be available at <code class="docutils literal notranslate"><span class="pre">/run/user/1000/cloud-hypervisor.123456</span></code>.</p>
+<p>The REST API default URL can be overridden through the Cloud Hypervisor
+option <code class="docutils literal notranslate"><span class="pre">--api-socket</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ ./target/debug/cloud-hypervisor --api-socket /tmp/cloud-hypervisor.sock
+Cloud Hypervisor Guest
+    API server: /tmp/cloud-hypervisor.sock
+    vCPUs: 1
+    Memory: 512 MB
+    Kernel: None
+    Kernel cmdline:
+    Disk(s): None
+</pre></div>
+</div>
+</section>
+<section id="endpoints">
+<h3>Endpoints<a class="headerlink" href="#endpoints" title="Permalink to this headline"></a></h3>
+<p>The Cloud Hypervisor API exposes the following actions through its endpoints:</p>
+<section id="virtual-machine-manager-vmm-actions">
+<h4>Virtual Machine Manager (VMM) Actions<a class="headerlink" href="#virtual-machine-manager-vmm-actions" title="Permalink to this headline"></a></h4>
+<table border="1" class="docutils">
+<thead>
+<tr>
+<th>Action</th>
+<th>Endpoint</th>
+<th>Request Body</th>
+<th>Response Body</th>
+<th>Prerequisites</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Check for the REST API availability</td>
+<td><code>/vmm.ping</code></td>
+<td>N/A</td>
+<td><code>/schemas/VmmPingResponse</code></td>
+<td>N/A</td>
+</tr>
+<tr>
+<td>Shut the VMM down</td>
+<td><code>/vmm.shutdown</code></td>
+<td>N/A</td>
+<td>N/A</td>
+<td>The VMM is running</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="virtual-machine-vm-actions">
+<h4>Virtual Machine (VM) Actions<a class="headerlink" href="#virtual-machine-vm-actions" title="Permalink to this headline"></a></h4>
+<table border="1" class="docutils">
+<thead>
+<tr>
+<th>Action</th>
+<th>Endpoint</th>
+<th>Request Body</th>
+<th>Response Body</th>
+<th>Prerequisites</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Create the VM</td>
+<td><code>/vm.create</code></td>
+<td><code>/schemas/VmConfig</code></td>
+<td>N/A</td>
+<td>The VM is not created yet</td>
+</tr>
+<tr>
+<td>Delete the VM</td>
+<td><code>/vm.delete</code></td>
+<td>N/A</td>
+<td>N/A</td>
+<td>N/A</td>
+</tr>
+<tr>
+<td>Boot the VM</td>
+<td><code>/vm.boot</code></td>
+<td>N/A</td>
+<td>N/A</td>
+<td>The VM is created but not booted</td>
+</tr>
+<tr>
+<td>Shut the VM down</td>
+<td><code>/vm.shutdown</code></td>
+<td>N/A</td>
+<td>N/A</td>
+<td>The VM is booted</td>
+</tr>
+<tr>
+<td>Reboot the VM</td>
+<td><code>/vm.reboot</code></td>
+<td>N/A</td>
+<td>N/A</td>
+<td>The VM is booted</td>
+</tr>
+<tr>
+<td>Trigger power button of the VM</td>
+<td><code>/vm.power-button</code></td>
+<td>N/A</td>
+<td>N/A</td>
+<td>The VM is booted</td>
+</tr>
+<tr>
+<td>Pause the VM</td>
+<td><code>/vm.pause</code></td>
+<td>N/A</td>
+<td>N/A</td>
+<td>The VM is booted</td>
+</tr>
+<tr>
+<td>Resume the VM</td>
+<td><code>/vm.resume</code></td>
+<td>N/A</td>
+<td>N/A</td>
+<td>The VM is paused</td>
+</tr>
+<tr>
+<td>Add/remove CPUs to/from the VM</td>
+<td><code>/vm.resize</code></td>
+<td><code>/schemas/VmResize</code></td>
+<td>N/A</td>
+<td>The VM is booted</td>
+</tr>
+<tr>
+<td>Add/remove memory from the VM</td>
+<td><code>/vm.resize</code></td>
+<td><code>/schemas/VmResize</code></td>
+<td>N/A</td>
+<td>The VM is booted</td>
+</tr>
+<tr>
+<td>Add/remove memory from a zone</td>
+<td><code>/vm.resize-zone</code></td>
+<td><code>/schemas/VmResizeZone</code></td>
+<td>N/A</td>
+<td>The VM is booted</td>
+</tr>
+<tr>
+<td>Dump the VM information</td>
+<td><code>/vm.info</code></td>
+<td>N/A</td>
+<td><code>/schemas/VmInfo</code></td>
+<td>The VM is created</td>
+</tr>
+<tr>
+<td>Add VFIO PCI device to the VM</td>
+<td><code>/vm.add-device</code></td>
+<td><code>/schemas/VmAddDevice</code></td>
+<td><code>/schemas/PciDeviceInfo</code></td>
+<td>The VM is booted</td>
+</tr>
+<tr>
+<td>Add disk device to the VM</td>
+<td><code>/vm.add-disk</code></td>
+<td><code>/schemas/DiskConfig</code></td>
+<td><code>/schemas/PciDeviceInfo</code></td>
+<td>The VM is booted</td>
+</tr>
+<tr>
+<td>Add fs device to the VM</td>
+<td><code>/vm.add-fs</code></td>
+<td><code>/schemas/FsConfig</code></td>
+<td><code>/schemas/PciDeviceInfo</code></td>
+<td>The VM is booted</td>
+</tr>
+<tr>
+<td>Add pmem device to the VM</td>
+<td><code>/vm.add-pmem</code></td>
+<td><code>/schemas/PmemConfig</code></td>
+<td><code>/schemas/PciDeviceInfo</code></td>
+<td>The VM is booted</td>
+</tr>
+<tr>
+<td>Add network device to the VM</td>
+<td><code>/vm.add-net</code></td>
+<td><code>/schemas/NetConfig</code></td>
+<td><code>/schemas/PciDeviceInfo</code></td>
+<td>The VM is booted</td>
+</tr>
+<tr>
+<td>Add userspace PCI device to the VM</td>
+<td><code>/vm.add-user-device</code></td>
+<td><code>/schemas/VmAddUserDevice</code></td>
+<td><code>/schemas/PciDeviceInfo</code></td>
+<td>The VM is booted</td>
+</tr>
+<tr>
+<td>Add vsock device to the VM</td>
+<td><code>/vm.add-vsock</code></td>
+<td><code>/schemas/VsockConfig</code></td>
+<td><code>/schemas/PciDeviceInfo</code></td>
+<td>The VM is booted</td>
+</tr>
+<tr>
+<td>Remove device from the VM</td>
+<td><code>/vm.remove-device</code></td>
+<td><code>/schemas/VmRemoveDevice</code></td>
+<td>N/A</td>
+<td>The VM is booted</td>
+</tr>
+<tr>
+<td>Dump the VM counters</td>
+<td><code>/vm.counters</code></td>
+<td>N/A</td>
+<td><code>/schemas/VmCounters</code></td>
+<td>The VM is booted</td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+<section id="rest-api-examples">
+<h3>REST API Examples<a class="headerlink" href="#rest-api-examples" title="Permalink to this headline"></a></h3>
+<p>For the following set of examples, we assume Cloud Hypervisor is started with
+the REST API available at <code class="docutils literal notranslate"><span class="pre">/tmp/cloud-hypervisor.sock</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ ./target/debug/cloud-hypervisor --api-socket /tmp/cloud-hypervisor.sock
+Cloud Hypervisor Guest
+    API server: /tmp/cloud-hypervisor.sock
+    vCPUs: 1
+    Memory: 512 MB
+    Kernel: None
+    Kernel cmdline:
+    Disk(s): None
+</pre></div>
+</div>
+<section id="create-a-virtual-machine">
+<h4>Create a Virtual Machine<a class="headerlink" href="#create-a-virtual-machine" title="Permalink to this headline"></a></h4>
+<p>We want to create a virtual machine with the following characteristics:</p>
+<ul class="simple">
+<li><p>4 vCPUs</p></li>
+<li><p>1 GB of RAM</p></li>
+<li><p>1 virtio based networking interface</p></li>
+<li><p>Direct kernel boot from a custom 5.6.0-rc4 Linux kernel located at
+<code class="docutils literal notranslate"><span class="pre">/opt/clh/kernel/vmlinux-virtio-fs-virtio-iommu</span></code></p></li>
+<li><p>Using a Ubuntu image as its root filesystem, located at
+<code class="docutils literal notranslate"><span class="pre">/opt/clh/images/focal-server-cloudimg-amd64.raw</span></code></p></li>
+</ul>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/bin/bash</span>
+
+curl --unix-socket /tmp/cloud-hypervisor.sock -i <span class="se">\</span>
+     -X PUT <span class="s1">&#39;http://localhost/api/v1/vm.create&#39;</span>  <span class="se">\</span>
+     -H <span class="s1">&#39;Accept: application/json&#39;</span>               <span class="se">\</span>
+     -H <span class="s1">&#39;Content-Type: application/json&#39;</span>         <span class="se">\</span>
+     -d <span class="s1">&#39;{</span>
+<span class="s1">         &quot;cpus&quot;:{&quot;boot_vcpus&quot;: 4, &quot;max_vcpus&quot;: 4},</span>
+<span class="s1">         &quot;kernel&quot;:{&quot;path&quot;:&quot;/opt/clh/kernel/vmlinux-virtio-fs-virtio-iommu&quot;},</span>
+<span class="s1">         &quot;cmdline&quot;:{&quot;args&quot;:&quot;console=ttyS0 console=hvc0 root=/dev/vda1 rw&quot;},</span>
+<span class="s1">         &quot;disks&quot;:[{&quot;path&quot;:&quot;/opt/clh/images/focal-server-cloudimg-amd64.raw&quot;}],</span>
+<span class="s1">         &quot;rng&quot;:{&quot;src&quot;:&quot;/dev/urandom&quot;},</span>
+<span class="s1">         &quot;net&quot;:[{&quot;ip&quot;:&quot;192.168.10.10&quot;, &quot;mask&quot;:&quot;255.255.255.0&quot;, &quot;mac&quot;:&quot;12:34:56:78:90:01&quot;}]</span>
+<span class="s1">         }&#39;</span>
+</pre></div>
+</div>
+</section>
+<section id="boot-a-virtual-machine">
+<h4>Boot a Virtual Machine<a class="headerlink" href="#boot-a-virtual-machine" title="Permalink to this headline"></a></h4>
+<p>Once the VM is created, we can boot it:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/bin/bash</span>
+
+curl --unix-socket /tmp/cloud-hypervisor.sock -i -X PUT <span class="s1">&#39;http://localhost/api/v1/vm.boot&#39;</span>
+</pre></div>
+</div>
+</section>
+<section id="dump-a-virtual-machine-information">
+<h4>Dump a Virtual Machine Information<a class="headerlink" href="#dump-a-virtual-machine-information" title="Permalink to this headline"></a></h4>
+<p>We can fetch information about any VM, as soon as it’s created:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/bin/bash</span>
+
+curl --unix-socket /tmp/cloud-hypervisor.sock -i <span class="se">\</span>
+     -X GET <span class="s1">&#39;http://localhost/api/v1/vm.info&#39;</span> <span class="se">\</span>
+     -H <span class="s1">&#39;Accept: application/json&#39;</span>
+</pre></div>
+</div>
+</section>
+<section id="reboot-a-virtual-machine">
+<h4>Reboot a Virtual Machine<a class="headerlink" href="#reboot-a-virtual-machine" title="Permalink to this headline"></a></h4>
+<p>We can reboot a VM that’s already booted:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/bin/bash</span>
+
+curl --unix-socket /tmp/cloud-hypervisor.sock -i -X PUT <span class="s1">&#39;http://localhost/api/v1/vm.reboot&#39;</span>
+</pre></div>
+</div>
+</section>
+<section id="shut-a-virtual-machine-down">
+<h4>Shut a Virtual Machine Down<a class="headerlink" href="#shut-a-virtual-machine-down" title="Permalink to this headline"></a></h4>
+<p>Once booted, we can shut a VM down from the REST API:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/bin/bash</span>
+
+curl --unix-socket /tmp/cloud-hypervisor.sock -i -X PUT <span class="s1">&#39;http://localhost/api/v1/vm.shutdown&#39;</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="command-line-interface">
+<h3>Command Line Interface<a class="headerlink" href="#command-line-interface" title="Permalink to this headline"></a></h3>
+<p>The Cloud Hypervisor Command Line Interface (CLI) can only be used for launching
+the Cloud Hypervisor binary, i.e. it can not be used for controlling the VMM or
+the launched VM once they’re up and running.</p>
+<p>If you want to inspect the VMM, or control the VM after launching Cloud
+Hypervisor from the CLI, you must use the <a class="reference external" href="#rest-api">REST API</a>.</p>
+<p>From the CLI, one can either:</p>
+<ol class="simple">
+<li><p>Create and boot a complete virtual machine by using the CLI options to build
+the VM config. Run <code class="docutils literal notranslate"><span class="pre">cloud-hypervisor</span> <span class="pre">--help</span></code> for a complete list of CLI
+options. As soon as the <code class="docutils literal notranslate"><span class="pre">cloud-hypervisor</span></code> binary is launched, the
+<a class="reference external" href="#rest-api">REST API</a> is available for controlling and managing the VM.</p></li>
+<li><p>Start the <a class="reference external" href="#rest-api">REST API</a> server only, by not passing any VM
+configuration options. The VM can then be asynchronously created and booted
+by sending HTTP commands to the <a class="reference external" href="#rest-api">REST API</a>. Check the
+<a class="reference external" href="#rest-api-examples">REST API examples</a> section for more details.</p></li>
+</ol>
+</section>
+<section id="rest-api-and-cli-architectural-relationship">
+<h3>REST API and CLI Architectural Relationship<a class="headerlink" href="#rest-api-and-cli-architectural-relationship" title="Permalink to this headline"></a></h3>
+<p>The REST API and the CLI both rely on a common, <a class="reference external" href="#internal-api">internal API</a>.</p>
+<p>The CLI options are parsed by the
+<a class="reference external" href="https://docs.rs/clap/2.33.0/clap/">clap crate</a> and then translated into
+<a class="reference external" href="#internal-api">internal API</a> commands.</p>
+<p>The REST API is processed by an HTTP thread using the
+<a class="reference external" href="https://github.com/firecracker-microvm/firecracker/tree/master/src/micro_http">Firecracker’s <code class="docutils literal notranslate"><span class="pre">micro_http</span></code></a>
+crate. As with the CLI, the HTTP requests eventually get translated into
+<a class="reference external" href="#internal-api">internal API</a> commands.</p>
+<p>As a summary, the REST API and the CLI are essentially frontends for the
+<a class="reference external" href="#internal-api">internal API</a>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>                                  <span class="o">+------------------+</span>
+                        <span class="n">REST</span> <span class="n">API</span>  <span class="o">|</span>                  <span class="o">|</span>
+                       <span class="o">+---------&gt;+</span>    <span class="n">micro_http</span>    <span class="o">+--------+</span>
+                       <span class="o">|</span>          <span class="o">|</span>                  <span class="o">|</span>        <span class="o">|</span>
+                       <span class="o">|</span>          <span class="o">+------------------+</span>        <span class="o">|</span>
+                       <span class="o">|</span>                                      <span class="o">|</span>      <span class="o">+------------------------+</span>
+                       <span class="o">|</span>                                      <span class="o">|</span>      <span class="o">|</span>                        <span class="o">|</span>
+<span class="o">+------------+</span>         <span class="o">|</span>                                      <span class="o">|</span>      <span class="o">|</span>                        <span class="o">|</span>
+<span class="o">|</span>            <span class="o">|</span>         <span class="o">|</span>                                      <span class="o">|</span>      <span class="o">|</span> <span class="o">+--------------+</span>       <span class="o">|</span>
+<span class="o">|</span>    <span class="n">User</span>    <span class="o">+---------+</span>                                      <span class="o">+------&gt;</span> <span class="o">|</span> <span class="n">Internal</span> <span class="n">API</span> <span class="o">|</span>       <span class="o">|</span>
+<span class="o">|</span>            <span class="o">|</span>         <span class="o">|</span>                                      <span class="o">|</span>      <span class="o">|</span> <span class="o">+--------------+</span>       <span class="o">|</span>
+<span class="o">+------------+</span>         <span class="o">|</span>                                      <span class="o">|</span>      <span class="o">|</span>                        <span class="o">|</span>
+                       <span class="o">|</span>                                      <span class="o">|</span>      <span class="o">|</span>                        <span class="o">|</span>
+                       <span class="o">|</span>                                      <span class="o">|</span>      <span class="o">+------------------------+</span>
+                       <span class="o">|</span>            <span class="o">+----------+</span>              <span class="o">|</span>                 <span class="n">VMM</span>
+                       <span class="o">|</span>     <span class="n">CLI</span>    <span class="o">|</span>          <span class="o">|</span>              <span class="o">|</span>
+                       <span class="o">+-----------&gt;+</span>   <span class="n">clap</span>   <span class="o">+--------------+</span>
+                                    <span class="o">|</span>          <span class="o">|</span>
+                                    <span class="o">+----------+</span>
+
+
+</pre></div>
+</div>
+</section>
+</section>
+<section id="internal-api">
+<h2>Internal API<a class="headerlink" href="#internal-api" title="Permalink to this headline"></a></h2>
+<p>The Cloud Hypervisor internal API, as its name suggests, is used internally
+by the different Cloud Hypervisor threads (VMM, HTTP, control loop, etc) to
+send commands and responses to each others.</p>
+<p>It is based on <a class="reference external" href="https://doc.rust-lang.org/std/sync/mpsc/">rust’s Multi-Producer, Single-Consumer (MPSC)</a>,
+and the single consumer (a.k.a. the API receiver) is the Cloud Hypervisor
+control loop.</p>
+<p>API producers are the HTTP thread handling the <a class="reference external" href="#rest-api">REST API</a> and the
+main thread that initially parses the <a class="reference external" href="#command-line-interface">CLI</a>.</p>
+<section id="goals-and-design">
+<h3>Goals and Design<a class="headerlink" href="#goals-and-design" title="Permalink to this headline"></a></h3>
+<p>The internal API is designed for controlling, managing and inspecting a Cloud
+Hypervisor VMM and its guest. It is a backend for handling external, user
+visible requests through either the <a class="reference external" href="#rest-api">REST API</a> or the
+<a class="reference external" href="#command-line-interface">CLI</a> interfaces.</p>
+<p>The API follows a command-response scheme that closely maps the <a class="reference external" href="#rest-api">REST API</a>.
+Any command must be replied to with a response.</p>
+<p>Commands are <a class="reference external" href="https://doc.rust-lang.org/std/sync/mpsc/">MPSC</a> based messages and
+are received and processed by the VMM control loop.</p>
+<p>In order for the VMM control loop to respond to any internal API command, it
+must be able to send a response back to the MPSC sender. For that purpose, all
+internal API command payload carry the <a class="reference external" href="https://doc.rust-lang.org/std/sync/mpsc/struct.Sender.html">Sender</a>
+end of an <a class="reference external" href="https://doc.rust-lang.org/std/sync/mpsc/">MPSC</a> channel.</p>
+<p>The sender of any internal API command is therefore responsible for:</p>
+<ol class="simple">
+<li><p>Creating an <a class="reference external" href="https://doc.rust-lang.org/std/sync/mpsc/">MPSC</a> response
+channel.</p></li>
+<li><p>Passing the <a class="reference external" href="https://doc.rust-lang.org/std/sync/mpsc/struct.Sender.html">Sender</a>
+end of the response channel as part of the internal API command payload.</p></li>
+<li><p>Waiting for the internal API command’s response on the <a class="reference external" href="https://doc.rust-lang.org/std/sync/mpsc/struct.Receiver.html">Receiver</a>
+end of the response channel.</p></li>
+</ol>
+</section>
+</section>
+<section id="end-to-end-example">
+<h2>End to End Example<a class="headerlink" href="#end-to-end-example" title="Permalink to this headline"></a></h2>
+<p>In order to further understand how the external and internal Cloud Hypervisor
+APIs work together, let’s look at a complete VM creation flow, from the
+<a class="reference external" href="#rest-api">REST API</a> call, to the reply the external user will receive:</p>
+<ol>
+<li><p>A user or operator sends an HTTP request to the Cloud Hypervisor
+<a class="reference external" href="#rest-api">REST API</a> in order to creates a virtual machine:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">shell</span>
+<span class="c1">#!/bin/bash</span>
+
+ <span class="n">curl</span> <span class="o">--</span><span class="n">unix</span><span class="o">-</span><span class="n">socket</span> <span class="o">/</span><span class="n">tmp</span><span class="o">/</span><span class="n">cloud</span><span class="o">-</span><span class="n">hypervisor</span><span class="o">.</span><span class="n">sock</span> <span class="o">-</span><span class="n">i</span> \
+ 	<span class="o">-</span><span class="n">X</span> <span class="n">PUT</span> <span class="s1">&#39;http://localhost/api/v1/vm.create&#39;</span>  \
+ 	<span class="o">-</span><span class="n">H</span> <span class="s1">&#39;Accept: application/json&#39;</span>               \
+ 	<span class="o">-</span><span class="n">H</span> <span class="s1">&#39;Content-Type: application/json&#39;</span>         \
+ 	<span class="o">-</span><span class="n">d</span> <span class="s1">&#39;{</span>
+ 		<span class="s2">&quot;cpus&quot;</span><span class="p">:{</span><span class="s2">&quot;boot_vcpus&quot;</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span> <span class="s2">&quot;max_vcpus&quot;</span><span class="p">:</span> <span class="mi">4</span><span class="p">},</span>
+ 		<span class="s2">&quot;kernel&quot;</span><span class="p">:{</span><span class="s2">&quot;path&quot;</span><span class="p">:</span><span class="s2">&quot;/opt/clh/kernel/vmlinux-virtio-fs-virtio-iommu&quot;</span><span class="p">},</span>
+ 		<span class="s2">&quot;cmdline&quot;</span><span class="p">:{</span><span class="s2">&quot;args&quot;</span><span class="p">:</span><span class="s2">&quot;console=ttyS0 console=hvc0 root=/dev/vda1 rw&quot;</span><span class="p">},</span>
+ 		<span class="s2">&quot;disks&quot;</span><span class="p">:[{</span><span class="s2">&quot;path&quot;</span><span class="p">:</span><span class="s2">&quot;/opt/clh/images/focal-server-cloudimg-amd64.raw&quot;</span><span class="p">}],</span>
+ 		<span class="s2">&quot;rng&quot;</span><span class="p">:{</span><span class="s2">&quot;src&quot;</span><span class="p">:</span><span class="s2">&quot;/dev/urandom&quot;</span><span class="p">},</span>
+ 		<span class="s2">&quot;net&quot;</span><span class="p">:[{</span><span class="s2">&quot;ip&quot;</span><span class="p">:</span><span class="s2">&quot;192.168.10.10&quot;</span><span class="p">,</span> <span class="s2">&quot;mask&quot;</span><span class="p">:</span><span class="s2">&quot;255.255.255.0&quot;</span><span class="p">,</span> <span class="s2">&quot;mac&quot;</span><span class="p">:</span><span class="s2">&quot;12:34:56:78:90:01&quot;</span><span class="p">}]</span>
+ 		<span class="p">}</span><span class="s1">&#39;</span>
+</pre></div>
+</div>
+</li>
+<li><p>The Cloud Hypervisor HTTP thread processes the request and de-serializes the
+HTTP request JSON body into an internal <code class="docutils literal notranslate"><span class="pre">VmConfig</span></code> structure.</p></li>
+<li><p>The Cloud Hypervisor HTTP thread creates an
+<a class="reference external" href="https://doc.rust-lang.org/std/sync/mpsc/">MPSC</a> channel for the internal API
+server to send its response back.</p></li>
+<li><p>The Cloud Hypervisor HTTP thread prepares an internal API command for creating a
+virtual machine. The command’s payload is made of the de-serialized
+<code class="docutils literal notranslate"><span class="pre">VmConfig</span></code> structure and the response channel:</p>
+<div class="highlight-Rust notranslate"><div class="highlight"><pre><span></span><span class="n">VmCreate</span><span class="p">(</span><span class="n">Arc</span><span class="o">&lt;</span><span class="n">Mutex</span><span class="o">&lt;</span><span class="n">VmConfig</span><span class="o">&gt;&gt;</span><span class="p">,</span><span class="w"> </span><span class="n">Sender</span><span class="o">&lt;</span><span class="n">ApiResponse</span><span class="o">&gt;</span><span class="p">)</span><span class="w"></span>
+</pre></div>
+</div>
+</li>
+<li><p>The Cloud Hypervisor HTTP thread sends the internal API command, and waits
+for the response:</p>
+<div class="highlight-Rust notranslate"><div class="highlight"><pre><span></span><span class="c1">// Send the VM creation request.</span>
+<span class="w"> </span><span class="n">api_sender</span><span class="w"></span>
+<span class="w">     </span><span class="p">.</span><span class="n">send</span><span class="p">(</span><span class="n">ApiRequest</span>::<span class="n">VmCreate</span><span class="p">(</span><span class="n">config</span><span class="p">,</span><span class="w"> </span><span class="n">response_sender</span><span class="p">))</span><span class="w"></span>
+<span class="w">     </span><span class="p">.</span><span class="n">map_err</span><span class="p">(</span><span class="n">ApiError</span>::<span class="n">RequestSend</span><span class="p">)</span><span class="o">?</span><span class="p">;</span><span class="w"></span>
+<span class="w"> </span><span class="n">api_evt</span><span class="p">.</span><span class="n">write</span><span class="p">(</span><span class="mi">1</span><span class="p">).</span><span class="n">map_err</span><span class="p">(</span><span class="n">ApiError</span>::<span class="n">EventFdWrite</span><span class="p">)</span><span class="o">?</span><span class="p">;</span><span class="w"></span>
+
+<span class="w"> </span><span class="n">response_receiver</span><span class="p">.</span><span class="n">recv</span><span class="p">().</span><span class="n">map_err</span><span class="p">(</span><span class="n">ApiError</span>::<span class="n">ResponseRecv</span><span class="p">)</span><span class="o">??</span><span class="p">;</span><span class="w"></span>
+</pre></div>
+</div>
+</li>
+<li><p>The Cloud Hypervisor control loop receives the command, as it listens on the
+internal API <a class="reference external" href="https://doc.rust-lang.org/std/sync/mpsc/">MPSC</a> channel:</p>
+<div class="highlight-Rust notranslate"><div class="highlight"><pre><span></span><span class="c1">// Read from the API receiver channel</span>
+<span class="kd">let</span><span class="w"> </span><span class="n">api_request</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">api_receiver</span><span class="p">.</span><span class="n">recv</span><span class="p">().</span><span class="n">map_err</span><span class="p">(</span><span class="n">Error</span>::<span class="n">ApiRequestRecv</span><span class="p">)</span><span class="o">?</span><span class="p">;</span><span class="w"></span>
+</pre></div>
+</div>
+</li>
+<li><p>The Cloud Hypervisor control loop matches the received internal API against
+the <code class="docutils literal notranslate"><span class="pre">VmCreate</span></code> payload, and extracts both the <code class="docutils literal notranslate"><span class="pre">VmConfig</span></code> structure and the
+<a class="reference external" href="https://doc.rust-lang.org/std/sync/mpsc/struct.Sender.html">Sender</a> from the
+command payload. It stores the <code class="docutils literal notranslate"><span class="pre">VmConfig</span></code> structure and replies back to the
+sender ((The HTTP thread):</p>
+<div class="highlight-Rust notranslate"><div class="highlight"><pre><span></span><span class="k">match</span><span class="w"> </span><span class="n">api_request</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">ApiRequest</span>::<span class="n">VmCreate</span><span class="p">(</span><span class="n">config</span><span class="p">,</span><span class="w"> </span><span class="n">sender</span><span class="p">)</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w"> 	   </span><span class="c1">// We only store the passed VM config.</span>
+<span class="w"> 	   </span><span class="c1">// The VM will be created when being asked to boot it.</span>
+<span class="w"> 	   </span><span class="kd">let</span><span class="w"> </span><span class="n">response</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="bp">self</span><span class="p">.</span><span class="n">vm_config</span><span class="p">.</span><span class="n">is_none</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w"> 		   </span><span class="bp">self</span><span class="p">.</span><span class="n">vm_config</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">Some</span><span class="p">(</span><span class="n">config</span><span class="p">);</span><span class="w"></span>
+<span class="w"> 		   </span><span class="nb">Ok</span><span class="p">(</span><span class="n">ApiResponsePayload</span>::<span class="n">Empty</span><span class="p">)</span><span class="w"></span>
+<span class="w"> 	   </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w"> 		   </span><span class="nb">Err</span><span class="p">(</span><span class="n">ApiError</span>::<span class="n">VmAlreadyCreated</span><span class="p">)</span><span class="w"></span>
+<span class="w"> 	   </span><span class="p">};</span><span class="w"></span>
+
+<span class="w">        </span><span class="n">sender</span><span class="p">.</span><span class="n">send</span><span class="p">(</span><span class="n">response</span><span class="p">).</span><span class="n">map_err</span><span class="p">(</span><span class="n">Error</span>::<span class="n">ApiResponseSend</span><span class="p">)</span><span class="o">?</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+</li>
+<li><p>The Cloud Hypervisor HTTP thread receives the internal API command response
+as the return value from its <code class="docutils literal notranslate"><span class="pre">VmCreate</span></code> HTTP handler. Depending on the
+control loop internal API response, it generates the appropriate HTTP
+response:</p>
+<div class="highlight-Rust notranslate"><div class="highlight"><pre><span></span><span class="c1">// Call vm_create()</span>
+<span class="k">match</span><span class="w"> </span><span class="n">vm_create</span><span class="p">(</span><span class="n">api_notifier</span><span class="p">,</span><span class="w"> </span><span class="n">api_sender</span><span class="p">,</span><span class="w"> </span><span class="n">Arc</span>::<span class="n">new</span><span class="p">(</span><span class="n">Mutex</span>::<span class="n">new</span><span class="p">(</span><span class="n">vm_config</span><span class="p">)))</span><span class="w"></span>
+<span class="w">    </span><span class="p">.</span><span class="n">map_err</span><span class="p">(</span><span class="n">HttpError</span>::<span class="n">VmCreate</span><span class="p">)</span><span class="w"></span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="nb">Ok</span><span class="p">(</span><span class="n">_</span><span class="p">)</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">Response</span>::<span class="n">new</span><span class="p">(</span><span class="n">Version</span>::<span class="n">Http11</span><span class="p">,</span><span class="w"> </span><span class="n">StatusCode</span>::<span class="n">NoContent</span><span class="p">),</span><span class="w"></span>
+<span class="w">    </span><span class="nb">Err</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">error_response</span><span class="p">(</span><span class="n">e</span><span class="p">,</span><span class="w"> </span><span class="n">StatusCode</span>::<span class="n">InternalServerError</span><span class="p">),</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+</li>
+<li><p>The Cloud Hypervisor HTTP thread sends the formed HTTP response back to the
+user. This is abstracted by the
+<a class="reference external" href="https://github.com/firecracker-microvm/firecracker/tree/master/src/micro_http">micro_http</a>
+crate.</p></li>
+</ol>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../README.html" class="btn btn-neutral float-left" title="Cloud Hypervisor" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="arm64.html" class="btn btn-neutral float-right" title="How to build and test Cloud Hypervisor on AArch64" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, various.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

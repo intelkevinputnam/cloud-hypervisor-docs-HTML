@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>How to create a custom Ubuntu image &mdash; Cloud Hypervisor  documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="cloud-hypervisor debug IO port" href="debug-port.html" />
+    <link rel="prev" title="CPU" href="cpu.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../README.html" class="icon icon-home"> Cloud Hypervisor
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="api.html">Cloud Hypervisor API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="arm64.html">How to build and test Cloud Hypervisor on AArch64</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cpu.html">CPU</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">How to create a custom Ubuntu image</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#create-the-image">Create the image</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#get-latest-ubuntu-cloud-image">Get latest Ubuntu cloud image</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#check-the-file-format-is-qcow2">Check the file format is QCOW2</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#convert-qcow2-into-raw">Convert QCOW2 into RAW</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#identify-the-linux-partition">Identify the Linux partition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#mount-the-linux-partition">Mount the Linux partition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#change-root-directory">Change root directory</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#install-needed-packages">Install needed packages</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#remove-counterproductive-packages">Remove counterproductive packages</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#cleanup-the-image">Cleanup the image</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#rename-the-image">Rename the image</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#create-qcow2-from-raw">Create QCOW2 from RAW</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#switch-ci-to-use-the-new-image">Switch CI to use the new image</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#upload-to-azure-storage">Upload to Azure storage</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#update-integration-tests">Update integration tests</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="debug-port.html"><code class="docutils literal notranslate"><span class="pre">cloud-hypervisor</span></code> debug IO port</a></li>
+<li class="toctree-l1"><a class="reference internal" href="device_model.html">Device Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="fs.html">How to use virtio-fs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="fuzzing.html">Fuzzing in Cloud Hypervisor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gdb.html">GDB Support</a></li>
+<li class="toctree-l1"><a class="reference internal" href="hotplug.html">Cloud Hypervisor Hot Plug</a></li>
+<li class="toctree-l1"><a class="reference internal" href="intel_sgx.html">Intel SGX</a></li>
+<li class="toctree-l1"><a class="reference internal" href="intel_tdx.html">Intel TDX</a></li>
+<li class="toctree-l1"><a class="reference internal" href="io_throttling.html">I/O Throttling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="iommu.html">Virtual IOMMU</a></li>
+<li class="toctree-l1"><a class="reference internal" href="live_migration.html">Live Migration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="logging.html">Logging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="macvtap-bridge.html">Using MACVTAP to Bridge onto Host Network</a></li>
+<li class="toctree-l1"><a class="reference internal" href="memory.html">Memory</a></li>
+<li class="toctree-l1"><a class="reference internal" href="profiling.html">Profiling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="seccomp.html">Seccomp filtering</a></li>
+<li class="toctree-l1"><a class="reference internal" href="snapshot_restore.html">Snapshot and Restore</a></li>
+<li class="toctree-l1"><a class="reference internal" href="uefi.html">UEFI Boot</a></li>
+<li class="toctree-l1"><a class="reference internal" href="uefi.html#links">Links</a></li>
+<li class="toctree-l1"><a class="reference internal" href="vfio.html">Cloud Hypervisor VFIO HOWTO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="vfio-user.html">Cloud Hypervisor VFIO-user HOWTO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="vhost-user-blk-testing.html">How to test vhost-user-blk with SPDK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="vhost-user-net-testing.html">How to test Vhost-user net with OpenVSwitch/DPDK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="virtiofs-root.html">HOWTO VirtioFS rootfs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="windows.html">Windows Support</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../README.html">Cloud Hypervisor</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../README.html" class="icon icon-home"></a> &raquo;</li>
+      <li>How to create a custom Ubuntu image</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/docs/custom-image.md.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section class="tex2jax_ignore mathjax_ignore" id="how-to-create-a-custom-ubuntu-image">
+<h1>How to create a custom Ubuntu image<a class="headerlink" href="#how-to-create-a-custom-ubuntu-image" title="Permalink to this headline"></a></h1>
+<p>In the context of adding more utilities to the Ubuntu cloud image being used
+for integration testing, this quick guide details how to achieve the proper
+modification of an official Ubuntu cloud image.</p>
+<section id="create-the-image">
+<h2>Create the image<a class="headerlink" href="#create-the-image" title="Permalink to this headline"></a></h2>
+<p>Let’s go through the steps on how to extend an official Ubuntu image. These
+steps can be applied to other distributions (with a few changes regarding
+package management).</p>
+<section id="get-latest-ubuntu-cloud-image">
+<h3>Get latest Ubuntu cloud image<a class="headerlink" href="#get-latest-ubuntu-cloud-image" title="Permalink to this headline"></a></h3>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>wget https://cloud-images.ubuntu.com/focal/current/focal-server-cloudimg-amd64.img
+</pre></div>
+</div>
+</section>
+<section id="check-the-file-format-is-qcow2">
+<h3>Check the file format is QCOW2<a class="headerlink" href="#check-the-file-format-is-qcow2" title="Permalink to this headline"></a></h3>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>file focal-server-cloudimg-amd64.img
+focal-server-cloudimg-amd64.img: QEMU QCOW2 Image <span class="o">(</span>v2<span class="o">)</span>, <span class="m">2361393152</span> bytes
+</pre></div>
+</div>
+</section>
+<section id="convert-qcow2-into-raw">
+<h3>Convert QCOW2 into RAW<a class="headerlink" href="#convert-qcow2-into-raw" title="Permalink to this headline"></a></h3>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>qemu-img convert -p -f qcow2 -O raw focal-server-cloudimg-amd64.img focal-server-cloudimg-amd64.raw
+</pre></div>
+</div>
+</section>
+<section id="identify-the-linux-partition">
+<h3>Identify the Linux partition<a class="headerlink" href="#identify-the-linux-partition" title="Permalink to this headline"></a></h3>
+<p>The goal is to mount the image rootfs so that it can be modified as needed.
+That’s why we need to identify where the Linux filesystem partition is located
+in the image.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo fdisk -l focal-server-cloudimg-amd64.raw
+Disk focal-server-cloudimg-amd64.raw: <span class="m">2</span>.2 GiB, <span class="m">2361393152</span> bytes, <span class="m">4612096</span> sectors
+Units: sectors of <span class="m">1</span> * <span class="nv">512</span> <span class="o">=</span> <span class="m">512</span> bytes
+Sector size <span class="o">(</span>logical/physical<span class="o">)</span>: <span class="m">512</span> bytes / <span class="m">512</span> bytes
+I/O size <span class="o">(</span>minimum/optimal<span class="o">)</span>: <span class="m">512</span> bytes / <span class="m">512</span> bytes
+Disklabel type: gpt
+Disk identifier: A1171ABA-2BEA-4218-A467-1B2B607E5953
+
+Device                             Start     End Sectors  Size Type
+focal-server-cloudimg-amd64.raw1  <span class="m">227328</span> <span class="m">4612062</span> <span class="m">4384735</span>  <span class="m">2</span>.1G Linux filesystem
+focal-server-cloudimg-amd64.raw14   <span class="m">2048</span>   <span class="m">10239</span>    <span class="m">8192</span>    4M BIOS boot
+focal-server-cloudimg-amd64.raw15  <span class="m">10240</span>  <span class="m">227327</span>  <span class="m">217088</span>  106M EFI System
+
+Partition table entries are not <span class="k">in</span> disk order.
+</pre></div>
+</div>
+</section>
+<section id="mount-the-linux-partition">
+<h3>Mount the Linux partition<a class="headerlink" href="#mount-the-linux-partition" title="Permalink to this headline"></a></h3>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>mkdir -p /mnt
+sudo mount -o loop,offset<span class="o">=</span><span class="k">$((</span><span class="m">227328</span> <span class="o">*</span> <span class="m">512</span><span class="k">))</span> focal-server-cloudimg-amd64.raw /mnt
+</pre></div>
+</div>
+</section>
+<section id="change-root-directory">
+<h3>Change root directory<a class="headerlink" href="#change-root-directory" title="Permalink to this headline"></a></h3>
+<p>Changing the root directory will allow us to install new packages to the rootfs
+contained by the cloud image.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo chroot /mnt
+mount -t proc proc /proc
+mount -t devpts devpts /dev/pts
+</pre></div>
+</div>
+</section>
+<section id="install-needed-packages">
+<h3>Install needed packages<a class="headerlink" href="#install-needed-packages" title="Permalink to this headline"></a></h3>
+<p>In the context Cloud Hypervisor’s integration tests, we need several utilities.
+Here is the way to install them for a Ubuntu image. This step is specific to
+Ubuntu distributions.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>apt update
+apt install fio iperf iperf3 socat stress
+</pre></div>
+</div>
+</section>
+<section id="remove-counterproductive-packages">
+<h3>Remove counterproductive packages<a class="headerlink" href="#remove-counterproductive-packages" title="Permalink to this headline"></a></h3>
+<ul class="simple">
+<li><p>snapd:</p></li>
+</ul>
+<p>This prevents snapd from trying to mount squashfs filesystem when the kernel
+might not support it. This might be the case when the image is used with direct
+kernel boot. This step is specific to Ubuntu distributions.</p>
+<ul class="simple">
+<li><p>pollinate:</p></li>
+</ul>
+<p>Remove this package which can fail and lead to the SSH daemon failing to start.
+See #2113 for details.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>apt remove --purge snapd pollinate
+</pre></div>
+</div>
+</section>
+<section id="cleanup-the-image">
+<h3>Cleanup the image<a class="headerlink" href="#cleanup-the-image" title="Permalink to this headline"></a></h3>
+<p>Leave no trace in the image before unmounting its content.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>umount /dev/pts
+umount /proc
+<span class="nb">history</span> -c
+<span class="nb">exit</span>
+umount /mnt
+</pre></div>
+</div>
+</section>
+<section id="rename-the-image">
+<h3>Rename the image<a class="headerlink" href="#rename-the-image" title="Permalink to this headline"></a></h3>
+<p>Renaming is important to identify this is a modified image.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>mv focal-server-cloudimg-amd64.raw focal-server-cloudimg-amd64-custom-<span class="k">$(</span>date <span class="s2">&quot;+%Y%m%d&quot;</span><span class="k">)</span>-0.raw
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">-0</span></code> is the revision and is only necessary to change if multiple images are
+updated on the same day.</p>
+</section>
+<section id="create-qcow2-from-raw">
+<h3>Create QCOW2 from RAW<a class="headerlink" href="#create-qcow2-from-raw" title="Permalink to this headline"></a></h3>
+<p>Last step is to create the QCOW2 image back from the modified image.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>qemu-img convert -p -f raw -O qcow2 focal-server-cloudimg-amd64-custom-<span class="k">$(</span>date <span class="s2">&quot;+%Y%m%d&quot;</span><span class="k">)</span>-0.raw focal-server-cloudimg-amd64-custom-<span class="k">$(</span>date <span class="s2">&quot;+%Y%m%d&quot;</span><span class="k">)</span>-0.qcow2
+</pre></div>
+</div>
+</section>
+</section>
+<section id="switch-ci-to-use-the-new-image">
+<h2>Switch CI to use the new image<a class="headerlink" href="#switch-ci-to-use-the-new-image" title="Permalink to this headline"></a></h2>
+<section id="upload-to-azure-storage">
+<h3>Upload to Azure storage<a class="headerlink" href="#upload-to-azure-storage" title="Permalink to this headline"></a></h3>
+<p>The next step is to update both images (QCOW2 and RAW) stored as part of the
+Azure storage account, replacing them with the newly created ones. This will
+make these new images available from the integration tests. This is usually
+achieved through the web interface.</p>
+</section>
+<section id="update-integration-tests">
+<h3>Update integration tests<a class="headerlink" href="#update-integration-tests" title="Permalink to this headline"></a></h3>
+<p>Last step is about updating the integration tests to work with this new image.
+The key point is to identify where the Linux filesystem partition is located,
+as we might need to update the direct kernel boot command line, replacing
+<code class="docutils literal notranslate"><span class="pre">/dev/vda1</span></code> with the appropriate partition number.</p>
+<p>Update all references to the previous image name to the new one.</p>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="cpu.html" class="btn btn-neutral float-left" title="CPU" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="debug-port.html" class="btn btn-neutral float-right" title="cloud-hypervisor debug IO port" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, various.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

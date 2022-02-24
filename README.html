@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cloud Hypervisor &mdash; Cloud Hypervisor  documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Cloud Hypervisor API" href="docs/api.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="#" class="icon icon-home"> Cloud Hypervisor
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="docs/api.html">Cloud Hypervisor API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="docs/arm64.html">How to build and test Cloud Hypervisor on AArch64</a></li>
+<li class="toctree-l1"><a class="reference internal" href="docs/cpu.html">CPU</a></li>
+<li class="toctree-l1"><a class="reference internal" href="docs/custom-image.html">How to create a custom Ubuntu image</a></li>
+<li class="toctree-l1"><a class="reference internal" href="docs/debug-port.html"><code class="docutils literal notranslate"><span class="pre">cloud-hypervisor</span></code> debug IO port</a></li>
+<li class="toctree-l1"><a class="reference internal" href="docs/device_model.html">Device Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="docs/fs.html">How to use virtio-fs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="docs/fuzzing.html">Fuzzing in Cloud Hypervisor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="docs/gdb.html">GDB Support</a></li>
+<li class="toctree-l1"><a class="reference internal" href="docs/hotplug.html">Cloud Hypervisor Hot Plug</a></li>
+<li class="toctree-l1"><a class="reference internal" href="docs/intel_sgx.html">Intel SGX</a></li>
+<li class="toctree-l1"><a class="reference internal" href="docs/intel_tdx.html">Intel TDX</a></li>
+<li class="toctree-l1"><a class="reference internal" href="docs/io_throttling.html">I/O Throttling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="docs/iommu.html">Virtual IOMMU</a></li>
+<li class="toctree-l1"><a class="reference internal" href="docs/live_migration.html">Live Migration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="docs/logging.html">Logging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="docs/macvtap-bridge.html">Using MACVTAP to Bridge onto Host Network</a></li>
+<li class="toctree-l1"><a class="reference internal" href="docs/memory.html">Memory</a></li>
+<li class="toctree-l1"><a class="reference internal" href="docs/profiling.html">Profiling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="docs/seccomp.html">Seccomp filtering</a></li>
+<li class="toctree-l1"><a class="reference internal" href="docs/snapshot_restore.html">Snapshot and Restore</a></li>
+<li class="toctree-l1"><a class="reference internal" href="docs/uefi.html">UEFI Boot</a></li>
+<li class="toctree-l1"><a class="reference internal" href="docs/uefi.html#links">Links</a></li>
+<li class="toctree-l1"><a class="reference internal" href="docs/vfio.html">Cloud Hypervisor VFIO HOWTO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="docs/vfio-user.html">Cloud Hypervisor VFIO-user HOWTO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="docs/vhost-user-blk-testing.html">How to test vhost-user-blk with SPDK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="docs/vhost-user-net-testing.html">How to test Vhost-user net with OpenVSwitch/DPDK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="docs/virtiofs-root.html">HOWTO VirtioFS rootfs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="docs/windows.html">Windows Support</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="#">Cloud Hypervisor</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="#" class="icon icon-home"></a> &raquo;</li>
+      <li>Cloud Hypervisor</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/README.md.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section class="tex2jax_ignore mathjax_ignore" id="cloud-hypervisor">
+<h1>Cloud Hypervisor<a class="headerlink" href="#cloud-hypervisor" title="Permalink to this headline"></a></h1>
+<div class="toctree-wrapper compound">
+</div>
+<ul class="simple">
+<li><p><a class="reference external" href="#1-what-is-cloud-hypervisor">1. What is Cloud Hypervisor?</a></p>
+<ul>
+<li><p><a class="reference external" href="#objectives">Objectives</a></p>
+<ul>
+<li><p><a class="reference external" href="#high-level">High Level</a></p></li>
+<li><p><a class="reference external" href="#architectures">Architectures</a></p></li>
+<li><p><a class="reference external" href="#guest-os">Guest OS</a></p></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p><a class="reference external" href="#2-getting-started">2. Getting Started</a></p>
+<ul>
+<li><p><a class="reference external" href="#preparation">Preparation</a></p></li>
+<li><p><a class="reference external" href="#install-prerequisites">Install prerequisites</a></p></li>
+<li><p><a class="reference external" href="#clone-and-build">Clone and build</a></p>
+<ul>
+<li><p><a class="reference external" href="#containerized-builds-and-tests">Containerized builds and tests</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference external" href="#run">Run</a></p>
+<ul>
+<li><p><a class="reference external" href="#cloud-image">Cloud image</a></p></li>
+<li><p><a class="reference external" href="#custom-kernel-and-disk-image">Custom kernel and disk image</a></p>
+<ul>
+<li><p><a class="reference external" href="#building-your-kernel">Building your kernel</a></p></li>
+<li><p><a class="reference external" href="#disk-image">Disk image</a></p></li>
+<li><p><a class="reference external" href="#booting-the-guest-vm">Booting the guest VM</a></p></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p><a class="reference external" href="#3-status">3. Status</a></p>
+<ul>
+<li><p><a class="reference external" href="#hot-plug">Hot Plug</a></p></li>
+<li><p><a class="reference external" href="#device-model">Device Model</a></p></li>
+<li><p><a class="reference external" href="#todo">TODO</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference external" href="#4-rust-vmm-project-dependency">4. <code class="docutils literal notranslate"><span class="pre">rust-vmm</span></code> project dependency</a></p>
+<ul>
+<li><p><a class="reference external" href="#firecracker-and-crosvm">Firecracker and crosvm</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference external" href="#5-community">5. Community</a></p>
+<ul>
+<li><p><a class="reference external" href="#contribute">Contribute</a></p></li>
+<li><p><a class="reference external" href="#join-us">Join us</a></p></li>
+<li><p><a class="reference external" href="#security-issues">Security issues</a></p></li>
+</ul>
+</li>
+</ul>
+<section id="what-is-cloud-hypervisor">
+<h2>1. What is Cloud Hypervisor?<a class="headerlink" href="#what-is-cloud-hypervisor" title="Permalink to this headline"></a></h2>
+<p>Cloud Hypervisor is an open source Virtual Machine Monitor (VMM) that runs on
+top of <a class="reference external" href="https://www.kernel.org/doc/Documentation/virtual/kvm/api.txt">KVM</a>
+hypervisor and Microsoft Hypervisor (MSHV).</p>
+<p>The project focuses on exclusively running modern, cloud workloads, on top of
+a limited set of hardware architectures and platforms. Cloud workloads refers
+to those that are usually run by customers inside a cloud provider. For our
+purposes this means modern operating systems with most I/O handled by
+paravirtualised devices (i.e. virtio), no requirement for legacy devices, and
+64-bit CPUs.</p>
+<p>Cloud Hypervisor is implemented in <a class="reference external" href="https://www.rust-lang.org/">Rust</a> and is
+based on the <a class="reference external" href="https://github.com/rust-vmm">rust-vmm</a> crates.</p>
+<section id="objectives">
+<h3>Objectives<a class="headerlink" href="#objectives" title="Permalink to this headline"></a></h3>
+<section id="high-level">
+<h4>High Level<a class="headerlink" href="#high-level" title="Permalink to this headline"></a></h4>
+<ul class="simple">
+<li><p>Runs on KVM or MSHV</p></li>
+<li><p>Minimal emulation</p></li>
+<li><p>Low latency</p></li>
+<li><p>Low memory footprint</p></li>
+<li><p>Low complexity</p></li>
+<li><p>High performance</p></li>
+<li><p>Small attack surface</p></li>
+<li><p>64-bit support only</p></li>
+<li><p>CPU, memory, PCI hotplug</p></li>
+<li><p>Machine to machine migration</p></li>
+</ul>
+</section>
+<section id="architectures">
+<h4>Architectures<a class="headerlink" href="#architectures" title="Permalink to this headline"></a></h4>
+<p>Cloud Hypervisor supports the <code class="docutils literal notranslate"><span class="pre">x86-64</span></code> and <code class="docutils literal notranslate"><span class="pre">AArch64</span></code> architectures. There are
+some small differences in functionality between the two architectures
+(see <a class="reference external" href="https://github.com/cloud-hypervisor/cloud-hypervisor/issues/1125">#1125</a>).</p>
+</section>
+<section id="guest-os">
+<h4>Guest OS<a class="headerlink" href="#guest-os" title="Permalink to this headline"></a></h4>
+<p>Cloud Hypervisor supports <code class="docutils literal notranslate"><span class="pre">64-bit</span> <span class="pre">Linux</span></code> and Windows 10/Windows Server 2019.</p>
+</section>
+</section>
+</section>
+<section id="getting-started">
+<h2>2. Getting Started<a class="headerlink" href="#getting-started" title="Permalink to this headline"></a></h2>
+<p>Below sections describe how to build and run Cloud Hypervisor on the <code class="docutils literal notranslate"><span class="pre">x86_64</span></code>
+platform. For getting started on the <code class="docutils literal notranslate"><span class="pre">AArch64</span></code> platform, please refer to the
+<a class="reference internal" href="docs/arm64.html"><span class="doc std std-doc">Arm64 documentation</span></a>.</p>
+<section id="preparation">
+<h3>Preparation<a class="headerlink" href="#preparation" title="Permalink to this headline"></a></h3>
+<p>We create a folder to build and run <code class="docutils literal notranslate"><span class="pre">cloud-hypervisor</span></code> at <code class="docutils literal notranslate"><span class="pre">$HOME/cloud-hypervisor</span></code></p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ <span class="nb">export</span> <span class="nv">CLOUDH</span><span class="o">=</span><span class="nv">$HOME</span>/cloud-hypervisor
+$ mkdir <span class="nv">$CLOUDH</span>
+</pre></div>
+</div>
+</section>
+<section id="install-prerequisites">
+<h3>Install prerequisites<a class="headerlink" href="#install-prerequisites" title="Permalink to this headline"></a></h3>
+<p>You need to install some prerequisite packages in order to build and test Cloud
+Hypervisor. Here, all the steps are based on Ubuntu, for other Linux
+distributions please replace the package manager and package name.</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="c1"># Install git</span>
+$ sudo apt install git
+<span class="c1"># Install rust tool chain</span>
+$ curl --proto <span class="s1">&#39;=https&#39;</span> --tlsv1.2 -sSf https://sh.rustup.rs <span class="p">|</span> sh
+<span class="c1"># Install build-essential</span>
+$ sudo apt install build-essential
+<span class="c1"># If you want to build statically linked binary please add musl target</span>
+$ rustup target add x86_64-unknown-linux-musl
+</pre></div>
+</div>
+</section>
+<section id="clone-and-build">
+<h3>Clone and build<a class="headerlink" href="#clone-and-build" title="Permalink to this headline"></a></h3>
+<p>First you need to clone and build the cloud-hypervisor repo:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ <span class="nb">pushd</span> <span class="nv">$CLOUDH</span>
+$ git clone https://github.com/cloud-hypervisor/cloud-hypervisor.git
+$ <span class="nb">cd</span> cloud-hypervisor
+$ cargo build --release
+
+<span class="c1"># We need to give the cloud-hypervisor binary the NET_ADMIN capabilities for it to set TAP interfaces up on the host.</span>
+$ sudo setcap cap_net_admin+ep ./target/release/cloud-hypervisor
+
+<span class="c1"># If you want to build statically linked binary</span>
+$ cargo build --release --target<span class="o">=</span>x86_64-unknown-linux-musl --all
+$ <span class="nb">popd</span>
+</pre></div>
+</div>
+<p>This will build a <code class="docutils literal notranslate"><span class="pre">cloud-hypervisor</span></code> binary under
+<code class="docutils literal notranslate"><span class="pre">$CLOUDH/cloud-hypervisor/target/release/cloud-hypervisor</span></code>.</p>
+<section id="containerized-builds-and-tests">
+<h4>Containerized builds and tests<a class="headerlink" href="#containerized-builds-and-tests" title="Permalink to this headline"></a></h4>
+<p>If you want to build and test Cloud Hypervisor without having to install all the
+required dependencies (The rust toolchain, cargo tools, etc), you can also use
+Cloud Hypervisor’s development script: <code class="docutils literal notranslate"><span class="pre">dev_cli.sh</span></code>. Please note that upon its
+first invocation, this script will pull a fairly large container image.</p>
+<p>For example, to build the Cloud Hypervisor release binary:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ <span class="nb">pushd</span> <span class="nv">$CLOUDH</span>
+$ <span class="nb">cd</span> cloud-hypervisor
+$ ./scripts/dev_cli.sh build --release
+</pre></div>
+</div>
+<p>With <code class="docutils literal notranslate"><span class="pre">dev_cli.sh</span></code>, one can also run the Cloud Hypervisor CI locally. This can be
+very convenient for debugging CI errors without having to fully rely on the
+Cloud Hypervisor CI infrastructure.</p>
+<p>For example, to run the Cloud Hypervisor unit tests:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ ./scripts/dev_cli.sh tests --unit
+</pre></div>
+</div>
+<p>Run the <code class="docutils literal notranslate"><span class="pre">./scripts/dev_cli.sh</span> <span class="pre">--help</span></code> command to view all the supported
+development script commands and their related options.</p>
+</section>
+</section>
+<section id="run">
+<h3>Run<a class="headerlink" href="#run" title="Permalink to this headline"></a></h3>
+<p>You can run a guest VM by either using an existing cloud image or booting into
+your own kernel and disk image.</p>
+<section id="cloud-image">
+<h4>Cloud image<a class="headerlink" href="#cloud-image" title="Permalink to this headline"></a></h4>
+<p>Cloud Hypervisor supports booting disk images containing all needed
+components to run cloud workloads, a.k.a. cloud images. To do that we rely on
+the <a class="reference external" href="https://github.com/cloud-hypervisor/rust-hypervisor-firmware">Rust Hypervisor
+Firmware</a> project
+to provide an ELF formatted KVM firmware for <code class="docutils literal notranslate"><span class="pre">cloud-hypervisor</span></code> to directly
+boot into.</p>
+<p>We need to get the latest <code class="docutils literal notranslate"><span class="pre">rust-hypervisor-firmware</span></code> release and also a working
+cloud image. Here we will use a Ubuntu image:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ <span class="nb">pushd</span> <span class="nv">$CLOUDH</span>
+$ wget https://cloud-images.ubuntu.com/focal/current/focal-server-cloudimg-amd64.img
+$ qemu-img convert -p -f qcow2 -O raw focal-server-cloudimg-amd64.img focal-server-cloudimg-amd64.raw
+$ wget https://github.com/cloud-hypervisor/rust-hypervisor-firmware/releases/download/0.3.2/hypervisor-fw
+$ <span class="nb">popd</span>
+</pre></div>
+</div>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ <span class="nb">pushd</span> <span class="nv">$CLOUDH</span>
+$ sudo setcap cap_net_admin+ep ./cloud-hypervisor/target/release/cloud-hypervisor
+$ ./cloud-hypervisor/target/release/cloud-hypervisor <span class="se">\</span>
+	--kernel ./hypervisor-fw <span class="se">\</span>
+	--disk <span class="nv">path</span><span class="o">=</span>focal-server-cloudimg-amd64.raw <span class="se">\</span>
+	--cpus <span class="nv">boot</span><span class="o">=</span><span class="m">4</span> <span class="se">\</span>
+	--memory <span class="nv">size</span><span class="o">=</span>1024M <span class="se">\</span>
+	--net <span class="s2">&quot;tap=,mac=,ip=,mask=&quot;</span>
+$ <span class="nb">popd</span>
+</pre></div>
+</div>
+<p>Multiple arguments can be given to the <code class="docutils literal notranslate"><span class="pre">--disk</span></code> parameter.</p>
+</section>
+<section id="custom-kernel-and-disk-image">
+<h4>Custom kernel and disk image<a class="headerlink" href="#custom-kernel-and-disk-image" title="Permalink to this headline"></a></h4>
+<section id="building-your-kernel">
+<h5>Building your kernel<a class="headerlink" href="#building-your-kernel" title="Permalink to this headline"></a></h5>
+<p>Cloud Hypervisor also supports direct kernel boot into a <code class="docutils literal notranslate"><span class="pre">vmlinux</span></code> ELF kernel.
+In order to support virtio-watchdog we have our own development branch. You are
+of course able to use your own kernel but these instructions will continue with
+the version that we develop and test against.</p>
+<p>To build the kernel:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="c1"># Clone the Cloud Hypervisor Linux branch</span>
+$ <span class="nb">pushd</span> <span class="nv">$CLOUDH</span>
+$ git clone --depth <span class="m">1</span> https://github.com/cloud-hypervisor/linux.git -b ch-5.15.12 linux-cloud-hypervisor
+$ <span class="nb">pushd</span> linux-cloud-hypervisor
+
+<span class="c1"># Use the cloud-hypervisor kernel config to build your kernel</span>
+$ cp <span class="nv">$CLOUDH</span>/cloud-hypervisor/resources/linux-config-x86_64 .config
+$ <span class="nv">KCFLAGS</span><span class="o">=</span><span class="s2">&quot;-Wa,-mx86-used-note=no&quot;</span> make bzImage -j <span class="sb">`</span>nproc<span class="sb">`</span>
+$ <span class="nb">popd</span>
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">vmlinux</span></code> kernel image will then be located at
+<code class="docutils literal notranslate"><span class="pre">linux-cloud-hypervisor/arch/x86/boot/compressed/vmlinux.bin</span></code>.</p>
+</section>
+<section id="disk-image">
+<h5>Disk image<a class="headerlink" href="#disk-image" title="Permalink to this headline"></a></h5>
+<p>For the disk image, we will use a Ubuntu cloud image that contains a root
+partition:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ <span class="nb">pushd</span> <span class="nv">$CLOUDH</span>
+$ wget https://cloud-images.ubuntu.com/focal/current/focal-server-cloudimg-amd64.img
+$ qemu-img convert -p -f qcow2 -O raw focal-server-cloudimg-amd64.img focal-server-cloudimg-amd64.raw
+$ <span class="nb">popd</span>
+</pre></div>
+</div>
+</section>
+<section id="booting-the-guest-vm">
+<h5>Booting the guest VM<a class="headerlink" href="#booting-the-guest-vm" title="Permalink to this headline"></a></h5>
+<p>Now we can directly boot into our custom kernel and make it use the Ubuntu root
+partition. If we want to have 4 vCPUs and 1024 MBytes of memory:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ <span class="nb">pushd</span> <span class="nv">$CLOUDH</span>
+$ sudo setcap cap_net_admin+ep ./cloud-hypervisor/target/release/cloud-hypervisor
+$ ./cloud-hypervisor/target/release/cloud-hypervisor <span class="se">\</span>
+	--kernel ./linux-cloud-hypervisor/arch/x86/boot/compressed/vmlinux.bin <span class="se">\</span>
+	--disk <span class="nv">path</span><span class="o">=</span>focal-server-cloudimg-amd64.raw <span class="se">\</span>
+	--cmdline <span class="s2">&quot;console=hvc0 root=/dev/vda1 rw&quot;</span> <span class="se">\</span>
+	--cpus <span class="nv">boot</span><span class="o">=</span><span class="m">4</span> <span class="se">\</span>
+	--memory <span class="nv">size</span><span class="o">=</span>1024M <span class="se">\</span>
+	--net <span class="s2">&quot;tap=,mac=,ip=,mask=&quot;</span>
+</pre></div>
+</div>
+<p>The above example use the <code class="docutils literal notranslate"><span class="pre">virtio-console</span></code> device as the guest console, and this
+device may not be enabled soon enough by the guest kernel to get early kernel
+debug messages.</p>
+<p>When in need for earlier debug messages, using the legacy serial device based
+console is preferred:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ ./cloud-hypervisor/target/release/cloud-hypervisor \
+	--kernel ./linux-cloud-hypervisor/arch/x86/boot/compressed/vmlinux.bin \
+	--console off \
+	--serial tty \
+	--disk path=focal-server-cloudimg-amd64.raw \
+	--cmdline &quot;console=ttyS0 root=/dev/vda1 rw&quot; \
+	--cpus boot=4 \
+	--memory size=1024M \
+	--net &quot;tap=,mac=,ip=,mask=&quot;
+</pre></div>
+</div>
+</section>
+</section>
+</section>
+</section>
+<section id="status">
+<h2>3. Status<a class="headerlink" href="#status" title="Permalink to this headline"></a></h2>
+<p>Cloud Hypervisor is under active development. The following stability guarantees
+are currently made:</p>
+<ul class="simple">
+<li><p>The API (including command line options) will not be removed or changed in a
+breaking way without a minimum of 2 releases notice. Where possible warnings
+will be given about the use of deprecated functionality and the deprecations
+will be documented in the release notes.</p></li>
+<li><p>Point releases will be made between individual releases where there are
+substantial bug fixes or security issues that need to be fixed.</p></li>
+</ul>
+<p>Currently the following items are <strong>not</strong> guaranteed across updates:</p>
+<ul class="simple">
+<li><p>Snapshot/restore is not supported across different versions</p></li>
+<li><p>Live migration is not supported across different versions</p></li>
+<li><p>The following features are considered experimental and may change
+substantially between releases: TDX, SGX.</p></li>
+</ul>
+<p>As of 2021-04-29, the following cloud images are supported:</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://cloud-images.ubuntu.com/bionic/current/">Ubuntu Bionic</a> (cloudimg)</p></li>
+<li><p><a class="reference external" href="https://cloud-images.ubuntu.com/focal/current/">Ubuntu Focal</a> (cloudimg)</p></li>
+<li><p><a class="reference external" href="https://cloud-images.ubuntu.com/groovy/current/">Ubuntu Groovy</a> (cloudimg)</p></li>
+<li><p><a class="reference external" href="https://cloud-images.ubuntu.com/hirsute/current/">Ubuntu Hirsute</a> (cloudimg)</p></li>
+</ul>
+<p>Direct kernel boot to userspace should work with a rootfs from most
+distributions.</p>
+<section id="hot-plug">
+<h3>Hot Plug<a class="headerlink" href="#hot-plug" title="Permalink to this headline"></a></h3>
+<p>Cloud Hypervisor supports hotplug of CPUs, passthrough devices (VFIO),
+<code class="docutils literal notranslate"><span class="pre">virtio-{net,block,pmem,fs,vsock}</span></code> and memory resizing. This
+<a class="reference internal" href="docs/hotplug.html"><span class="doc std std-doc">document</span></a> details how to add devices to a running VM.</p>
+</section>
+<section id="device-model">
+<h3>Device Model<a class="headerlink" href="#device-model" title="Permalink to this headline"></a></h3>
+<p>Details of the device model can be found in this
+<a class="reference internal" href="docs/device_model.html"><span class="doc std std-doc">documentation</span></a>.</p>
+</section>
+<section id="todo">
+<h3>TODO<a class="headerlink" href="#todo" title="Permalink to this headline"></a></h3>
+<p>We are not tracking the Cloud Hypervisor TODO list from a specific git tracked
+file but through
+<a class="reference external" href="https://github.com/cloud-hypervisor/cloud-hypervisor/issues/new">github issues</a>
+instead.</p>
+</section>
+</section>
+<section id="rust-vmm-project-dependency">
+<h2>4. <code class="docutils literal notranslate"><span class="pre">rust-vmm</span></code> project dependency<a class="headerlink" href="#rust-vmm-project-dependency" title="Permalink to this headline"></a></h2>
+<p>In order to satisfy the design goal of having a high-performance,
+security-focused hypervisor the decision was made to use the
+<a class="reference external" href="https://www.rust-lang.org/">Rust</a> programming language. The language’s strong
+focus on memory and thread safety makes it an ideal candidate for implementing
+VMMs.</p>
+<p>Instead of implementing the VMM components from scratch, Cloud Hypervisor is
+importing the <a class="reference external" href="https://github.com/rust-vmm">rust-vmm</a> crates, and sharing code
+and architecture together with other VMMs like e.g. Amazon’s
+<a class="reference external" href="https://firecracker-microvm.github.io/">Firecracker</a> and Google’s
+<a class="reference external" href="https://chromium.googlesource.com/chromiumos/platform/crosvm/">crosvm</a>.</p>
+<p>Cloud Hypervisor embraces the rust-vmm project goals, which is to be able to
+share and re-use as many virtualization crates as possible. As such, the Cloud
+Hypervisor relationship with the rust-vmm project is twofold:</p>
+<ol class="simple">
+<li><p>It will use as much of the rust-vmm code as possible. Any new rust-vmm crate
+that’s relevant to the project goals will be integrated as soon as possible.</p></li>
+<li><p>As it is likely that the rust-vmm project will lack some of the features that
+Cloud Hypervisor needs (e.g. ACPI, VFIO, vhost-user, etc), we will be using
+the Cloud Hypervisor VMM to implement and test them, and contribute them back
+to the rust-vmm project.</p></li>
+</ol>
+<section id="firecracker-and-crosvm">
+<h3>Firecracker and crosvm<a class="headerlink" href="#firecracker-and-crosvm" title="Permalink to this headline"></a></h3>
+<p>A large part of the Cloud Hypervisor code is based on either the Firecracker or
+the crosvm projects implementations. Both of these are VMMs written in Rust with
+a focus on safety and security, like Cloud Hypervisor.</p>
+<p>However we want to emphasize that the Cloud Hypervisor project is neither a fork
+nor a reimplementation of any of those projects. The goals and use cases we’re
+trying to meet are different. We’re aiming at supporting cloud workloads, i.e.
+those modern, full Linux distribution images currently being run by Cloud
+Service Provider (CSP) tenants.</p>
+<p>Our primary target is not to support client or serverless use cases, and as such
+our code base already diverges from the crosvm and Firecracker ones. As we add
+more features to support our use cases, we believe that the divergence will
+increase while at the same time sharing as much of the fundamental
+virtualization code through the rust-vmm project crates as possible.</p>
+</section>
+</section>
+<section id="community">
+<h2>5. Community<a class="headerlink" href="#community" title="Permalink to this headline"></a></h2>
+<p>The Cloud Hypervisor project follows the governance, and community guidelines
+described in the <a class="reference external" href="https://github.com/cloud-hypervisor/community">Community</a>
+repository.</p>
+<section id="contribute">
+<h3>Contribute<a class="headerlink" href="#contribute" title="Permalink to this headline"></a></h3>
+<p>We are working on building a global, diverse and collaborative community around
+the Cloud Hypervisor project. Anyone who is interested in
+<a class="reference internal" href="CONTRIBUTING.html"><span class="doc std std-doc">contributing</span></a> to the project is welcome to participate.</p>
+<p>We believe that contributing to a open source project like Cloud Hypervisor
+covers a lot more than just sending code. Testing, documentation, pull request
+reviews, bug reports, feature requests, project improvement suggestions, etc,
+are all equal and welcome means of contribution. See the
+<a class="reference internal" href="CONTRIBUTING.html"><span class="doc std std-doc">CONTRIBUTING</span></a> document for more details.</p>
+</section>
+<section id="join-us">
+<h3>Join us<a class="headerlink" href="#join-us" title="Permalink to this headline"></a></h3>
+<p>Get an <a class="reference external" href="https://join.slack.com/t/cloud-hypervisor/shared_invite/enQtNjY3MTE3MDkwNDQ4LWQ1MTA1ZDVmODkwMWQ1MTRhYzk4ZGNlN2UwNTI3ZmFlODU0OTcwOWZjMTkwZDExYWE3YjFmNzgzY2FmNDAyMjI">invite to our Slack channel</a>
+and <a class="reference external" href="https://cloud-hypervisor.slack.com/">join us on Slack</a>.</p>
+</section>
+<section id="security-issues">
+<h3>Security issues<a class="headerlink" href="#security-issues" title="Permalink to this headline"></a></h3>
+<p>Please contact the maintainers listed in the MAINTAINERS.md file with security issues.</p>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="docs/api.html" class="btn btn-neutral float-right" title="Cloud Hypervisor API" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, various.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

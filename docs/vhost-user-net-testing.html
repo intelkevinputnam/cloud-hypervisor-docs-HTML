@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>How to test Vhost-user net with OpenVSwitch/DPDK &mdash; Cloud Hypervisor  documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="HOWTO VirtioFS rootfs" href="virtiofs-root.html" />
+    <link rel="prev" title="How to test vhost-user-blk with SPDK" href="vhost-user-blk-testing.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../README.html" class="icon icon-home"> Cloud Hypervisor
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="api.html">Cloud Hypervisor API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="arm64.html">How to build and test Cloud Hypervisor on AArch64</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cpu.html">CPU</a></li>
+<li class="toctree-l1"><a class="reference internal" href="custom-image.html">How to create a custom Ubuntu image</a></li>
+<li class="toctree-l1"><a class="reference internal" href="debug-port.html"><code class="docutils literal notranslate"><span class="pre">cloud-hypervisor</span></code> debug IO port</a></li>
+<li class="toctree-l1"><a class="reference internal" href="device_model.html">Device Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="fs.html">How to use virtio-fs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="fuzzing.html">Fuzzing in Cloud Hypervisor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gdb.html">GDB Support</a></li>
+<li class="toctree-l1"><a class="reference internal" href="hotplug.html">Cloud Hypervisor Hot Plug</a></li>
+<li class="toctree-l1"><a class="reference internal" href="intel_sgx.html">Intel SGX</a></li>
+<li class="toctree-l1"><a class="reference internal" href="intel_tdx.html">Intel TDX</a></li>
+<li class="toctree-l1"><a class="reference internal" href="io_throttling.html">I/O Throttling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="iommu.html">Virtual IOMMU</a></li>
+<li class="toctree-l1"><a class="reference internal" href="live_migration.html">Live Migration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="logging.html">Logging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="macvtap-bridge.html">Using MACVTAP to Bridge onto Host Network</a></li>
+<li class="toctree-l1"><a class="reference internal" href="memory.html">Memory</a></li>
+<li class="toctree-l1"><a class="reference internal" href="profiling.html">Profiling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="seccomp.html">Seccomp filtering</a></li>
+<li class="toctree-l1"><a class="reference internal" href="snapshot_restore.html">Snapshot and Restore</a></li>
+<li class="toctree-l1"><a class="reference internal" href="uefi.html">UEFI Boot</a></li>
+<li class="toctree-l1"><a class="reference internal" href="uefi.html#links">Links</a></li>
+<li class="toctree-l1"><a class="reference internal" href="vfio.html">Cloud Hypervisor VFIO HOWTO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="vfio-user.html">Cloud Hypervisor VFIO-user HOWTO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="vhost-user-blk-testing.html">How to test vhost-user-blk with SPDK</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">How to test Vhost-user net with OpenVSwitch/DPDK</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#framework">Framework</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#prerequisites">Prerequisites</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#test">Test</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="virtiofs-root.html">HOWTO VirtioFS rootfs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="windows.html">Windows Support</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../README.html">Cloud Hypervisor</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../README.html" class="icon icon-home"></a> &raquo;</li>
+      <li>How to test Vhost-user net with OpenVSwitch/DPDK</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/docs/vhost-user-net-testing.md.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section class="tex2jax_ignore mathjax_ignore" id="how-to-test-vhost-user-net-with-openvswitch-dpdk">
+<h1>How to test Vhost-user net with OpenVSwitch/DPDK<a class="headerlink" href="#how-to-test-vhost-user-net-with-openvswitch-dpdk" title="Permalink to this headline"></a></h1>
+<p>The purpose of this document is to illustrate how to test vhost-user-net
+in cloud-hypervisor with OVS/DPDK as the backend. This document was
+tested with Open vSwitch v2.13.1, DPDK v19.11.3, and Cloud Hypervisor
+v15.0 on Ubuntu 20.04.1 (host kernel v5.4.0).</p>
+<section id="framework">
+<h2>Framework<a class="headerlink" href="#framework" title="Permalink to this headline"></a></h2>
+<p>It’s a simple test to validate the communication between two virtual machine, connecting them to vhost-user ports respectively provided by <code class="docutils literal notranslate"><span class="pre">OVS/DPDK</span></code>.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>             <span class="o">+----+----------+</span>          <span class="o">+-------------+-----------+-------------+</span>          <span class="o">+----------+----+</span>
+             <span class="o">|</span>    <span class="o">|</span>          <span class="o">|</span>          <span class="o">|</span>             <span class="o">|</span>           <span class="o">|</span>             <span class="o">|</span>          <span class="o">|</span>          <span class="o">|</span>    <span class="o">|</span>
+             <span class="o">|</span>    <span class="o">|</span><span class="n">vhost</span><span class="o">-</span><span class="n">user</span><span class="o">|----------|</span> <span class="n">vhost</span><span class="o">-</span><span class="n">user</span>  <span class="o">|</span>   <span class="n">ovs</span>     <span class="o">|</span> <span class="n">vhost</span><span class="o">-</span><span class="n">user</span>  <span class="o">|----------|</span><span class="n">vhost</span><span class="o">-</span><span class="n">user</span><span class="o">|</span>    <span class="o">|</span>
+             <span class="o">|</span>    <span class="o">|</span><span class="n">net</span> <span class="n">device</span><span class="o">|</span>          <span class="o">|</span> <span class="n">port</span> <span class="mi">1</span>      <span class="o">|</span>           <span class="o">|</span> <span class="n">port</span> <span class="mi">2</span>      <span class="o">|</span>          <span class="o">|</span><span class="n">net</span> <span class="n">device</span><span class="o">|</span>    <span class="o">|</span>
+             <span class="o">|</span>    <span class="o">|</span>          <span class="o">|</span>          <span class="o">|</span>             <span class="o">|</span>           <span class="o">|</span>             <span class="o">|</span>          <span class="o">|</span>          <span class="o">|</span>    <span class="o">|</span>
+             <span class="o">|</span>    <span class="o">+----------+</span>          <span class="o">+-------------+-----------+-------------+</span>          <span class="o">+----------+</span>    <span class="o">|</span>
+             <span class="o">|</span>               <span class="o">|</span>          <span class="o">|</span>                                       <span class="o">|</span>          <span class="o">|</span>               <span class="o">|</span>
+             <span class="o">|</span><span class="n">vm1</span>            <span class="o">|</span>          <span class="o">|</span>                  <span class="n">dpdk</span>                 <span class="o">|</span>          <span class="o">|</span>           <span class="n">vm2</span> <span class="o">|</span>
+             <span class="o">|</span>               <span class="o">|</span>          <span class="o">|</span>                                       <span class="o">|</span>          <span class="o">|</span>               <span class="o">|</span>
+          <span class="o">+--+---------------------------------------------------------------------------------------------+--+</span>
+          <span class="o">|</span>  <span class="o">|</span>                                       <span class="n">hugepages</span>                                             <span class="o">|</span>  <span class="o">|</span>
+          <span class="o">|</span>  <span class="o">+---------------------------------------------------------------------------------------------+</span>  <span class="o">|</span>
+          <span class="o">|</span>                                                                                                   <span class="o">|</span>
+          <span class="o">|</span>                                              <span class="n">host</span>                                                 <span class="o">|</span>
+          <span class="o">|</span>                                                                                                   <span class="o">|</span>
+          <span class="o">+---------------------------------------------------------------------------------------------------+</span>
+</pre></div>
+</div>
+</section>
+<section id="prerequisites">
+<h2>Prerequisites<a class="headerlink" href="#prerequisites" title="Permalink to this headline"></a></h2>
+<p>Prior to running the test, the following steps need to be performed.</p>
+<ul class="simple">
+<li><p>Enable hugepages</p></li>
+<li><p>Install DPDK</p></li>
+<li><p>Install OVS</p></li>
+</ul>
+<p>Here is a good reference for setting up OVS with DPDK from scratch:
+https://docs.openvswitch.org/en/latest/intro/install/dpdk/.</p>
+<p>On Ubuntu systems (18.04 or newer), the OpenVswitch-DPDK package can be
+easily installed with:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo apt-get update
+sudo apt-get install openvswitch-switch-dpdk
+sudo update-alternatives --set ovs-vswitchd /usr/lib/openvswitch-switch-dpdk/ovs-vswitchd-dpdk
+</pre></div>
+</div>
+</section>
+<section id="test">
+<h2>Test<a class="headerlink" href="#test" title="Permalink to this headline"></a></h2>
+<p>The test runs with multiple queue (MQ) support enabled, using 2 pairs of
+TX/RX queues defined for both OVS and the virtual machine. Here are the
+detailed instructions.</p>
+<p><em>Setup OVS</em></p>
+<p>Here is an example how to configure a basic OpenVswitch using DPDK:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># load the ovs kernel module</span>
+modprobe openvswitch
+sudo service openvswitch-switch start
+ovs-vsctl init
+ovs-vsctl <span class="nb">set</span> Open_vSwitch . other_config:dpdk-init<span class="o">=</span><span class="nb">true</span>
+<span class="c1"># run on core 0-3 only</span>
+ovs-vsctl <span class="nb">set</span> Open_vSwitch . other_config:dpdk-lcore-mask<span class="o">=</span>0xf
+<span class="c1"># allocate 2G huge pages (to NUMA 0 only)</span>
+ovs-vsctl <span class="nb">set</span> Open_vSwitch . other_config:dpdk-socket-mem<span class="o">=</span><span class="m">1024</span>
+<span class="c1"># run PMD (Pull Mode Driver) threads on core 0-3 only</span>
+ovs-vsctl <span class="nb">set</span> Open_vSwitch . other_config:pmd-cpu-mask<span class="o">=</span>0xf
+sudo service openvswitch-switch restart
+<span class="c1"># double check the configurations</span>
+ovs-vsctl list Open_vSwitch
+</pre></div>
+</div>
+<p>Here is an example how to create a bridge and add two DPDK ports to it
+(for later use via Cloud Hypervisor):</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># create a bridge</span>
+ovs-vsctl add-br ovsbr0 -- <span class="nb">set</span> bridge ovsbr0 <span class="nv">datapath_type</span><span class="o">=</span>netdev
+<span class="c1"># create two DPDK ports and add them to the bridge</span>
+ovs-vsctl add-port ovsbr0 vhost-user1 -- <span class="nb">set</span> Interface vhost-user1 <span class="nv">type</span><span class="o">=</span>dpdkvhostuser
+ovs-vsctl add-port ovsbr0 vhost-user2 -- <span class="nb">set</span> Interface vhost-user2
+<span class="nv">type</span><span class="o">=</span>dpdkvhostuser
+<span class="c1"># set the number of rx queues</span>
+ovs-vsctl <span class="nb">set</span> Interface vhost-user1 options:n_rxq<span class="o">=</span><span class="m">2</span>
+ovs-vsctl <span class="nb">set</span> Interface vhost-user2 options:n_rxq<span class="o">=</span><span class="m">2</span>
+</pre></div>
+</div>
+<p><em>Launch the VMs</em></p>
+<p>VMs run in client mode. They connect to the socket created by the <code class="docutils literal notranslate"><span class="pre">dpdkvhostuser</span></code> backend.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># From one terminal. We need to give the cloud-hypervisor binary the NET_ADMIN capabilities for it to set TAP interfaces up on the host.</span>
+./cloud-hypervisor <span class="se">\</span>
+        --cpus <span class="nv">boot</span><span class="o">=</span><span class="m">2</span> <span class="se">\</span>
+        --memory <span class="nv">size</span><span class="o">=</span>512M,hugepages<span class="o">=</span>on,shared<span class="o">=</span><span class="nb">true</span> <span class="se">\</span>
+        --kernel vmlinux <span class="se">\</span>
+        --cmdline <span class="s2">&quot;console=ttyS0 console=hvc0 root=/dev/vda1 rw&quot;</span> <span class="se">\</span>
+        --disk <span class="nv">path</span><span class="o">=</span>focal-server-cloudimg-amd64.raw   <span class="se">\</span>
+        --net <span class="nv">mac</span><span class="o">=</span><span class="m">52</span>:54:00:02:d9:01,vhost_user<span class="o">=</span>true,socket<span class="o">=</span>/var/run/openvswitch/vhost-user1,num_queues<span class="o">=</span><span class="m">4</span>
+
+<span class="c1"># From another terminal. We need to give the cloud-hypervisor binary the NET_ADMIN capabilities for it to set TAP interfaces up on the host.</span>
+./cloud-hypervisor <span class="se">\</span>
+        --cpus <span class="nv">boot</span><span class="o">=</span><span class="m">2</span> <span class="se">\</span>
+        --memory <span class="nv">size</span><span class="o">=</span>512M,hugepages<span class="o">=</span>on,shared<span class="o">=</span><span class="nb">true</span> <span class="se">\</span>
+        --kernel vmlinux <span class="se">\</span>
+        --cmdline <span class="s2">&quot;console=ttyS0 console=hvc0 root=/dev/vda1 rw&quot;</span> <span class="se">\</span>
+        --disk <span class="nv">path</span><span class="o">=</span>focal-server-cloudimg-amd64.raw   <span class="se">\</span>
+        --net <span class="nv">mac</span><span class="o">=</span><span class="m">52</span>:54:20:11:C5:02,vhost_user<span class="o">=</span>true,socket<span class="o">=</span>/var/run/openvswitch/vhost-user2,num_queues<span class="o">=</span><span class="m">4</span>
+</pre></div>
+</div>
+<p><em>Setup VM1</em></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># From inside the guest</span>
+sudo ip addr add <span class="m">172</span>.100.0.1/24 dev ens2
+sudo ip link <span class="nb">set</span> up dev ens2
+</pre></div>
+</div>
+<p><em>Setup VM2</em></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># From inside the guest</span>
+sudo ip addr add <span class="m">172</span>.100.0.2/24 dev ens2
+sudo ip link <span class="nb">set</span> up dev ens2
+</pre></div>
+</div>
+<p><em>Ping VM1 from VM2</em></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># From inside the guest</span>
+sudo ping <span class="m">172</span>.100.0.1
+</pre></div>
+</div>
+<p><em>Ping VM2 from VM1</em></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># From inside the guest</span>
+sudo ping <span class="m">172</span>.100.0.2
+</pre></div>
+</div>
+<p><strong>Result:</strong> At this point, VM1 and VM2 can ping each other successfully. We can now run <code class="docutils literal notranslate"><span class="pre">iperf3</span></code> test.</p>
+<p><em>Run VM1 as server</em></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># From inside the guest</span>
+iperf3 -s -p <span class="m">4444</span>
+</pre></div>
+</div>
+<p><em>Run VM2 as client</em></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># From inside the guest</span>
+iperf3 -c <span class="m">172</span>.100.0.1 -t <span class="m">30</span> -p <span class="m">4444</span> <span class="p">&amp;</span>
+</pre></div>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="vhost-user-blk-testing.html" class="btn btn-neutral float-left" title="How to test vhost-user-blk with SPDK" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="virtiofs-root.html" class="btn btn-neutral float-right" title="HOWTO VirtioFS rootfs" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, various.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

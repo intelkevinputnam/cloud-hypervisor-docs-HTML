@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Live Migration &mdash; Cloud Hypervisor  documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Logging" href="logging.html" />
+    <link rel="prev" title="Virtual IOMMU" href="iommu.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../README.html" class="icon icon-home"> Cloud Hypervisor
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="api.html">Cloud Hypervisor API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="arm64.html">How to build and test Cloud Hypervisor on AArch64</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cpu.html">CPU</a></li>
+<li class="toctree-l1"><a class="reference internal" href="custom-image.html">How to create a custom Ubuntu image</a></li>
+<li class="toctree-l1"><a class="reference internal" href="debug-port.html"><code class="docutils literal notranslate"><span class="pre">cloud-hypervisor</span></code> debug IO port</a></li>
+<li class="toctree-l1"><a class="reference internal" href="device_model.html">Device Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="fs.html">How to use virtio-fs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="fuzzing.html">Fuzzing in Cloud Hypervisor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gdb.html">GDB Support</a></li>
+<li class="toctree-l1"><a class="reference internal" href="hotplug.html">Cloud Hypervisor Hot Plug</a></li>
+<li class="toctree-l1"><a class="reference internal" href="intel_sgx.html">Intel SGX</a></li>
+<li class="toctree-l1"><a class="reference internal" href="intel_tdx.html">Intel TDX</a></li>
+<li class="toctree-l1"><a class="reference internal" href="io_throttling.html">I/O Throttling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="iommu.html">Virtual IOMMU</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Live Migration</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#local-migration-suitable-for-live-upgrade-of-vmm">Local Migration (Suitable for Live Upgrade of VMM)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#nested-vm-migration">Nested-VM Migration</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="logging.html">Logging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="macvtap-bridge.html">Using MACVTAP to Bridge onto Host Network</a></li>
+<li class="toctree-l1"><a class="reference internal" href="memory.html">Memory</a></li>
+<li class="toctree-l1"><a class="reference internal" href="profiling.html">Profiling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="seccomp.html">Seccomp filtering</a></li>
+<li class="toctree-l1"><a class="reference internal" href="snapshot_restore.html">Snapshot and Restore</a></li>
+<li class="toctree-l1"><a class="reference internal" href="uefi.html">UEFI Boot</a></li>
+<li class="toctree-l1"><a class="reference internal" href="uefi.html#links">Links</a></li>
+<li class="toctree-l1"><a class="reference internal" href="vfio.html">Cloud Hypervisor VFIO HOWTO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="vfio-user.html">Cloud Hypervisor VFIO-user HOWTO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="vhost-user-blk-testing.html">How to test vhost-user-blk with SPDK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="vhost-user-net-testing.html">How to test Vhost-user net with OpenVSwitch/DPDK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="virtiofs-root.html">HOWTO VirtioFS rootfs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="windows.html">Windows Support</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../README.html">Cloud Hypervisor</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../README.html" class="icon icon-home"></a> &raquo;</li>
+      <li>Live Migration</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/docs/live_migration.md.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section class="tex2jax_ignore mathjax_ignore" id="live-migration">
+<h1>Live Migration<a class="headerlink" href="#live-migration" title="Permalink to this headline"></a></h1>
+<p>This document gives two examples of how to use the live migration
+support in Cloud Hypervisor:</p>
+<ol class="simple">
+<li><p>local migration - migrating between two VMs running on the same
+machine;</p></li>
+<li><p>nested-vm migration - migrating between two nested VMs whose host VMs
+are running on the same machine.</p></li>
+</ol>
+<section id="local-migration-suitable-for-live-upgrade-of-vmm">
+<h2>Local Migration (Suitable for Live Upgrade of VMM)<a class="headerlink" href="#local-migration-suitable-for-live-upgrade-of-vmm" title="Permalink to this headline"></a></h2>
+<p>Launch the source VM (on the host machine):</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ target/release/cloud-hypervisor
+    --kernel ~/workloads/vmlinux <span class="se">\</span>
+    --disk <span class="nv">path</span><span class="o">=</span>~/workloads/focal.raw <span class="se">\</span>
+    --cpus <span class="nv">boot</span><span class="o">=</span><span class="m">1</span> --memory <span class="nv">size</span><span class="o">=</span>1G,shared<span class="o">=</span>on <span class="se">\</span>
+    --cmdline <span class="s2">&quot;root=/dev/vda1 console=ttyS0&quot;</span>  <span class="se">\</span>
+    --serial tty --console off --api-socket<span class="o">=</span>/tmp/api1
+</pre></div>
+</div>
+<p>Launch the destination VM from the same directory (on the host machine):</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ target/release/cloud-hypervisor --api-socket<span class="o">=</span>/tmp/api2
+</pre></div>
+</div>
+<p>Get ready for receiving migration for the destination VM (on the host machine):</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ target/release/ch-remote --api-socket<span class="o">=</span>/tmp/api2 receive-migration unix:/tmp/sock
+</pre></div>
+</div>
+<p>Start to send migration for the source VM (on the host machine):</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ target/release/ch-remote --api-socket<span class="o">=</span>/tmp/api1 send-migration --local unix:/tmp/sock
+</pre></div>
+</div>
+<p>When the above commands completed, the source VM should be successfully
+migrated to the destination VM. Now the destination VM is running while
+the source VM is terminated gracefully.</p>
+</section>
+<section id="nested-vm-migration">
+<h2>Nested-VM Migration<a class="headerlink" href="#nested-vm-migration" title="Permalink to this headline"></a></h2>
+<p>Launch VM 1 (on the host machine) with an extra virtio-blk device for
+exposing a guest image for the nested source VM:</p>
+<blockquote>
+<div><p>Note: the example below also attached an additional virtio-blk device
+with a dummy image for testing purpose (which is optional).</p>
+</div></blockquote>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ head -c 1M &lt; /dev/urandom &gt; tmp.img <span class="c1"># create a dummy image for testing</span>
+$ sudo /target/release/cloud-hypervisor <span class="se">\</span>
+        --serial tty --console off <span class="se">\</span>
+        --cpus <span class="nv">boot</span><span class="o">=</span><span class="m">1</span> --memory <span class="nv">size</span><span class="o">=</span>512M <span class="se">\</span>
+        --kernel vmlinux <span class="se">\</span>
+        --cmdline <span class="s2">&quot;root=/dev/vda1 console=ttyS0&quot;</span>  <span class="se">\</span>
+        --disk <span class="nv">path</span><span class="o">=</span>focal-1.raw <span class="nv">path</span><span class="o">=</span>focal-nested.raw <span class="nv">path</span><span class="o">=</span>tmp.img<span class="se">\</span>
+        --net <span class="nv">ip</span><span class="o">=</span><span class="m">192</span>.168.101.1
+</pre></div>
+</div>
+<p>Launch VM 2 (on the host machine) with an extra virtio-blk device for
+exposing the same guest image for the nested destination VM:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ sudo /target/release/cloud-hypervisor <span class="se">\</span>
+        --serial tty --console off <span class="se">\</span>
+        --cpus <span class="nv">boot</span><span class="o">=</span><span class="m">1</span> --memory <span class="nv">size</span><span class="o">=</span>512M <span class="se">\</span>
+        --kernel vmlinux <span class="se">\</span>
+        --cmdline <span class="s2">&quot;root=/dev/vda1 console=ttyS0&quot;</span>  <span class="se">\</span>
+        --disk <span class="nv">path</span><span class="o">=</span>focal-2.raw <span class="nv">path</span><span class="o">=</span>focal-nested.raw <span class="nv">path</span><span class="o">=</span>tmp.img<span class="se">\</span>
+        --net <span class="nv">ip</span><span class="o">=</span><span class="m">192</span>.168.102.1
+</pre></div>
+</div>
+<p>Launch the nested source VM (inside the guest OS of the VM 1) :</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>vm-1:~$ sudo ./cloud-hypervisor <span class="se">\</span>
+        --serial tty --console off <span class="se">\</span>
+        --memory <span class="nv">size</span><span class="o">=</span>128M <span class="se">\</span>
+        --kernel vmlinux <span class="se">\</span>
+        --cmdline <span class="s2">&quot;console=ttyS0 root=/dev/vda1&quot;</span> <span class="se">\</span>
+        --disk <span class="nv">path</span><span class="o">=</span>/dev/vdb <span class="nv">path</span><span class="o">=</span>/dev/vdc <span class="se">\</span>
+        --api-socket<span class="o">=</span>/tmp/api1 <span class="se">\</span>
+        --net <span class="nv">ip</span><span class="o">=</span><span class="m">192</span>.168.100.1
+vm-1:~$ <span class="c1"># setup the guest network if needed</span>
+vm-1:~$ sudo ip addr add <span class="m">192</span>.168.101.2/24 dev ens4
+vm-1:~$ sudo ip link <span class="nb">set</span> up dev ens4
+vm-1:~$ sudo ip r add default via <span class="m">192</span>.168.101.1
+</pre></div>
+</div>
+<p>Optional: Run the guest workload below (on the guest OS of the nested source VM),
+which performs intensive virtio-blk operations. Now the console of the nested
+source VM should repeatedly print <code class="docutils literal notranslate"><span class="pre">&quot;equal&quot;</span></code>, and our goal is migrating
+this VM and the running workload without interruption.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1">#/bin/bash</span>
+
+<span class="c1"># On the guest OS of the nested source VM</span>
+
+<span class="nv">input</span><span class="o">=</span><span class="s2">&quot;/dev/vdb&quot;</span>
+<span class="nv">result</span><span class="o">=</span><span class="k">$(</span>md5sum <span class="nv">$input</span><span class="k">)</span>
+<span class="nv">tmp</span><span class="o">=</span><span class="k">$(</span>md5sum <span class="nv">$input</span><span class="k">)</span>
+
+<span class="k">while</span>  <span class="o">[[</span> <span class="s2">&quot;</span><span class="nv">$result</span><span class="s2">&quot;</span> <span class="o">==</span> <span class="s2">&quot;</span><span class="nv">$tmp</span><span class="s2">&quot;</span> <span class="o">]]</span>
+<span class="k">do</span>
+    <span class="nb">echo</span> <span class="s2">&quot;equal&quot;</span>
+    <span class="nv">tmp</span><span class="o">=</span><span class="k">$(</span>md5sum <span class="nv">$input</span><span class="k">)</span>
+<span class="k">done</span>
+
+<span class="nb">echo</span> <span class="s2">&quot;not equal&quot;</span>
+<span class="nb">echo</span> <span class="s2">&quot;result = </span><span class="nv">$result</span><span class="s2">&quot;</span>
+<span class="nb">echo</span> <span class="s2">&quot;tmp = </span><span class="nv">$tmp</span><span class="s2">&quot;</span>
+</pre></div>
+</div>
+<p>Launch the nested destination VM (inside the guest OS of the VM 2):</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>vm-2:~$ sudo ./cloud-hypervisor --api-socket<span class="o">=</span>/tmp/api2
+vm-2:~$ <span class="c1"># setup the guest network with the following commands if needed</span>
+vm-2:~$ sudo ip addr add <span class="m">192</span>.168.102.2/24 dev ens4
+vm-2:~$ sudo ip link <span class="nb">set</span> up dev ens4
+vm-2:~$ sudo ip r add default via <span class="m">192</span>.168.102.1
+vm-2:~$ ping <span class="m">192</span>.168.101.2 <span class="c1"># This should succeed</span>
+</pre></div>
+</div>
+<blockquote>
+<div><p>Note: If the above ping failed, please check the iptables rule on the
+host machine, e.g. whether the policy for the <code class="docutils literal notranslate"><span class="pre">FORWARD</span></code> chain is set
+to <code class="docutils literal notranslate"><span class="pre">DROP</span></code> (which is the default setting configured by Docker).</p>
+</div></blockquote>
+<p>Get ready for receiving migration for the nested destination VM (inside
+the guest OS of the VM 2):</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>vm-2:~$ sudo ./ch-remote --api-socket<span class="o">=</span>/tmp/api2 receive-migration unix:/tmp/sock2
+vm-2:~$ sudo socat TCP-LISTEN:6000,reuseaddr UNIX-CLIENT:/tmp/sock2
+</pre></div>
+</div>
+<p>Start to send migration for the nested source VM (inside the guest OS of
+the VM 1):</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>vm-1:~$ sudo socat UNIX-LISTEN:/tmp/sock1,reuseaddr TCP:192.168.102.2:6000
+vm-1:~$ sudo ./ch-remote --api-socket<span class="o">=</span>/tmp/api1 send-migration unix:/tmp/sock1
+</pre></div>
+</div>
+<p>When the above commands completed, the source VM should be successfully
+migrated to the destination VM without interrupting our testing guest
+workload. Now the destination VM is running the testing guest workload
+while the source VM is terminated gracefully.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="iommu.html" class="btn btn-neutral float-left" title="Virtual IOMMU" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="logging.html" class="btn btn-neutral float-right" title="Logging" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, various.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

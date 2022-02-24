@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Device Model &mdash; Cloud Hypervisor  documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="How to use virtio-fs" href="fs.html" />
+    <link rel="prev" title="cloud-hypervisor debug IO port" href="debug-port.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../README.html" class="icon icon-home"> Cloud Hypervisor
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="api.html">Cloud Hypervisor API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="arm64.html">How to build and test Cloud Hypervisor on AArch64</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cpu.html">CPU</a></li>
+<li class="toctree-l1"><a class="reference internal" href="custom-image.html">How to create a custom Ubuntu image</a></li>
+<li class="toctree-l1"><a class="reference internal" href="debug-port.html"><code class="docutils literal notranslate"><span class="pre">cloud-hypervisor</span></code> debug IO port</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Device Model</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#summary">Summary</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#legacy-devices">Legacy devices</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#serial-port">Serial port</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#rtc-cmos">RTC/CMOS</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#i-o-apic">I/O APIC</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#i8042">i8042</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#arm-primecell-general-purpose-input-output-pl061">ARM PrimeCell General Purpose Input/Output (PL061)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#acpi-device">ACPI device</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#virtio-devices">Virtio devices</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#virtio-block">virtio-block</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#virtio-console">virtio-console</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#virtio-iommu">virtio-iommu</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#virtio-net">virtio-net</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#virtio-pmem">virtio-pmem</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#virtio-rng">virtio-rng</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#virtio-vsock">virtio-vsock</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#vhost-user-devices">Vhost-user devices</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#vhost-user-blk">vhost-user-blk</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#vhost-user-fs">vhost-user-fs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#vhost-user-net">vhost-user-net</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#vfio">VFIO</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="fs.html">How to use virtio-fs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="fuzzing.html">Fuzzing in Cloud Hypervisor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gdb.html">GDB Support</a></li>
+<li class="toctree-l1"><a class="reference internal" href="hotplug.html">Cloud Hypervisor Hot Plug</a></li>
+<li class="toctree-l1"><a class="reference internal" href="intel_sgx.html">Intel SGX</a></li>
+<li class="toctree-l1"><a class="reference internal" href="intel_tdx.html">Intel TDX</a></li>
+<li class="toctree-l1"><a class="reference internal" href="io_throttling.html">I/O Throttling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="iommu.html">Virtual IOMMU</a></li>
+<li class="toctree-l1"><a class="reference internal" href="live_migration.html">Live Migration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="logging.html">Logging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="macvtap-bridge.html">Using MACVTAP to Bridge onto Host Network</a></li>
+<li class="toctree-l1"><a class="reference internal" href="memory.html">Memory</a></li>
+<li class="toctree-l1"><a class="reference internal" href="profiling.html">Profiling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="seccomp.html">Seccomp filtering</a></li>
+<li class="toctree-l1"><a class="reference internal" href="snapshot_restore.html">Snapshot and Restore</a></li>
+<li class="toctree-l1"><a class="reference internal" href="uefi.html">UEFI Boot</a></li>
+<li class="toctree-l1"><a class="reference internal" href="uefi.html#links">Links</a></li>
+<li class="toctree-l1"><a class="reference internal" href="vfio.html">Cloud Hypervisor VFIO HOWTO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="vfio-user.html">Cloud Hypervisor VFIO-user HOWTO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="vhost-user-blk-testing.html">How to test vhost-user-blk with SPDK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="vhost-user-net-testing.html">How to test Vhost-user net with OpenVSwitch/DPDK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="virtiofs-root.html">HOWTO VirtioFS rootfs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="windows.html">Windows Support</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../README.html">Cloud Hypervisor</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../README.html" class="icon icon-home"></a> &raquo;</li>
+      <li>Device Model</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/docs/device_model.md.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section class="tex2jax_ignore mathjax_ignore" id="device-model">
+<h1>Device Model<a class="headerlink" href="#device-model" title="Permalink to this headline"></a></h1>
+<p>This document describes the device model supported by <code class="docutils literal notranslate"><span class="pre">cloud-hypervisor</span></code>.</p>
+<section id="summary">
+<h2>Summary<a class="headerlink" href="#summary" title="Permalink to this headline"></a></h2>
+<table border="1" class="docutils">
+<thead>
+<tr>
+<th align="center">Device</th>
+<th align="center">Build configurable</th>
+<th align="center">Enabled by default</th>
+<th align="center">Runtime configurable</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center">Serial port</td>
+<td align="center">:negative_squared_cross_mark:</td>
+<td align="center">:negative_squared_cross_mark:</td>
+<td align="center">:heavy_check_mark:</td>
+</tr>
+<tr>
+<td align="center">RTC/CMOS</td>
+<td align="center">:heavy_check_mark:</td>
+<td align="center">:heavy_check_mark:</td>
+<td align="center">:negative_squared_cross_mark:</td>
+</tr>
+<tr>
+<td align="center">I/O APIC</td>
+<td align="center">:negative_squared_cross_mark:</td>
+<td align="center">:negative_squared_cross_mark:</td>
+<td align="center">:heavy_check_mark:</td>
+</tr>
+<tr>
+<td align="center">i8042 shutdown/reboot</td>
+<td align="center">:negative_squared_cross_mark:</td>
+<td align="center">:negative_squared_cross_mark:</td>
+<td align="center">:negative_squared_cross_mark:</td>
+</tr>
+<tr>
+<td align="center">ACPI shutdown/reboot</td>
+<td align="center">:negative_squared_cross_mark:</td>
+<td align="center">:heavy_check_mark:</td>
+<td align="center">:negative_squared_cross_mark:</td>
+</tr>
+<tr>
+<td align="center">virtio-blk</td>
+<td align="center">:negative_squared_cross_mark:</td>
+<td align="center">:negative_squared_cross_mark:</td>
+<td align="center">:heavy_check_mark:</td>
+</tr>
+<tr>
+<td align="center">virtio-console</td>
+<td align="center">:negative_squared_cross_mark:</td>
+<td align="center">:negative_squared_cross_mark:</td>
+<td align="center">:heavy_check_mark:</td>
+</tr>
+<tr>
+<td align="center">virtio-iommu</td>
+<td align="center">:negative_squared_cross_mark:</td>
+<td align="center">:negative_squared_cross_mark:</td>
+<td align="center">:heavy_check_mark:</td>
+</tr>
+<tr>
+<td align="center">virtio-net</td>
+<td align="center">:negative_squared_cross_mark:</td>
+<td align="center">:negative_squared_cross_mark:</td>
+<td align="center">:heavy_check_mark:</td>
+</tr>
+<tr>
+<td align="center">virtio-pmem</td>
+<td align="center">:negative_squared_cross_mark:</td>
+<td align="center">:negative_squared_cross_mark:</td>
+<td align="center">:heavy_check_mark:</td>
+</tr>
+<tr>
+<td align="center">virtio-rng</td>
+<td align="center">:negative_squared_cross_mark:</td>
+<td align="center">:negative_squared_cross_mark:</td>
+<td align="center">:heavy_check_mark:</td>
+</tr>
+<tr>
+<td align="center">virtio-vsock</td>
+<td align="center">:negative_squared_cross_mark:</td>
+<td align="center">:negative_squared_cross_mark:</td>
+<td align="center">:heavy_check_mark:</td>
+</tr>
+<tr>
+<td align="center">vhost-user-blk</td>
+<td align="center">:negative_squared_cross_mark:</td>
+<td align="center">:negative_squared_cross_mark:</td>
+<td align="center">:heavy_check_mark:</td>
+</tr>
+<tr>
+<td align="center">vhost-user-fs</td>
+<td align="center">:negative_squared_cross_mark:</td>
+<td align="center">:negative_squared_cross_mark:</td>
+<td align="center">:heavy_check_mark:</td>
+</tr>
+<tr>
+<td align="center">vhost-user-net</td>
+<td align="center">:negative_squared_cross_mark:</td>
+<td align="center">:negative_squared_cross_mark:</td>
+<td align="center">:heavy_check_mark:</td>
+</tr>
+<tr>
+<td align="center">VFIO</td>
+<td align="center">:heavy_check_mark:</td>
+<td align="center">:negative_squared_cross_mark:</td>
+<td align="center">:heavy_check_mark:</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="legacy-devices">
+<h2>Legacy devices<a class="headerlink" href="#legacy-devices" title="Permalink to this headline"></a></h2>
+<section id="serial-port">
+<h3>Serial port<a class="headerlink" href="#serial-port" title="Permalink to this headline"></a></h3>
+<p>Simple emulation of a serial port by reading and writing to specific port I/O
+addresses. The serial port can be very useful to gather early logs from the
+operating system booted inside the VM.</p>
+<p>For x86_64, The default serial port is from an emulated 16550A device. It can
+be used as the default console for Linux when booting with the option
+<code class="docutils literal notranslate"><span class="pre">console=ttyS0</span></code>. For AArch64, the default serial port is from an emulated
+PL011 UART device. The related command line for AArch64 is <code class="docutils literal notranslate"><span class="pre">console=ttyAMA0</span></code>.</p>
+<p>This device is always built-in, and it is disabled by default. It can be
+enabled with the <code class="docutils literal notranslate"><span class="pre">--serial</span></code> option, as long as its parameter is not <code class="docutils literal notranslate"><span class="pre">off</span></code>.</p>
+</section>
+<section id="rtc-cmos">
+<h3>RTC/CMOS<a class="headerlink" href="#rtc-cmos" title="Permalink to this headline"></a></h3>
+<p>For environments such as Windows or EFI which cannot rely on KVM clock, the
+emulation of this legacy device makes the platform usable.</p>
+<p>This device is built-in by default, but it can be compiled out with Rust
+features. When compiled in, it is always enabled, and cannot be disabled
+from the command line.</p>
+<p>For AArch64 machines, an ARM PrimeCell Real Time Clock(PL031) is implemented.
+This device is built-in by default for the AArch64 platform, and it is always
+enabled, and cannot be disabled from the command line.</p>
+</section>
+<section id="i-o-apic">
+<h3>I/O APIC<a class="headerlink" href="#i-o-apic" title="Permalink to this headline"></a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">cloud-hypervisor</span></code> supports a so-called split IRQ chip implementation by
+implementing support for the <a class="reference external" href="https://wiki.osdev.org/IOAPIC">IOAPIC</a>.
+By moving part of the IRQ chip implementation from kernel space to user space,
+the IRQ chip emulation does not always run in a fully privileged mode.</p>
+<p>The device is always built-in, and it is enabled depending on the presence of
+the serial port. If the serial port is disabled, and because no other device
+would require pin based interrupts (INTx), the I/O APIC is disabled.</p>
+</section>
+<section id="i8042">
+<h3>i8042<a class="headerlink" href="#i8042" title="Permalink to this headline"></a></h3>
+<p>Simplified PS/2 port since it supports only one key to trigger a reboot or
+shutdown, depending on the ACPI support.</p>
+<p>This device is always built-in, but it is disabled by default. Because ACPI is
+enabled by default, the handling of reboot/shutdown goes through the dedicated
+ACPI device. In case ACPI is disabled, this device is enabled to bring to the
+VM some reboot/shutdown support.</p>
+</section>
+<section id="arm-primecell-general-purpose-input-output-pl061">
+<h3>ARM PrimeCell General Purpose Input/Output (PL061)<a class="headerlink" href="#arm-primecell-general-purpose-input-output-pl061" title="Permalink to this headline"></a></h3>
+<p>Simplified ARM PrimeCell GPIO (PL061) implementation. Only supports key 3 to
+trigger a graceful shutdown of the AArch64 guest.</p>
+</section>
+<section id="acpi-device">
+<h3>ACPI device<a class="headerlink" href="#acpi-device" title="Permalink to this headline"></a></h3>
+<p>This is a dedicated device for handling ACPI shutdown and reboot when ACPI is
+enabled.</p>
+<p>This device is always built-in, and it is enabled by default since the ACPI
+feature is enabled by default.</p>
+</section>
+</section>
+<section id="virtio-devices">
+<h2>Virtio devices<a class="headerlink" href="#virtio-devices" title="Permalink to this headline"></a></h2>
+<p>For all virtio devices listed below, only <code class="docutils literal notranslate"><span class="pre">virtio-pci</span></code> transport layer is
+supported. Cloud Hypervisor supports multiple PCI segments, and users can
+append <code class="docutils literal notranslate"><span class="pre">,pci_segment=&lt;PCI_segment_number&gt;</span></code> to the device flag in the Cloud
+Hypervisor command line to assign devices to a specific PCI segment.</p>
+<section id="virtio-block">
+<h3>virtio-block<a class="headerlink" href="#virtio-block" title="Permalink to this headline"></a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">virtio-blk</span></code> device exposes a block device to the guest. This device is
+usually used to boot the operating system running in the VM.</p>
+<p>This device is always built-in, and it is enabled based on the presence of the
+flag <code class="docutils literal notranslate"><span class="pre">--disk</span></code>.</p>
+</section>
+<section id="virtio-console">
+<h3>virtio-console<a class="headerlink" href="#virtio-console" title="Permalink to this headline"></a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">cloud-hypervisor</span></code> exposes a <code class="docutils literal notranslate"><span class="pre">virtio-console</span></code> device to the guest. Although
+using this device as a guest console can potentially cut some early boot
+messages, it can reduce the guest boot time and provides a complete console
+implementation.</p>
+<p>This device is always built-in, and it is enabled by default to provide a guest
+console. It can be disabled, switching back to the legacy serial port by
+selecting <code class="docutils literal notranslate"><span class="pre">--serial</span> <span class="pre">tty</span> <span class="pre">--console</span> <span class="pre">off</span></code> from the command line.</p>
+</section>
+<section id="virtio-iommu">
+<h3>virtio-iommu<a class="headerlink" href="#virtio-iommu" title="Permalink to this headline"></a></h3>
+<p>As we want to improve our nested guests support, we added support for exposing
+a <a class="reference internal" href="iommu.html"><span class="doc std std-doc">paravirtualized IOMMU</span></a> device through virtio. This allows for a
+safer nested virtio and directly assigned devices support.</p>
+<p>This device is always built-in, and it is enabled based on the presence of the
+parameter <code class="docutils literal notranslate"><span class="pre">iommu=on</span></code> in any of the virtio or VFIO devices. If at least one of
+these devices needs to be connected to the paravirtualized IOMMU, the
+<code class="docutils literal notranslate"><span class="pre">virtio-iommu</span></code> device will be created.</p>
+</section>
+<section id="virtio-net">
+<h3>virtio-net<a class="headerlink" href="#virtio-net" title="Permalink to this headline"></a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">virtio-net</span></code> device provides network connectivity for the guest, as it
+creates a network interface connected to a TAP interface automatically created
+by the <code class="docutils literal notranslate"><span class="pre">cloud-hypervisor</span></code> on the host.</p>
+<p>This device is always built-in, and it is enabled based on the presence of the
+flag <code class="docutils literal notranslate"><span class="pre">--net</span></code>.</p>
+</section>
+<section id="virtio-pmem">
+<h3>virtio-pmem<a class="headerlink" href="#virtio-pmem" title="Permalink to this headline"></a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">virtio-pmem</span></code> implementation emulates a virtual persistent memory device
+that <code class="docutils literal notranslate"><span class="pre">cloud-hypervisor</span></code> can e.g. boot from. Booting from a <code class="docutils literal notranslate"><span class="pre">virtio-pmem</span></code> device
+allows to bypass the guest page cache and improve the guest memory footprint.</p>
+<p>This device is always built-in, and it is enabled based on the presence of the
+flag <code class="docutils literal notranslate"><span class="pre">--pmem</span></code>.</p>
+</section>
+<section id="virtio-rng">
+<h3>virtio-rng<a class="headerlink" href="#virtio-rng" title="Permalink to this headline"></a></h3>
+<p>A VM does not generate entropy like a real machine would, which is an issue
+when workloads running in the guest need random numbers to be generated. The
+<code class="docutils literal notranslate"><span class="pre">virtio-rng</span></code> device provides entropy to the guest by relying on the generator
+that can be found on the host. By default, the chosen source of entropy is
+<code class="docutils literal notranslate"><span class="pre">/dev/urandom</span></code>.</p>
+<p>This device is always built-in, and it is always enabled. The <code class="docutils literal notranslate"><span class="pre">--rng</span></code> flag can
+be used to change the source of entropy.</p>
+</section>
+<section id="virtio-vsock">
+<h3>virtio-vsock<a class="headerlink" href="#virtio-vsock" title="Permalink to this headline"></a></h3>
+<p>In order to more efficiently and securely communicate between host and guest,
+we added a hybrid implementation of the <a class="reference external" href="http://man7.org/linux/man-pages/man7/vsock.7.html">VSOCK</a>
+socket address family over virtio.
+Credits go to the <a class="reference external" href="https://github.com/firecracker-microvm/firecracker/blob/master/docs/vsock.md">Firecracker</a>
+project as our implementation is a copy of theirs.</p>
+<p>This device is always built-in, and it is enabled based on the presence of the
+flag <code class="docutils literal notranslate"><span class="pre">--vsock</span></code>.</p>
+</section>
+</section>
+<section id="vhost-user-devices">
+<h2>Vhost-user devices<a class="headerlink" href="#vhost-user-devices" title="Permalink to this headline"></a></h2>
+<p>Vhost-user devices are virtio backends running outside of the VMM, as its own
+separate process. They are usually used to bring more flexibility and increased
+isolation.</p>
+<section id="vhost-user-blk">
+<h3>vhost-user-blk<a class="headerlink" href="#vhost-user-blk" title="Permalink to this headline"></a></h3>
+<p>As part of the general effort to offload paravirtualized I/O to external
+processes, we added support for vhost-user-blk backends. This enables
+<code class="docutils literal notranslate"><span class="pre">cloud-hypervisor</span></code> users to plug a <code class="docutils literal notranslate"><span class="pre">vhost-user</span></code> based block device (e.g. SPDK)
+into the VMM as their virtio block backend.</p>
+<p>This device is always built-in, and it is enabled when <code class="docutils literal notranslate"><span class="pre">vhost_user=true</span></code> and
+<code class="docutils literal notranslate"><span class="pre">socket</span></code> are provided to the <code class="docutils literal notranslate"><span class="pre">--disk</span></code> parameter.</p>
+</section>
+<section id="vhost-user-fs">
+<h3>vhost-user-fs<a class="headerlink" href="#vhost-user-fs" title="Permalink to this headline"></a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">cloud-hypervisor</span></code> supports the <a class="reference external" href="https://virtio-fs.gitlab.io/">virtio-fs</a>
+shared file system, allowing for an efficient and reliable way of sharing
+a filesystem between the host and the cloud-hypervisor guest.</p>
+<p>See our <a class="reference internal" href="fs.html"><span class="doc std std-doc">filesystem sharing</span></a> documentation for more details on how to
+use virtio-fs with cloud-hypervisor.</p>
+<p>This device is always built-in, and it is enabled based on the presence of the
+flag <code class="docutils literal notranslate"><span class="pre">--fs</span></code>.</p>
+</section>
+<section id="vhost-user-net">
+<h3>vhost-user-net<a class="headerlink" href="#vhost-user-net" title="Permalink to this headline"></a></h3>
+<p>As part of the general effort to offload paravirtualized I/O to external
+processes, we added support for <a class="reference external" href="https://access.redhat.com/solutions/3394851">vhost-user-net</a>
+backends. This enables <code class="docutils literal notranslate"><span class="pre">cloud-hypervisor</span></code> users to plug a <code class="docutils literal notranslate"><span class="pre">vhost-user</span></code> based
+networking device (e.g. DPDK) into the VMM as their virtio network backend.</p>
+<p>This device is always built-in, and it is enabled when <code class="docutils literal notranslate"><span class="pre">vhost_user=true</span></code> and
+<code class="docutils literal notranslate"><span class="pre">socket</span></code> are provided to the <code class="docutils literal notranslate"><span class="pre">--net</span></code> parameter.</p>
+</section>
+</section>
+<section id="vfio">
+<h2>VFIO<a class="headerlink" href="#vfio" title="Permalink to this headline"></a></h2>
+<p>VFIO (Virtual Function I/O) is a kernel framework that exposes direct device
+access to userspace. <code class="docutils literal notranslate"><span class="pre">cloud-hypervisor</span></code> uses VFIO to directly assign host
+physical devices into its guest.</p>
+<p>See our <a class="reference internal" href="vfio.html"><span class="doc std std-doc">VFIO documentation</span></a> for more details on how to directly
+assign host devices to <code class="docutils literal notranslate"><span class="pre">cloud-hypervisor</span></code> guests.</p>
+<p>Because VFIO implies <code class="docutils literal notranslate"><span class="pre">vfio-pci</span></code> in the <code class="docutils literal notranslate"><span class="pre">cloud-hypervisor</span></code> context, the VFIO
+support is built-in when the <code class="docutils literal notranslate"><span class="pre">pci</span></code> feature is selected. And because the <code class="docutils literal notranslate"><span class="pre">pci</span></code>
+feature is built-in by default, VFIO support is also built-in by default.
+When VFIO support is built-in, a physical device can be passed through, using
+the flag <code class="docutils literal notranslate"><span class="pre">--device</span></code> in order to enable the VFIO code.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="debug-port.html" class="btn btn-neutral float-left" title="cloud-hypervisor debug IO port" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="fs.html" class="btn btn-neutral float-right" title="How to use virtio-fs" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, various.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

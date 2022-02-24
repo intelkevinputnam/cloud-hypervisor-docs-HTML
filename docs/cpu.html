@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CPU &mdash; Cloud Hypervisor  documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="How to create a custom Ubuntu image" href="custom-image.html" />
+    <link rel="prev" title="How to build and test Cloud Hypervisor on AArch64" href="arm64.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../README.html" class="icon icon-home"> Cloud Hypervisor
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="api.html">Cloud Hypervisor API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="arm64.html">How to build and test Cloud Hypervisor on AArch64</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">CPU</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#options">Options</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#boot"><code class="docutils literal notranslate"><span class="pre">boot</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#max"><code class="docutils literal notranslate"><span class="pre">max</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#topology"><code class="docutils literal notranslate"><span class="pre">topology</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#kvm-hyperv"><code class="docutils literal notranslate"><span class="pre">kvm_hyperv</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#max-phys-bits"><code class="docutils literal notranslate"><span class="pre">max_phys_bits</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#affinity"><code class="docutils literal notranslate"><span class="pre">affinity</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="custom-image.html">How to create a custom Ubuntu image</a></li>
+<li class="toctree-l1"><a class="reference internal" href="debug-port.html"><code class="docutils literal notranslate"><span class="pre">cloud-hypervisor</span></code> debug IO port</a></li>
+<li class="toctree-l1"><a class="reference internal" href="device_model.html">Device Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="fs.html">How to use virtio-fs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="fuzzing.html">Fuzzing in Cloud Hypervisor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gdb.html">GDB Support</a></li>
+<li class="toctree-l1"><a class="reference internal" href="hotplug.html">Cloud Hypervisor Hot Plug</a></li>
+<li class="toctree-l1"><a class="reference internal" href="intel_sgx.html">Intel SGX</a></li>
+<li class="toctree-l1"><a class="reference internal" href="intel_tdx.html">Intel TDX</a></li>
+<li class="toctree-l1"><a class="reference internal" href="io_throttling.html">I/O Throttling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="iommu.html">Virtual IOMMU</a></li>
+<li class="toctree-l1"><a class="reference internal" href="live_migration.html">Live Migration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="logging.html">Logging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="macvtap-bridge.html">Using MACVTAP to Bridge onto Host Network</a></li>
+<li class="toctree-l1"><a class="reference internal" href="memory.html">Memory</a></li>
+<li class="toctree-l1"><a class="reference internal" href="profiling.html">Profiling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="seccomp.html">Seccomp filtering</a></li>
+<li class="toctree-l1"><a class="reference internal" href="snapshot_restore.html">Snapshot and Restore</a></li>
+<li class="toctree-l1"><a class="reference internal" href="uefi.html">UEFI Boot</a></li>
+<li class="toctree-l1"><a class="reference internal" href="uefi.html#links">Links</a></li>
+<li class="toctree-l1"><a class="reference internal" href="vfio.html">Cloud Hypervisor VFIO HOWTO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="vfio-user.html">Cloud Hypervisor VFIO-user HOWTO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="vhost-user-blk-testing.html">How to test vhost-user-blk with SPDK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="vhost-user-net-testing.html">How to test Vhost-user net with OpenVSwitch/DPDK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="virtiofs-root.html">HOWTO VirtioFS rootfs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="windows.html">Windows Support</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../README.html">Cloud Hypervisor</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../README.html" class="icon icon-home"></a> &raquo;</li>
+      <li>CPU</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/docs/cpu.md.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section class="tex2jax_ignore mathjax_ignore" id="cpu">
+<h1>CPU<a class="headerlink" href="#cpu" title="Permalink to this headline"></a></h1>
+<p>Cloud Hypervisor has many options when it comes to the creation of virtual
+CPUs. This document aims to explain what Cloud Hypervisor is capable of and
+how it can be used to meet the needs of very different use cases.</p>
+<section id="options">
+<h2>Options<a class="headerlink" href="#options" title="Permalink to this headline"></a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">CpusConfig</span></code> or what is known as <code class="docutils literal notranslate"><span class="pre">--cpus</span></code> from the CLI perspective is the way
+to set vCPUs options for Cloud Hypervisor.</p>
+<div class="highlight-rust notranslate"><div class="highlight"><pre><span></span><span class="k">struct</span> <span class="nc">CpusConfig</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">boot_vcpus</span>: <span class="kt">u8</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="n">max_vcpus</span>: <span class="kt">u8</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="n">topology</span>: <span class="nb">Option</span><span class="o">&lt;</span><span class="n">CpuTopology</span><span class="o">&gt;</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="n">kvm_hyperv</span>: <span class="kt">bool</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="n">max_phys_bits</span>: <span class="kt">u8</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="n">affinity</span>: <span class="nb">Option</span><span class="o">&lt;</span><span class="nb">Vec</span><span class="o">&lt;</span><span class="n">CpuAffinity</span><span class="o">&gt;&gt;</span><span class="p">,</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">--</span><span class="n">cpus</span> <span class="n">boot</span><span class="o">=&lt;</span><span class="n">boot_vcpus</span><span class="o">&gt;</span><span class="p">,</span><span class="nb">max</span><span class="o">=&lt;</span><span class="n">max_vcpus</span><span class="o">&gt;</span><span class="p">,</span><span class="n">topology</span><span class="o">=&lt;</span><span class="n">threads_per_core</span><span class="o">&gt;</span><span class="p">:</span><span class="o">&lt;</span><span class="n">cores_per_die</span><span class="o">&gt;</span><span class="p">:</span><span class="o">&lt;</span><span class="n">dies_per_package</span><span class="o">&gt;</span><span class="p">:</span><span class="o">&lt;</span><span class="n">packages</span><span class="o">&gt;</span><span class="p">,</span><span class="n">kvm_hyperv</span><span class="o">=</span><span class="n">on</span><span class="o">|</span><span class="n">off</span><span class="p">,</span><span class="n">max_phys_bits</span><span class="o">=&lt;</span><span class="n">maximum_number_of_physical_bits</span><span class="o">&gt;</span><span class="p">,</span><span class="n">affinity</span><span class="o">=&lt;</span><span class="n">list_of_vcpus_with_their_associated_cpuset</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+<section id="boot">
+<h3><code class="docutils literal notranslate"><span class="pre">boot</span></code><a class="headerlink" href="#boot" title="Permalink to this headline"></a></h3>
+<p>Number of vCPUs present at boot time.</p>
+<p>This option allows to define a specific number of vCPUs to be present at the
+time the VM is started. This option is mandatory when using the <code class="docutils literal notranslate"><span class="pre">--cpus</span></code>
+parameter. If <code class="docutils literal notranslate"><span class="pre">--cpus</span></code> is not specified, this option takes the default value
+of <code class="docutils literal notranslate"><span class="pre">1</span></code>, starting the VM with a single vCPU.</p>
+<p>Value is an unsigned integer of 8 bits.</p>
+<p><em>Example</em></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">--</span><span class="n">cpus</span> <span class="n">boot</span><span class="o">=</span><span class="mi">2</span>
+</pre></div>
+</div>
+</section>
+<section id="max">
+<h3><code class="docutils literal notranslate"><span class="pre">max</span></code><a class="headerlink" href="#max" title="Permalink to this headline"></a></h3>
+<p>Maximum number of vCPUs.</p>
+<p>This option defines the maximum number of vCPUs that can be assigned to the VM.
+In particular, this option is used when looking for CPU hotplug as it lets the
+provide an indication about how many vCPUs might be needed later during the
+runtime of the VM.
+For instance, if booting the VM with 2 vCPUs and a maximum of 6 vCPUs, it means
+up to 4 vCPUs can be added later at runtime by resizing the VM.</p>
+<p>The value must be greater than or equal to the number of boot vCPUs.
+The value is an unsigned integer of 8 bits.</p>
+<p>By default this option takes the value of <code class="docutils literal notranslate"><span class="pre">boot</span></code>, meaning vCPU hotplug is not
+expected and can’t be performed.</p>
+<p><em>Example</em></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">--</span><span class="n">cpus</span> <span class="nb">max</span><span class="o">=</span><span class="mi">3</span>
+</pre></div>
+</div>
+</section>
+<section id="topology">
+<h3><code class="docutils literal notranslate"><span class="pre">topology</span></code><a class="headerlink" href="#topology" title="Permalink to this headline"></a></h3>
+<p>Topology of the guest platform.</p>
+<p>This option gives the user a way to describe the exact topology that should be
+exposed to the guest. It can be useful to describe to the guest the same
+topology found on the host as it allows for proper usage of the resources and
+is a way to achieve better performances.</p>
+<p>The topology is described through the following structure:</p>
+<div class="highlight-rust notranslate"><div class="highlight"><pre><span></span><span class="k">struct</span> <span class="nc">CpuTopology</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">threads_per_core</span>: <span class="kt">u8</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="n">cores_per_die</span>: <span class="kt">u8</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="n">dies_per_package</span>: <span class="kt">u8</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="n">packages</span>: <span class="kt">u8</span><span class="p">,</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+<p>or the following syntax through the CLI:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">topology</span><span class="o">=&lt;</span><span class="n">threads_per_core</span><span class="o">&gt;</span><span class="p">:</span><span class="o">&lt;</span><span class="n">cores_per_die</span><span class="o">&gt;</span><span class="p">:</span><span class="o">&lt;</span><span class="n">dies_per_package</span><span class="o">&gt;</span><span class="p">:</span><span class="o">&lt;</span><span class="n">packages</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+<p>By default the topology will be <code class="docutils literal notranslate"><span class="pre">1:1:1:1</span></code>.</p>
+<p><em>Example</em></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">--</span><span class="n">cpus</span> <span class="n">boot</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span><span class="n">topology</span><span class="o">=</span><span class="mi">1</span><span class="p">:</span><span class="mi">1</span><span class="p">:</span><span class="mi">2</span><span class="p">:</span><span class="mi">1</span>
+</pre></div>
+</div>
+</section>
+<section id="kvm-hyperv">
+<h3><code class="docutils literal notranslate"><span class="pre">kvm_hyperv</span></code><a class="headerlink" href="#kvm-hyperv" title="Permalink to this headline"></a></h3>
+<p>Enable KVM Hyper-V emulation.</p>
+<p>When turned on, this option relies on KVM to emulate the synthetic interrupt
+controller (SynIC) along with synthetic timers expected by a Windows guest.
+A Windows guest usually runs on top of Microsoft Hyper-V, therefore expects
+these synthetic devices to be present. That’s why KVM provides a way to emulate
+them and avoids failures running a Windows guest with Cloud Hypervisor.</p>
+<p>By default this option is turned off.</p>
+<p><em>Example</em></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">--</span><span class="n">cpus</span> <span class="n">kvm_hyperv</span><span class="o">=</span><span class="n">on</span>
+</pre></div>
+</div>
+</section>
+<section id="max-phys-bits">
+<h3><code class="docutils literal notranslate"><span class="pre">max_phys_bits</span></code><a class="headerlink" href="#max-phys-bits" title="Permalink to this headline"></a></h3>
+<p>Maximum size for guest’s addressable space.</p>
+<p>This option defines the maximum number of physical bits for all vCPUs, which
+sets a limit for the size of the guest’s addressable space. This is mainly
+useful for debug purpose.</p>
+<p>The value is an unsigned integer of 8 bits.</p>
+<p><em>Example</em></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">--</span><span class="n">cpus</span> <span class="n">max_phys_bits</span><span class="o">=</span><span class="mi">40</span>
+</pre></div>
+</div>
+</section>
+<section id="affinity">
+<h3><code class="docutils literal notranslate"><span class="pre">affinity</span></code><a class="headerlink" href="#affinity" title="Permalink to this headline"></a></h3>
+<p>Affinity of each vCPU.</p>
+<p>This option gives the user a way to provide the host CPU set associated with
+each vCPU. It is useful for achieving CPU pinning, ensuring multiple VMs won’t
+affect the performance of each other. It might also be used in the context of
+NUMA as it is way of making sure the VM can run on a specific host NUMA node.
+In general, this option is used to increase the performances of a VM depending
+on the host platform and the type of workload running in the guest.</p>
+<p>The affinity is described through the following structure:</p>
+<div class="highlight-rust notranslate"><div class="highlight"><pre><span></span><span class="k">struct</span> <span class="nc">CpuAffinity</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">vcpu</span>: <span class="kt">u8</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="n">host_cpus</span>: <span class="nb">Vec</span><span class="o">&lt;</span><span class="kt">u8</span><span class="o">&gt;</span><span class="p">,</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+<p>or the following syntax through the CLI:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">affinity</span><span class="o">=</span><span class="p">[</span><span class="o">&lt;</span><span class="n">vcpu_id1</span><span class="o">&gt;@</span><span class="p">[</span><span class="o">&lt;</span><span class="n">host_cpu_id1</span><span class="o">&gt;</span><span class="p">,</span> <span class="o">&lt;</span><span class="n">host_cpu_id2</span><span class="o">&gt;</span><span class="p">],</span> <span class="o">&lt;</span><span class="n">vcpu_id2</span><span class="o">&gt;@</span><span class="p">[</span><span class="o">&lt;</span><span class="n">host_cpu_id3</span><span class="o">&gt;</span><span class="p">,</span> <span class="o">&lt;</span><span class="n">host_cpu_id4</span><span class="o">&gt;</span><span class="p">]]</span>
+</pre></div>
+</div>
+<p>The outer brackets define the list of vCPUs. And for each vCPU, the inner
+brackets attached to <code class="docutils literal notranslate"><span class="pre">&#64;</span></code> define the list of host CPUs the vCPU is allowed to
+run onto.</p>
+<p>Multiple values can be provided to define each list. Each value is an unsigned
+integer of 8 bits.</p>
+<p>For instance, if one needs to run vCPU 0 on host CPUs from 0 to 4, the syntax
+using <code class="docutils literal notranslate"><span class="pre">-</span></code> will help define a contiguous range with <code class="docutils literal notranslate"><span class="pre">affinity=0&#64;[0-4]</span></code>. The
+same example could also be described with <code class="docutils literal notranslate"><span class="pre">affinity=0&#64;[0,1,2,3,4]</span></code>.</p>
+<p>A combination of both <code class="docutils literal notranslate"><span class="pre">-</span></code> and <code class="docutils literal notranslate"><span class="pre">,</span></code> separators is useful when one might need to
+describe a list containing host CPUs from 0 to 99 and the host CPU 255, as it
+could simply be described with <code class="docutils literal notranslate"><span class="pre">affinity=0&#64;[0-99,255]</span></code>.</p>
+<p>As soon as one tries to describe a list of values, <code class="docutils literal notranslate"><span class="pre">[</span></code> and <code class="docutils literal notranslate"><span class="pre">]</span></code> must be used to
+demarcate the list.</p>
+<p>By default each vCPU runs on the entire host CPU set.</p>
+<p><em>Example</em></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">--</span><span class="n">cpus</span> <span class="n">boot</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span><span class="n">affinity</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="o">@</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">],</span><span class="mi">1</span><span class="o">@</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">]]</span>
+</pre></div>
+</div>
+<p>In this example, assuming the host has 4 CPUs, vCPU 0 will run exclusively on
+host CPUs 2 and 3, while vCPU 1 will run exclusively on host CPUs 0 and 1.
+Because nothing is defined for vCPU 2, it can run on any of the 4 host CPUs.</p>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="arm64.html" class="btn btn-neutral float-left" title="How to build and test Cloud Hypervisor on AArch64" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="custom-image.html" class="btn btn-neutral float-right" title="How to create a custom Ubuntu image" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, various.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

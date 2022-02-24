@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Memory &mdash; Cloud Hypervisor  documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Profiling" href="profiling.html" />
+    <link rel="prev" title="Using MACVTAP to Bridge onto Host Network" href="macvtap-bridge.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../README.html" class="icon icon-home"> Cloud Hypervisor
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="api.html">Cloud Hypervisor API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="arm64.html">How to build and test Cloud Hypervisor on AArch64</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cpu.html">CPU</a></li>
+<li class="toctree-l1"><a class="reference internal" href="custom-image.html">How to create a custom Ubuntu image</a></li>
+<li class="toctree-l1"><a class="reference internal" href="debug-port.html"><code class="docutils literal notranslate"><span class="pre">cloud-hypervisor</span></code> debug IO port</a></li>
+<li class="toctree-l1"><a class="reference internal" href="device_model.html">Device Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="fs.html">How to use virtio-fs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="fuzzing.html">Fuzzing in Cloud Hypervisor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gdb.html">GDB Support</a></li>
+<li class="toctree-l1"><a class="reference internal" href="hotplug.html">Cloud Hypervisor Hot Plug</a></li>
+<li class="toctree-l1"><a class="reference internal" href="intel_sgx.html">Intel SGX</a></li>
+<li class="toctree-l1"><a class="reference internal" href="intel_tdx.html">Intel TDX</a></li>
+<li class="toctree-l1"><a class="reference internal" href="io_throttling.html">I/O Throttling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="iommu.html">Virtual IOMMU</a></li>
+<li class="toctree-l1"><a class="reference internal" href="live_migration.html">Live Migration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="logging.html">Logging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="macvtap-bridge.html">Using MACVTAP to Bridge onto Host Network</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Memory</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#basic-parameters">Basic Parameters</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#size"><code class="docutils literal notranslate"><span class="pre">size</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#mergeable"><code class="docutils literal notranslate"><span class="pre">mergeable</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#hotplug-method"><code class="docutils literal notranslate"><span class="pre">hotplug_method</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#hotplug-size"><code class="docutils literal notranslate"><span class="pre">hotplug_size</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#hotplugged-size"><code class="docutils literal notranslate"><span class="pre">hotplugged_size</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#shared"><code class="docutils literal notranslate"><span class="pre">shared</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#hugepages-and-hugepage-size"><code class="docutils literal notranslate"><span class="pre">hugepages</span></code> and <code class="docutils literal notranslate"><span class="pre">hugepage_size</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#prefault"><code class="docutils literal notranslate"><span class="pre">prefault</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#advanced-parameters">Advanced Parameters</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id"><code class="docutils literal notranslate"><span class="pre">id</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id1"><code class="docutils literal notranslate"><span class="pre">size</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#file"><code class="docutils literal notranslate"><span class="pre">file</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id2"><code class="docutils literal notranslate"><span class="pre">shared</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id3"><code class="docutils literal notranslate"><span class="pre">hugepages</span></code> and <code class="docutils literal notranslate"><span class="pre">hugepage_size</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#host-numa-node"><code class="docutils literal notranslate"><span class="pre">host_numa_node</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id4"><code class="docutils literal notranslate"><span class="pre">hotplug_size</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id5"><code class="docutils literal notranslate"><span class="pre">hotplugged_size</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id6"><code class="docutils literal notranslate"><span class="pre">prefault</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#numa-settings">NUMA settings</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#guest-numa-id"><code class="docutils literal notranslate"><span class="pre">guest_numa_id</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#cpus"><code class="docutils literal notranslate"><span class="pre">cpus</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#distances"><code class="docutils literal notranslate"><span class="pre">distances</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#memory-zones"><code class="docutils literal notranslate"><span class="pre">memory_zones</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#sgx-epc-sections"><code class="docutils literal notranslate"><span class="pre">sgx_epc_sections</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pci-bus">PCI bus</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="profiling.html">Profiling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="seccomp.html">Seccomp filtering</a></li>
+<li class="toctree-l1"><a class="reference internal" href="snapshot_restore.html">Snapshot and Restore</a></li>
+<li class="toctree-l1"><a class="reference internal" href="uefi.html">UEFI Boot</a></li>
+<li class="toctree-l1"><a class="reference internal" href="uefi.html#links">Links</a></li>
+<li class="toctree-l1"><a class="reference internal" href="vfio.html">Cloud Hypervisor VFIO HOWTO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="vfio-user.html">Cloud Hypervisor VFIO-user HOWTO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="vhost-user-blk-testing.html">How to test vhost-user-blk with SPDK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="vhost-user-net-testing.html">How to test Vhost-user net with OpenVSwitch/DPDK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="virtiofs-root.html">HOWTO VirtioFS rootfs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="windows.html">Windows Support</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../README.html">Cloud Hypervisor</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../README.html" class="icon icon-home"></a> &raquo;</li>
+      <li>Memory</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/docs/memory.md.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section class="tex2jax_ignore mathjax_ignore" id="memory">
+<h1>Memory<a class="headerlink" href="#memory" title="Permalink to this headline"></a></h1>
+<p>Cloud Hypervisor has many ways to expose memory to the guest VM. This document
+aims to explain what Cloud Hypervisor is capable of and how it can be used to
+meet the needs of very different use cases.</p>
+<section id="basic-parameters">
+<h2>Basic Parameters<a class="headerlink" href="#basic-parameters" title="Permalink to this headline"></a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">MemoryConfig</span></code> or what is known as <code class="docutils literal notranslate"><span class="pre">--memory</span></code> from the CLI perspective is the
+easiest way to get started with Cloud Hypervisor.</p>
+<div class="highlight-rust notranslate"><div class="highlight"><pre><span></span><span class="k">struct</span> <span class="nc">MemoryConfig</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">size</span>: <span class="kt">u64</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="n">mergeable</span>: <span class="kt">bool</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="n">hotplug_method</span>: <span class="nc">HotplugMethod</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="n">hotplug_size</span>: <span class="nb">Option</span><span class="o">&lt;</span><span class="kt">u64</span><span class="o">&gt;</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="n">hotplugged_size</span>: <span class="nb">Option</span><span class="o">&lt;</span><span class="kt">u64</span><span class="o">&gt;</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="n">shared</span>: <span class="kt">bool</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="n">hugepages</span>: <span class="kt">bool</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="n">hugepage_size</span>: <span class="nb">Option</span><span class="o">&lt;</span><span class="kt">u64</span><span class="o">&gt;</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="n">prefault</span>: <span class="kt">bool</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="n">zones</span>: <span class="nb">Option</span><span class="o">&lt;</span><span class="nb">Vec</span><span class="o">&lt;</span><span class="n">MemoryZoneConfig</span><span class="o">&gt;&gt;</span><span class="p">,</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">--</span><span class="n">memory</span> <span class="o">&lt;</span><span class="n">memory</span><span class="o">&gt;</span>	<span class="n">Memory</span> <span class="n">parameters</span> <span class="s2">&quot;size=&lt;guest_memory_size&gt;,mergeable=on|off,shared=on|off,hugepages=on|off,hugepage_size=&lt;hugepage_size&gt;,hotplug_method=acpi|virtio-mem,hotplug_size=&lt;hotpluggable_memory_size&gt;,hotplugged_size=&lt;hotplugged_memory_size&gt;,prefault=on|off&quot;</span> <span class="p">[</span><span class="n">default</span><span class="p">:</span> <span class="n">size</span><span class="o">=</span><span class="mi">512</span><span class="n">M</span><span class="p">]</span>
+</pre></div>
+</div>
+<section id="size">
+<h3><code class="docutils literal notranslate"><span class="pre">size</span></code><a class="headerlink" href="#size" title="Permalink to this headline"></a></h3>
+<p>Size of the RAM in the guest VM.</p>
+<p>This option is mandatory when using the <code class="docutils literal notranslate"><span class="pre">--memory</span></code> parameter.</p>
+<p>Value is an unsigned integer of 64 bits.</p>
+<p><em>Example</em></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">--</span><span class="n">memory</span> <span class="n">size</span><span class="o">=</span><span class="mi">1</span><span class="n">G</span>
+</pre></div>
+</div>
+</section>
+<section id="mergeable">
+<h3><code class="docutils literal notranslate"><span class="pre">mergeable</span></code><a class="headerlink" href="#mergeable" title="Permalink to this headline"></a></h3>
+<p>Specifies if the pages from the guest RAM must be marked as <em>mergeable</em>. In
+case this option is <code class="docutils literal notranslate"><span class="pre">true</span></code> or <code class="docutils literal notranslate"><span class="pre">on</span></code>, the pages will be marked with <code class="docutils literal notranslate"><span class="pre">madvise(2)</span></code>
+to let the host kernel know which pages are eligible for being merged by the
+KSM daemon.</p>
+<p>This option can be used when trying to reach a higher density of VMs running
+on a single host, as it will reduce the amount of memory consumed by each VM.</p>
+<p>By default this option is turned off.</p>
+<p><em>Example</em></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">--</span><span class="n">memory</span> <span class="n">size</span><span class="o">=</span><span class="mi">1</span><span class="n">G</span><span class="p">,</span><span class="n">mergeable</span><span class="o">=</span><span class="n">on</span>
+</pre></div>
+</div>
+</section>
+<section id="hotplug-method">
+<h3><code class="docutils literal notranslate"><span class="pre">hotplug_method</span></code><a class="headerlink" href="#hotplug-method" title="Permalink to this headline"></a></h3>
+<p>Selects the way of adding and/or removing memory to/from a booted VM.</p>
+<p>Possible values are <code class="docutils literal notranslate"><span class="pre">acpi</span></code> and <code class="docutils literal notranslate"><span class="pre">virtio-mem</span></code>. Default value is <code class="docutils literal notranslate"><span class="pre">acpi</span></code>.</p>
+<p><em>Example</em></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">--</span><span class="n">memory</span> <span class="n">size</span><span class="o">=</span><span class="mi">1</span><span class="n">G</span><span class="p">,</span><span class="n">hotplug_method</span><span class="o">=</span><span class="n">acpi</span>
+</pre></div>
+</div>
+</section>
+<section id="hotplug-size">
+<h3><code class="docutils literal notranslate"><span class="pre">hotplug_size</span></code><a class="headerlink" href="#hotplug-size" title="Permalink to this headline"></a></h3>
+<p>Amount of memory that can be dynamically added to the VM.</p>
+<p>Value is an unsigned integer of 64 bits. A value of 0 is invalid.</p>
+<p><em>Example</em></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">--</span><span class="n">memory</span> <span class="n">size</span><span class="o">=</span><span class="mi">1</span><span class="n">G</span><span class="p">,</span><span class="n">hotplug_size</span><span class="o">=</span><span class="mi">1</span><span class="n">G</span>
+</pre></div>
+</div>
+</section>
+<section id="hotplugged-size">
+<h3><code class="docutils literal notranslate"><span class="pre">hotplugged_size</span></code><a class="headerlink" href="#hotplugged-size" title="Permalink to this headline"></a></h3>
+<p>Amount of memory that will be dynamically added to the VM at boot. This option
+allows for starting a VM with a certain amount of memory that can be reduced
+during runtime.</p>
+<p>This is only valid when the <code class="docutils literal notranslate"><span class="pre">hotplug_method</span></code> is <code class="docutils literal notranslate"><span class="pre">virtio-mem</span></code> as it does not
+make sense for the <code class="docutils literal notranslate"><span class="pre">acpi</span></code> use case. When using ACPI, the memory can’t be
+resized after it has been extended.</p>
+<p>This option is only valid when <code class="docutils literal notranslate"><span class="pre">hotplug_size</span></code> is specified, and its value can’t
+exceed the value of <code class="docutils literal notranslate"><span class="pre">hotplug_size</span></code>.</p>
+<p>Value is an unsigned integer of 64 bits. A value of 0 is invalid.</p>
+<p><em>Example</em></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">--</span><span class="n">memory</span> <span class="n">size</span><span class="o">=</span><span class="mi">1</span><span class="n">G</span><span class="p">,</span><span class="n">hotplug_method</span><span class="o">=</span><span class="n">virtio</span><span class="o">-</span><span class="n">mem</span><span class="p">,</span><span class="n">hotplug_size</span><span class="o">=</span><span class="mi">1</span><span class="n">G</span><span class="p">,</span><span class="n">hotplugged_size</span><span class="o">=</span><span class="mi">512</span><span class="n">M</span>
+</pre></div>
+</div>
+</section>
+<section id="shared">
+<h3><code class="docutils literal notranslate"><span class="pre">shared</span></code><a class="headerlink" href="#shared" title="Permalink to this headline"></a></h3>
+<p>Specifies if the memory must be <code class="docutils literal notranslate"><span class="pre">mmap(2)</span></code> with <code class="docutils literal notranslate"><span class="pre">MAP_SHARED</span></code> flag.</p>
+<p>By sharing a memory mapping, one can share the guest RAM with other processes
+running on the host. One can use this option when running vhost-user devices
+as part of the VM device model, as they will be driven by standalone daemons
+needing access to the guest RAM content.</p>
+<p>By default this option is turned off, which results in performing <code class="docutils literal notranslate"><span class="pre">mmap(2)</span></code>
+with <code class="docutils literal notranslate"><span class="pre">MAP_PRIVATE</span></code> flag.</p>
+<p><em>Example</em></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">--</span><span class="n">memory</span> <span class="n">size</span><span class="o">=</span><span class="mi">1</span><span class="n">G</span><span class="p">,</span><span class="n">shared</span><span class="o">=</span><span class="n">on</span>
+</pre></div>
+</div>
+</section>
+<section id="hugepages-and-hugepage-size">
+<h3><code class="docutils literal notranslate"><span class="pre">hugepages</span></code> and <code class="docutils literal notranslate"><span class="pre">hugepage_size</span></code><a class="headerlink" href="#hugepages-and-hugepage-size" title="Permalink to this headline"></a></h3>
+<p>Specifies if the memory must be created and <code class="docutils literal notranslate"><span class="pre">mmap(2)</span></code> with <code class="docutils literal notranslate"><span class="pre">MAP_HUGETLB</span></code> and size
+flags. This performs a memory mapping relying on the specified huge page size.
+If no huge page size is supplied the system’s default huge page size is used.</p>
+<p>By using hugepages, one can improve the overall performance of the VM, assuming
+the guest will allocate hugepages as well. Another interesting use case is VFIO
+as it speeds up the VM’s boot time since the amount of IOMMU mappings are
+reduced.</p>
+<p>The user is responsible for ensuring there are sufficient huge pages of the
+specified size for the VMM to use. Failure to do so may result in strange VMM
+behaviour, e.g. error with <code class="docutils literal notranslate"><span class="pre">ReadKernelImage</span></code> is common. If there is a strange
+error with <code class="docutils literal notranslate"><span class="pre">hugepages</span></code> enabled, just disable it or check whether there are enough
+huge pages.</p>
+<p>By default this option is turned off.</p>
+<p><em>Example</em></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">--</span><span class="n">memory</span> <span class="n">size</span><span class="o">=</span><span class="mi">1</span><span class="n">G</span><span class="p">,</span><span class="n">hugepages</span><span class="o">=</span><span class="n">on</span><span class="p">,</span><span class="n">hugepage_size</span><span class="o">=</span><span class="mi">2</span><span class="n">M</span>
+</pre></div>
+</div>
+</section>
+<section id="prefault">
+<h3><code class="docutils literal notranslate"><span class="pre">prefault</span></code><a class="headerlink" href="#prefault" title="Permalink to this headline"></a></h3>
+<p>Specifies if the memory must be <code class="docutils literal notranslate"><span class="pre">mmap(2)</span></code> with <code class="docutils literal notranslate"><span class="pre">MAP_POPULATE</span></code> flag.</p>
+<p>By triggering prefault, one can allocate all required physical memory and create
+its page tables while calling <code class="docutils literal notranslate"><span class="pre">mmap</span></code>. With physical memory allocated, the number
+of page faults will decrease during running, and performance will also improve.</p>
+<p>Note that boot of VM will be slower with <code class="docutils literal notranslate"><span class="pre">prefault</span></code> enabled because of allocating
+physical memory and creating page tables in advance, and physical memory of the
+specified size will be consumed quickly.</p>
+<p>This option only takes effect at boot of VM. There is also a <code class="docutils literal notranslate"><span class="pre">prefault</span></code> option in
+restore and its choice will overwrite <code class="docutils literal notranslate"><span class="pre">prefault</span></code> in memory.</p>
+<p>By default this option is turned off.</p>
+<p><em>Example</em></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">--</span><span class="n">memory</span> <span class="n">size</span><span class="o">=</span><span class="mi">1</span><span class="n">G</span><span class="p">,</span><span class="n">prefault</span><span class="o">=</span><span class="n">on</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="advanced-parameters">
+<h2>Advanced Parameters<a class="headerlink" href="#advanced-parameters" title="Permalink to this headline"></a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">MemoryZoneConfig</span></code> or what is known as <code class="docutils literal notranslate"><span class="pre">--memory-zone</span></code> from the CLI perspective
+is a power user parameter. It allows for a full description of the guest RAM,
+describing how every memory region is backed and exposed to the guest.</p>
+<div class="highlight-rust notranslate"><div class="highlight"><pre><span></span><span class="k">struct</span> <span class="nc">MemoryZoneConfig</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">id</span>: <span class="nb">String</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="n">size</span>: <span class="kt">u64</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="n">file</span>: <span class="nb">Option</span><span class="o">&lt;</span><span class="n">PathBuf</span><span class="o">&gt;</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="n">shared</span>: <span class="kt">bool</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="n">hugepages</span>: <span class="kt">bool</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="n">hugepage_size</span>: <span class="nb">Option</span><span class="o">&lt;</span><span class="kt">u64</span><span class="o">&gt;</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="n">host_numa_node</span>: <span class="nb">Option</span><span class="o">&lt;</span><span class="kt">u32</span><span class="o">&gt;</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="n">hotplug_size</span>: <span class="nb">Option</span><span class="o">&lt;</span><span class="kt">u64</span><span class="o">&gt;</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="n">hotplugged_size</span>: <span class="nb">Option</span><span class="o">&lt;</span><span class="kt">u64</span><span class="o">&gt;</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="n">prefault</span>: <span class="kt">bool</span><span class="p">,</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">--</span><span class="n">memory</span><span class="o">-</span><span class="n">zone</span> <span class="o">&lt;</span><span class="n">memory</span><span class="o">-</span><span class="n">zone</span><span class="o">&gt;</span>	<span class="n">User</span> <span class="n">defined</span> <span class="n">memory</span> <span class="n">zone</span> <span class="n">parameters</span> <span class="s2">&quot;size=&lt;guest_memory_region_size&gt;,file=&lt;backing_file&gt;,shared=on|off,hugepages=on|off,hugepage_size=&lt;hugepage_size&gt;,host_numa_node=&lt;node_id&gt;,id=&lt;zone_identifier&gt;,hotplug_size=&lt;hotpluggable_memory_size&gt;,hotplugged_size=&lt;hotplugged_memory_size&gt;,prefault=on|off&quot;</span>
+</pre></div>
+</div>
+<p>This parameter expects one or more occurences, allowing for a list of memory
+zones to be defined. It must be used with <code class="docutils literal notranslate"><span class="pre">--memory</span> <span class="pre">size=0</span></code>, clearly indicating
+that the memory will be described through advanced parameters.</p>
+<p>Each zone is given a list of options which we detail through the following
+sections.</p>
+<section id="id">
+<h3><code class="docutils literal notranslate"><span class="pre">id</span></code><a class="headerlink" href="#id" title="Permalink to this headline"></a></h3>
+<p>Memory zone identifier. This identifier must be unique, otherwise an error will
+be returned.</p>
+<p>This option is useful when referring to a memory zone previously created. In
+particular, the <code class="docutils literal notranslate"><span class="pre">--numa</span></code> parameter can associate a memory zone to a specific
+NUMA node based on the memory zone identifier.</p>
+<p>This option is mandatory when using the <code class="docutils literal notranslate"><span class="pre">--memory-zone</span></code> parameter.</p>
+<p>Value is a string.</p>
+<p><em>Example</em></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">--</span><span class="n">memory</span> <span class="n">size</span><span class="o">=</span><span class="mi">0</span>
+<span class="o">--</span><span class="n">memory</span><span class="o">-</span><span class="n">zone</span> <span class="nb">id</span><span class="o">=</span><span class="n">mem0</span><span class="p">,</span><span class="n">size</span><span class="o">=</span><span class="mi">1</span><span class="n">G</span>
+</pre></div>
+</div>
+</section>
+<section id="id1">
+<h3><code class="docutils literal notranslate"><span class="pre">size</span></code><a class="headerlink" href="#id1" title="Permalink to this headline"></a></h3>
+<p>Size of the memory zone.</p>
+<p>This option is mandatory when using the <code class="docutils literal notranslate"><span class="pre">--memory-zone</span></code> parameter.</p>
+<p>Value is an unsigned integer of 64 bits.</p>
+<p><em>Example</em></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">--</span><span class="n">memory</span> <span class="n">size</span><span class="o">=</span><span class="mi">0</span>
+<span class="o">--</span><span class="n">memory</span><span class="o">-</span><span class="n">zone</span> <span class="nb">id</span><span class="o">=</span><span class="n">mem0</span><span class="p">,</span><span class="n">size</span><span class="o">=</span><span class="mi">1</span><span class="n">G</span>
+</pre></div>
+</div>
+</section>
+<section id="file">
+<h3><code class="docutils literal notranslate"><span class="pre">file</span></code><a class="headerlink" href="#file" title="Permalink to this headline"></a></h3>
+<p>Path to the file backing the memory zone. This can be either a file or a
+directory. In case of a file, it will be opened and used as the backing file
+for the <code class="docutils literal notranslate"><span class="pre">mmap(2)</span></code> operation. In case of a directory, a temporary file with no
+hard link on the filesystem will be created. This file will be used as the
+backing file for the <code class="docutils literal notranslate"><span class="pre">mmap(2)</span></code> operation.</p>
+<p>This option can be particularly useful when trying to back a part of the guest
+RAM with a well known file. In the context of the snapshot/restore feature, and
+if the provided path is a file, the snapshot operation will not perform any
+copy of the guest RAM content for this specific memory zone since the user has
+access to it and it would duplicate data already stored on the current
+filesystem.</p>
+<p>Value is a string.</p>
+<p><em>Example</em></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">--</span><span class="n">memory</span> <span class="n">size</span><span class="o">=</span><span class="mi">0</span>
+<span class="o">--</span><span class="n">memory</span><span class="o">-</span><span class="n">zone</span> <span class="nb">id</span><span class="o">=</span><span class="n">mem0</span><span class="p">,</span><span class="n">size</span><span class="o">=</span><span class="mi">1</span><span class="n">G</span><span class="p">,</span><span class="n">file</span><span class="o">=/</span><span class="n">foo</span><span class="o">/</span><span class="n">bar</span>
+</pre></div>
+</div>
+</section>
+<section id="id2">
+<h3><code class="docutils literal notranslate"><span class="pre">shared</span></code><a class="headerlink" href="#id2" title="Permalink to this headline"></a></h3>
+<p>Specifies if the memory zone must be <code class="docutils literal notranslate"><span class="pre">mmap(2)</span></code> with <code class="docutils literal notranslate"><span class="pre">MAP_SHARED</span></code> flag.</p>
+<p>By sharing a memory zone mapping, one can share part of the guest RAM with
+other processes running on the host. One can use this option when running
+vhost-user devices as part of the VM device model, as they will be driven
+by standalone daemons needing access to the guest RAM content.</p>
+<p>By default this option is turned off, which result in performing <code class="docutils literal notranslate"><span class="pre">mmap(2)</span></code>
+with <code class="docutils literal notranslate"><span class="pre">MAP_PRIVATE</span></code> flag.</p>
+<p><em>Example</em></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">--</span><span class="n">memory</span> <span class="n">size</span><span class="o">=</span><span class="mi">0</span>
+<span class="o">--</span><span class="n">memory</span><span class="o">-</span><span class="n">zone</span> <span class="nb">id</span><span class="o">=</span><span class="n">mem0</span><span class="p">,</span><span class="n">size</span><span class="o">=</span><span class="mi">1</span><span class="n">G</span><span class="p">,</span><span class="n">shared</span><span class="o">=</span><span class="n">on</span>
+</pre></div>
+</div>
+</section>
+<section id="id3">
+<h3><code class="docutils literal notranslate"><span class="pre">hugepages</span></code> and <code class="docutils literal notranslate"><span class="pre">hugepage_size</span></code><a class="headerlink" href="#id3" title="Permalink to this headline"></a></h3>
+<p>Specifies if the memory must be created and <code class="docutils literal notranslate"><span class="pre">mmap(2)</span></code> with <code class="docutils literal notranslate"><span class="pre">MAP_HUGETLB</span></code> and size
+flags. This performs a memory mapping relying on the specified huge page size.
+If no huge page size is supplied the system’s default huge page size is used.</p>
+<p>By using hugepages, one can improve the overall performance of the VM, assuming
+the guest will allocate hugepages as well. Another interesting use case is VFIO
+as it speeds up the VM’s boot time since the amount of IOMMU mappings are
+reduced.</p>
+<p>The user is responsible for ensuring there are sufficient huge pages of the
+specified size for the VMM to use. Failure to do so may result in strange VMM
+behaviour, e.g. error with <code class="docutils literal notranslate"><span class="pre">ReadKernelImage</span></code> is common. If there is a strange
+error with <code class="docutils literal notranslate"><span class="pre">hugepages</span></code> enabled, just disable it or check whether there are enough
+huge pages.</p>
+<p>By default this option is turned off.</p>
+<p><em>Example</em></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">--</span><span class="n">memory</span> <span class="n">size</span><span class="o">=</span><span class="mi">0</span>
+<span class="o">--</span><span class="n">memory</span><span class="o">-</span><span class="n">zone</span> <span class="nb">id</span><span class="o">=</span><span class="n">mem0</span><span class="p">,</span><span class="n">size</span><span class="o">=</span><span class="mi">1</span><span class="n">G</span><span class="p">,</span><span class="n">hugepages</span><span class="o">=</span><span class="n">on</span><span class="p">,</span><span class="n">hugepage_size</span><span class="o">=</span><span class="mi">2</span><span class="n">M</span>
+</pre></div>
+</div>
+</section>
+<section id="host-numa-node">
+<h3><code class="docutils literal notranslate"><span class="pre">host_numa_node</span></code><a class="headerlink" href="#host-numa-node" title="Permalink to this headline"></a></h3>
+<p>Node identifier of a node present on the host. This option will let the user
+pick a specific NUMA node from which the memory must be allocated. After the
+memory zone is <code class="docutils literal notranslate"><span class="pre">mmap(2)</span></code>, the NUMA policy for this memory mapping will be
+applied through <code class="docutils literal notranslate"><span class="pre">mbind(2)</span></code>, relying on the provided node identifier. If the
+node does not exist on the host, the call to <code class="docutils literal notranslate"><span class="pre">mbind(2)</span></code> will fail.</p>
+<p>This option is useful when trying to back a VM memory with a specific type of
+memory from the host. Assuming a host has two types of memory, with one slower
+than the other, each related to a distinct NUMA node, one could create a VM
+with slower memory accesses by backing the entire guest RAM from the furthest
+NUMA node on the host.</p>
+<p>This option also gives the opportunity to create a VM with non uniform memory
+accesses as one could define a first memory zone backed by fast memory, and a
+second memory zone backed by slow memory.</p>
+<p>Value is an unsigned integer of 32 bits.</p>
+<p><em>Example</em></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">--</span><span class="n">memory</span> <span class="n">size</span><span class="o">=</span><span class="mi">0</span>
+<span class="o">--</span><span class="n">memory</span><span class="o">-</span><span class="n">zone</span> <span class="nb">id</span><span class="o">=</span><span class="n">mem0</span><span class="p">,</span><span class="n">size</span><span class="o">=</span><span class="mi">1</span><span class="n">G</span><span class="p">,</span><span class="n">host_numa_node</span><span class="o">=</span><span class="mi">0</span>
+</pre></div>
+</div>
+</section>
+<section id="id4">
+<h3><code class="docutils literal notranslate"><span class="pre">hotplug_size</span></code><a class="headerlink" href="#id4" title="Permalink to this headline"></a></h3>
+<p>Amount of memory that can be dynamically added to the memory zone. Since
+<code class="docutils literal notranslate"><span class="pre">virtio-mem</span></code> is the only way of resizing a memory zone, one must specify
+the <code class="docutils literal notranslate"><span class="pre">hotplug_method=virtio-mem</span></code> to the <code class="docutils literal notranslate"><span class="pre">--memory</span></code> parameter.</p>
+<p>Value is an unsigned integer of 64 bits. A value of 0 is invalid.</p>
+<p><em>Example</em></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">--</span><span class="n">memory</span> <span class="n">size</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="n">hotplug_method</span><span class="o">=</span><span class="n">virtio</span><span class="o">-</span><span class="n">mem</span>
+<span class="o">--</span><span class="n">memory</span><span class="o">-</span><span class="n">zone</span> <span class="nb">id</span><span class="o">=</span><span class="n">mem0</span><span class="p">,</span><span class="n">size</span><span class="o">=</span><span class="mi">1</span><span class="n">G</span><span class="p">,</span><span class="n">hotplug_size</span><span class="o">=</span><span class="mi">1</span><span class="n">G</span>
+</pre></div>
+</div>
+</section>
+<section id="id5">
+<h3><code class="docutils literal notranslate"><span class="pre">hotplugged_size</span></code><a class="headerlink" href="#id5" title="Permalink to this headline"></a></h3>
+<p>Amount of memory that will be dynamically added to a memory zone at VM’s boot.
+This option allows for starting a VM with a certain amount of memory that can
+be reduced during runtime.</p>
+<p>This is only valid when the <code class="docutils literal notranslate"><span class="pre">hotplug_method</span></code> is <code class="docutils literal notranslate"><span class="pre">virtio-mem</span></code> as it does not
+make sense for the <code class="docutils literal notranslate"><span class="pre">acpi</span></code> use case. When using ACPI, the memory can’t be
+resized after it has been extended.</p>
+<p>This option is only valid when <code class="docutils literal notranslate"><span class="pre">hotplug_size</span></code> is specified, and its value can’t
+exceed the value of <code class="docutils literal notranslate"><span class="pre">hotplug_size</span></code>.</p>
+<p>Value is an unsigned integer of 64 bits. A value of 0 is invalid.</p>
+<p><em>Example</em></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">--</span><span class="n">memory</span> <span class="n">size</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="n">hotplug_method</span><span class="o">=</span><span class="n">virtio</span><span class="o">-</span><span class="n">mem</span>
+<span class="o">--</span><span class="n">memory</span><span class="o">-</span><span class="n">zone</span> <span class="nb">id</span><span class="o">=</span><span class="n">mem0</span><span class="p">,</span><span class="n">size</span><span class="o">=</span><span class="mi">1</span><span class="n">G</span><span class="p">,</span><span class="n">hotplug_size</span><span class="o">=</span><span class="mi">1</span><span class="n">G</span><span class="p">,</span><span class="n">hotplugged_size</span><span class="o">=</span><span class="mi">512</span><span class="n">M</span>
+</pre></div>
+</div>
+</section>
+<section id="id6">
+<h3><code class="docutils literal notranslate"><span class="pre">prefault</span></code><a class="headerlink" href="#id6" title="Permalink to this headline"></a></h3>
+<p>Specifies if the memory must be <code class="docutils literal notranslate"><span class="pre">mmap(2)</span></code> with <code class="docutils literal notranslate"><span class="pre">MAP_POPULATE</span></code> flag.</p>
+<p>By triggering prefault, one can allocate all required physical memory and create
+its page tables while calling <code class="docutils literal notranslate"><span class="pre">mmap</span></code>. With physical memory allocated, the number
+of page faults will decrease during running, and performance will also improve.</p>
+<p>Note that boot of VM will be slower with <code class="docutils literal notranslate"><span class="pre">prefault</span></code> enabled because of allocating
+physical memory and creating page tables in advance, and physical memory of the
+specified size will be consumed quickly.</p>
+<p>This option only takes effect at boot of VM. There is also a <code class="docutils literal notranslate"><span class="pre">prefault</span></code> option in
+restore and its choice will overwrite <code class="docutils literal notranslate"><span class="pre">prefault</span></code> in memory.</p>
+<p>By default this option is turned off.</p>
+<p><em>Example</em></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">--</span><span class="n">memory</span> <span class="n">size</span><span class="o">=</span><span class="mi">0</span>
+<span class="o">--</span><span class="n">memory</span><span class="o">-</span><span class="n">zone</span> <span class="nb">id</span><span class="o">=</span><span class="n">mem0</span><span class="p">,</span><span class="n">size</span><span class="o">=</span><span class="mi">1</span><span class="n">G</span><span class="p">,</span><span class="n">prefault</span><span class="o">=</span><span class="n">on</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="numa-settings">
+<h2>NUMA settings<a class="headerlink" href="#numa-settings" title="Permalink to this headline"></a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">NumaConfig</span></code> or what is known as <code class="docutils literal notranslate"><span class="pre">--numa</span></code> from the CLI perspective has been
+introduced to define a guest NUMA topology. It allows for a fine description
+about the CPUs and memory ranges associated with each NUMA node. Additionally
+it allows for specifying the distance between each NUMA node.</p>
+<div class="highlight-rust notranslate"><div class="highlight"><pre><span></span><span class="k">struct</span> <span class="nc">NumaConfig</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">guest_numa_id</span>: <span class="kt">u32</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="n">cpus</span>: <span class="nb">Option</span><span class="o">&lt;</span><span class="nb">Vec</span><span class="o">&lt;</span><span class="kt">u8</span><span class="o">&gt;&gt;</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="n">distances</span>: <span class="nb">Option</span><span class="o">&lt;</span><span class="nb">Vec</span><span class="o">&lt;</span><span class="n">NumaDistance</span><span class="o">&gt;&gt;</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="n">memory_zones</span>: <span class="nb">Option</span><span class="o">&lt;</span><span class="nb">Vec</span><span class="o">&lt;</span><span class="nb">String</span><span class="o">&gt;&gt;</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="n">sgx_epc_sections</span>: <span class="nb">Option</span><span class="o">&lt;</span><span class="nb">Vec</span><span class="o">&lt;</span><span class="nb">String</span><span class="o">&gt;&gt;</span><span class="p">,</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">--</span><span class="n">numa</span> <span class="o">&lt;</span><span class="n">numa</span><span class="o">&gt;</span>	<span class="n">Settings</span> <span class="n">related</span> <span class="n">to</span> <span class="n">a</span> <span class="n">given</span> <span class="n">NUMA</span> <span class="n">node</span> <span class="s2">&quot;guest_numa_id=&lt;node_id&gt;,cpus=&lt;cpus_id&gt;,distances=&lt;list_of_distances_to_destination_nodes&gt;,memory_zones=&lt;list_of_memory_zones&gt;,sgx_epc_sections=&lt;list_of_sgx_epc_sections&gt;&quot;</span>
+</pre></div>
+</div>
+<section id="guest-numa-id">
+<h3><code class="docutils literal notranslate"><span class="pre">guest_numa_id</span></code><a class="headerlink" href="#guest-numa-id" title="Permalink to this headline"></a></h3>
+<p>Node identifier of a guest NUMA node. This identifier must be unique, otherwise
+an error will be returned.</p>
+<p>This option is mandatory when using the <code class="docutils literal notranslate"><span class="pre">--numa</span></code> parameter.</p>
+<p>Value is an unsigned integer of 32 bits.</p>
+<p><em>Example</em></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">--</span><span class="n">numa</span> <span class="n">guest_numa_id</span><span class="o">=</span><span class="mi">0</span>
+</pre></div>
+</div>
+</section>
+<section id="cpus">
+<h3><code class="docutils literal notranslate"><span class="pre">cpus</span></code><a class="headerlink" href="#cpus" title="Permalink to this headline"></a></h3>
+<p>List of virtual CPUs attached to the guest NUMA node identified by the
+<code class="docutils literal notranslate"><span class="pre">guest_numa_id</span></code> option. This allows for describing a list of CPUs which
+must be seen by the guest as belonging to the NUMA node <code class="docutils literal notranslate"><span class="pre">guest_numa_id</span></code>.</p>
+<p>One can use this option for a fine grained description of the NUMA topology
+regarding the CPUs associated with it, which might help the guest run more
+efficiently.</p>
+<p>Multiple values can be provided to define the list. Each value is an unsigned
+integer of 8 bits.</p>
+<p>For instance, if one needs to attach all CPUs from 0 to 4 to a specific node,
+the syntax using <code class="docutils literal notranslate"><span class="pre">-</span></code> will help define a contiguous range with <code class="docutils literal notranslate"><span class="pre">cpus=0-4</span></code>. The
+same example could also be described with <code class="docutils literal notranslate"><span class="pre">cpus=[0,1,2,3,4]</span></code>.</p>
+<p>A combination of both <code class="docutils literal notranslate"><span class="pre">-</span></code> and <code class="docutils literal notranslate"><span class="pre">,</span></code> separators is useful when one might need to
+describe a list containing all CPUs from 0 to 99 and the CPU 255, as it could
+simply be described with <code class="docutils literal notranslate"><span class="pre">cpus=[0-99,255]</span></code>.</p>
+<p>As soon as one tries to describe a list of values, <code class="docutils literal notranslate"><span class="pre">[</span></code> and <code class="docutils literal notranslate"><span class="pre">]</span></code> must be used to
+demarcate the list.</p>
+<p><em>Example</em></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">--</span><span class="n">cpus</span> <span class="n">boot</span><span class="o">=</span><span class="mi">8</span>
+<span class="o">--</span><span class="n">numa</span> <span class="n">guest_numa_id</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="n">cpus</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="o">-</span><span class="mi">3</span><span class="p">,</span><span class="mi">7</span><span class="p">]</span> <span class="n">guest_numa_id</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">cpus</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">4</span><span class="o">-</span><span class="mi">6</span><span class="p">]</span>
+</pre></div>
+</div>
+</section>
+<section id="distances">
+<h3><code class="docutils literal notranslate"><span class="pre">distances</span></code><a class="headerlink" href="#distances" title="Permalink to this headline"></a></h3>
+<p>List of distances between the current NUMA node referred by <code class="docutils literal notranslate"><span class="pre">guest_numa_id</span></code>
+and the destination NUMA nodes listed along with distances. This option let
+the user choose the distances between guest NUMA nodes. This is important to
+provide an accurate description of the way non uniform memory accesses will
+perform in the guest.</p>
+<p>One or more tuple of two values must be provided through this option. The first
+value is an unsigned integer of 32 bits as it represents the destination NUMA
+node. The second value is an unsigned integer of 8 bits as it represents the
+distance between the current NUMA node and the destination NUMA node. The two
+values are separated by <code class="docutils literal notranslate"><span class="pre">&#64;</span></code> (<code class="docutils literal notranslate"><span class="pre">value1&#64;value2</span></code>), meaning the destination NUMA
+node <code class="docutils literal notranslate"><span class="pre">value1</span></code> is located at a distance of <code class="docutils literal notranslate"><span class="pre">value2</span></code>. Each tuple is separated
+from the others with <code class="docutils literal notranslate"><span class="pre">,</span></code> separator.</p>
+<p>As soon as one tries to describe a list of values, <code class="docutils literal notranslate"><span class="pre">[</span></code> and <code class="docutils literal notranslate"><span class="pre">]</span></code> must be used to
+demarcate the list.</p>
+<p>For instance, if one wants to define 3 NUMA nodes, with each node located at
+different distances, it can be described with the following example.</p>
+<p><em>Example</em></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">--</span><span class="n">numa</span> <span class="n">guest_numa_id</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="n">distances</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="o">@</span><span class="mi">15</span><span class="p">,</span><span class="mi">2</span><span class="o">@</span><span class="mi">25</span><span class="p">]</span> <span class="n">guest_numa_id</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">distances</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="o">@</span><span class="mi">15</span><span class="p">,</span><span class="mi">2</span><span class="o">@</span><span class="mi">20</span><span class="p">]</span> <span class="n">guest_numa_id</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span><span class="n">distances</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="o">@</span><span class="mi">25</span><span class="p">,</span><span class="mi">1</span><span class="o">@</span><span class="mi">20</span><span class="p">]</span>
+</pre></div>
+</div>
+</section>
+<section id="memory-zones">
+<h3><code class="docutils literal notranslate"><span class="pre">memory_zones</span></code><a class="headerlink" href="#memory-zones" title="Permalink to this headline"></a></h3>
+<p>List of memory zones attached to the guest NUMA node identified by the
+<code class="docutils literal notranslate"><span class="pre">guest_numa_id</span></code> option. This allows for describing a list of memory ranges
+which must be seen by the guest as belonging to the NUMA node <code class="docutils literal notranslate"><span class="pre">guest_numa_id</span></code>.</p>
+<p>This option can be very useful and powerful when combined with <code class="docutils literal notranslate"><span class="pre">host_numa_node</span></code>
+option from <code class="docutils literal notranslate"><span class="pre">--memory-zone</span></code> parameter as it allows for creating a VM with non
+uniform memory accesses, and let the guest know about it. It allows for
+exposing memory zones through different NUMA nodes, which can help the guest
+workload run more efficiently.</p>
+<p>Multiple values can be provided to define the list. Each value is a string
+referring to an existing memory zone identifier. Values are separated from
+each other with the <code class="docutils literal notranslate"><span class="pre">,</span></code> separator.</p>
+<p>As soon as one tries to describe a list of values, <code class="docutils literal notranslate"><span class="pre">[</span></code> and <code class="docutils literal notranslate"><span class="pre">]</span></code> must be used to
+demarcate the list.</p>
+<p>Note that a memory zone must belong to a single NUMA node. The following
+configuration is incorrect, therefore not allowed:
+<code class="docutils literal notranslate"><span class="pre">--numa</span> <span class="pre">guest_numa_id=0,memory_zones=mem0</span> <span class="pre">guest_numa_id=1,memory_zones=mem0</span></code></p>
+<p><em>Example</em></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">--</span><span class="n">memory</span> <span class="n">size</span><span class="o">=</span><span class="mi">0</span>
+<span class="o">--</span><span class="n">memory</span><span class="o">-</span><span class="n">zone</span> <span class="nb">id</span><span class="o">=</span><span class="n">mem0</span><span class="p">,</span><span class="n">size</span><span class="o">=</span><span class="mi">1</span><span class="n">G</span> <span class="nb">id</span><span class="o">=</span><span class="n">mem1</span><span class="p">,</span><span class="n">size</span><span class="o">=</span><span class="mi">1</span><span class="n">G</span> <span class="nb">id</span><span class="o">=</span><span class="n">mem2</span><span class="p">,</span><span class="n">size</span><span class="o">=</span><span class="mi">1</span><span class="n">G</span>
+<span class="o">--</span><span class="n">numa</span> <span class="n">guest_numa_id</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="n">memory_zones</span><span class="o">=</span><span class="p">[</span><span class="n">mem0</span><span class="p">,</span><span class="n">mem2</span><span class="p">]</span> <span class="n">guest_numa_id</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">memory_zones</span><span class="o">=</span><span class="n">mem1</span>
+</pre></div>
+</div>
+</section>
+<section id="sgx-epc-sections">
+<h3><code class="docutils literal notranslate"><span class="pre">sgx_epc_sections</span></code><a class="headerlink" href="#sgx-epc-sections" title="Permalink to this headline"></a></h3>
+<p>List of SGX EPC sections attached to the guest NUMA node identified by the
+<code class="docutils literal notranslate"><span class="pre">guest_numa_id</span></code> option. This allows for describing a list of SGX EPC sections
+which must be seen by the guest as belonging to the NUMA node <code class="docutils literal notranslate"><span class="pre">guest_numa_id</span></code>.</p>
+<p>Multiple values can be provided to define the list. Each value is a string
+referring to an existing SGX EPC section identifier. Values are separated from
+each other with the <code class="docutils literal notranslate"><span class="pre">,</span></code> separator.</p>
+<p>As soon as one tries to describe a list of values, <code class="docutils literal notranslate"><span class="pre">[</span></code> and <code class="docutils literal notranslate"><span class="pre">]</span></code> must be used to
+demarcate the list.</p>
+<p><em>Example</em></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">--</span><span class="n">sgx</span><span class="o">-</span><span class="n">epc</span> <span class="nb">id</span><span class="o">=</span><span class="n">epc0</span><span class="p">,</span><span class="n">size</span><span class="o">=</span><span class="mi">32</span><span class="n">M</span> <span class="nb">id</span><span class="o">=</span><span class="n">epc1</span><span class="p">,</span><span class="n">size</span><span class="o">=</span><span class="mi">64</span><span class="n">M</span> <span class="nb">id</span><span class="o">=</span><span class="n">epc2</span><span class="p">,</span><span class="n">size</span><span class="o">=</span><span class="mi">32</span><span class="n">M</span>
+<span class="o">--</span><span class="n">numa</span> <span class="n">guest_numa_id</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="n">sgx_epc_sections</span><span class="o">=</span><span class="n">epc1</span> <span class="n">guest_numa_id</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">sgx_epc_sections</span><span class="o">=</span><span class="p">[</span><span class="n">epc0</span><span class="p">,</span><span class="n">epc2</span><span class="p">]</span>
+</pre></div>
+</div>
+</section>
+<section id="pci-bus">
+<h3>PCI bus<a class="headerlink" href="#pci-bus" title="Permalink to this headline"></a></h3>
+<p>Cloud Hypervisor supports only one PCI bus, which is why it has been tied to
+the NUMA node 0 by default. It is the user responsibility to organize the NUMA
+nodes correctly so that vCPUs and guest RAM which should be located on the same
+NUMA node as the PCI bus end up on the NUMA node 0.</p>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="macvtap-bridge.html" class="btn btn-neutral float-left" title="Using MACVTAP to Bridge onto Host Network" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="profiling.html" class="btn btn-neutral float-right" title="Profiling" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, various.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

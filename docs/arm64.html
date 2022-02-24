@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>How to build and test Cloud Hypervisor on AArch64 &mdash; Cloud Hypervisor  documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="CPU" href="cpu.html" />
+    <link rel="prev" title="Cloud Hypervisor API" href="api.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../README.html" class="icon icon-home"> Cloud Hypervisor
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="api.html">Cloud Hypervisor API</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">How to build and test Cloud Hypervisor on AArch64</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#hardware-requirements">Hardware requirements</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#getting-started">Getting started</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#prerequisites">Prerequisites</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#tools">Tools</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#building-cloud-hypervisor">Building Cloud Hypervisor</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#disk-image">Disk image</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#uefi-booting">UEFI booting</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#building-edk2">Building EDK2</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#booting-the-guest-vm">Booting the guest VM</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#direct-kernel-booting">Direct-kernel booting</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#building-kernel">Building kernel</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id1">Booting the guest VM</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="cpu.html">CPU</a></li>
+<li class="toctree-l1"><a class="reference internal" href="custom-image.html">How to create a custom Ubuntu image</a></li>
+<li class="toctree-l1"><a class="reference internal" href="debug-port.html"><code class="docutils literal notranslate"><span class="pre">cloud-hypervisor</span></code> debug IO port</a></li>
+<li class="toctree-l1"><a class="reference internal" href="device_model.html">Device Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="fs.html">How to use virtio-fs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="fuzzing.html">Fuzzing in Cloud Hypervisor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gdb.html">GDB Support</a></li>
+<li class="toctree-l1"><a class="reference internal" href="hotplug.html">Cloud Hypervisor Hot Plug</a></li>
+<li class="toctree-l1"><a class="reference internal" href="intel_sgx.html">Intel SGX</a></li>
+<li class="toctree-l1"><a class="reference internal" href="intel_tdx.html">Intel TDX</a></li>
+<li class="toctree-l1"><a class="reference internal" href="io_throttling.html">I/O Throttling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="iommu.html">Virtual IOMMU</a></li>
+<li class="toctree-l1"><a class="reference internal" href="live_migration.html">Live Migration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="logging.html">Logging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="macvtap-bridge.html">Using MACVTAP to Bridge onto Host Network</a></li>
+<li class="toctree-l1"><a class="reference internal" href="memory.html">Memory</a></li>
+<li class="toctree-l1"><a class="reference internal" href="profiling.html">Profiling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="seccomp.html">Seccomp filtering</a></li>
+<li class="toctree-l1"><a class="reference internal" href="snapshot_restore.html">Snapshot and Restore</a></li>
+<li class="toctree-l1"><a class="reference internal" href="uefi.html">UEFI Boot</a></li>
+<li class="toctree-l1"><a class="reference internal" href="uefi.html#links">Links</a></li>
+<li class="toctree-l1"><a class="reference internal" href="vfio.html">Cloud Hypervisor VFIO HOWTO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="vfio-user.html">Cloud Hypervisor VFIO-user HOWTO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="vhost-user-blk-testing.html">How to test vhost-user-blk with SPDK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="vhost-user-net-testing.html">How to test Vhost-user net with OpenVSwitch/DPDK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="virtiofs-root.html">HOWTO VirtioFS rootfs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="windows.html">Windows Support</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../README.html">Cloud Hypervisor</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../README.html" class="icon icon-home"></a> &raquo;</li>
+      <li>How to build and test Cloud Hypervisor on AArch64</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/docs/arm64.md.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section class="tex2jax_ignore mathjax_ignore" id="how-to-build-and-test-cloud-hypervisor-on-aarch64">
+<h1>How to build and test Cloud Hypervisor on AArch64<a class="headerlink" href="#how-to-build-and-test-cloud-hypervisor-on-aarch64" title="Permalink to this headline"></a></h1>
+<p>This document introduces how to build and test Cloud Hypervisor on AArch64.
+Currently, Cloud Hypervisor supports 2 methods of booting on AArch64: UEFI
+booting and direct-kernel booting. The document covers both methods.</p>
+<p>All the steps are based on Ubuntu. We use the Ubuntu cloud image for guest VM
+disk.</p>
+<section id="hardware-requirements">
+<h2>Hardware requirements<a class="headerlink" href="#hardware-requirements" title="Permalink to this headline"></a></h2>
+<ul class="simple">
+<li><p>AArch64 servers (recommended) or development boards equipped with the GICv3
+interrupt controller.</p></li>
+<li><p>On development boards that have constrained RAM resources, if the creation of
+a VM consumes a large portion of the free memory on the host, it may be required
+to enable swap. For example, this was required on a board with 3 GB of RAM
+booting a 2 GB VM at a point in time when 2.8 GB were free. Without enabling
+swap the <code class="docutils literal notranslate"><span class="pre">cloud-hypervisor</span></code> process was terminated by the OOM killer. In this
+situation memory was allocated for the virtual machine using memfd while the
+page cache was filled, leading to a situation where the kernel could not even
+drop caches. Making a small section of swap available (observably, 1 to 15 MB),
+this situation can be resolved and the resulting memory footprint of
+<code class="docutils literal notranslate"><span class="pre">cloud-hypervisor</span></code> is as expected.</p></li>
+</ul>
+</section>
+<section id="getting-started">
+<h2>Getting started<a class="headerlink" href="#getting-started" title="Permalink to this headline"></a></h2>
+<p>We create a folder to build and run Cloud Hypervisor at <code class="docutils literal notranslate"><span class="pre">$HOME/cloud-hypervisor</span></code></p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ <span class="nb">export</span> <span class="nv">CLOUDH</span><span class="o">=</span><span class="nv">$HOME</span>/cloud-hypervisor
+$ mkdir <span class="nv">$CLOUDH</span>
+</pre></div>
+</div>
+</section>
+<section id="prerequisites">
+<h2>Prerequisites<a class="headerlink" href="#prerequisites" title="Permalink to this headline"></a></h2>
+<p>You need to install some prerequisite packages to build and test Cloud Hypervisor.</p>
+<section id="tools">
+<h3>Tools<a class="headerlink" href="#tools" title="Permalink to this headline"></a></h3>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Install rust tool chain</span>
+$ curl --proto <span class="s1">&#39;=https&#39;</span> --tlsv1.2 -sSf https://sh.rustup.rs <span class="p">|</span> sh
+<span class="c1"># Install the tools used for building guest kernel, EDK2 and converting guest disk</span>
+$ sudo apt-get update
+$ sudo apt-get install git build-essential m4 bison flex uuid-dev qemu-utils
+</pre></div>
+</div>
+</section>
+<section id="building-cloud-hypervisor">
+<h3>Building Cloud Hypervisor<a class="headerlink" href="#building-cloud-hypervisor" title="Permalink to this headline"></a></h3>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ <span class="nb">pushd</span> <span class="nv">$CLOUDH</span>
+$ git clone https://github.com/cloud-hypervisor/cloud-hypervisor.git
+$ <span class="nb">cd</span> cloud-hypervisor
+$ cargo build
+$ <span class="nb">popd</span>
+</pre></div>
+</div>
+</section>
+<section id="disk-image">
+<h3>Disk image<a class="headerlink" href="#disk-image" title="Permalink to this headline"></a></h3>
+<p>Download the Ubuntu cloud image and convert the image type.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ <span class="nb">pushd</span> <span class="nv">$CLOUDH</span>
+$ wget https://cloud-images.ubuntu.com/focal/current/focal-server-cloudimg-arm64.img
+$ qemu-img convert -p -f qcow2 -O raw focal-server-cloudimg-arm64.img focal-server-cloudimg-arm64.raw
+$ <span class="nb">popd</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="uefi-booting">
+<h2>UEFI booting<a class="headerlink" href="#uefi-booting" title="Permalink to this headline"></a></h2>
+<p>This part introduces how to build EDK2 firmware and boot Cloud Hypervisor with it.</p>
+<section id="building-edk2">
+<h3>Building EDK2<a class="headerlink" href="#building-edk2" title="Permalink to this headline"></a></h3>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ <span class="nb">pushd</span> <span class="nv">$CLOUDH</span>
+
+<span class="c1"># Clone source code repos</span>
+$ git clone --depth <span class="m">1</span> https://github.com/tianocore/edk2.git -b master
+$ <span class="nb">cd</span> edk2
+$ git submodule update --init
+$ <span class="nb">cd</span> ..
+$ git clone --depth <span class="m">1</span> https://github.com/tianocore/edk2-platforms.git -b master
+$ git clone --depth <span class="m">1</span> https://github.com/acpica/acpica.git -b master
+
+<span class="c1"># Build tools</span>
+$ <span class="nb">export</span> <span class="nv">PACKAGES_PATH</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$PWD</span><span class="s2">/edk2:</span><span class="nv">$PWD</span><span class="s2">/edk2-platforms&quot;</span>
+$ <span class="nb">export</span> <span class="nv">IASL_PREFIX</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$PWD</span><span class="s2">/acpica/generate/unix/bin/&quot;</span>
+$ make -C acpica
+$ <span class="nb">cd</span> edk2/
+$ . edksetup.sh
+$ <span class="nb">cd</span> ..
+$ make -C edk2/BaseTools
+
+<span class="c1"># Build EDK2</span>
+$ build -a AARCH64 -t GCC5 -p ArmVirtPkg/ArmVirtCloudHv.dsc -b RELEASE
+
+$ <span class="nb">popd</span>
+</pre></div>
+</div>
+<p>If the build goes well, the EDK2 binary is available at
+<code class="docutils literal notranslate"><span class="pre">edk2/Build/ArmVirtCloudHv-AARCH64/RELEASE_GCC5/FV/CLOUDHV_EFI.fd</span></code>.</p>
+</section>
+<section id="booting-the-guest-vm">
+<h3>Booting the guest VM<a class="headerlink" href="#booting-the-guest-vm" title="Permalink to this headline"></a></h3>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ <span class="nb">pushd</span> <span class="nv">$CLOUDH</span>
+$ sudo <span class="nv">RUST_BACKTRACE</span><span class="o">=</span><span class="m">1</span> <span class="nv">$CLOUDH</span>/cloud-hypervisor/target/debug/cloud-hypervisor <span class="se">\</span>
+           --api-socket /tmp/cloud-hypervisor.sock <span class="se">\</span>
+           --kernel <span class="nv">$CLOUDH</span>/edk2/Build/ArmVirtCloudHv-AARCH64/RELEASE_GCC5/FV/CLOUDHV_EFI.fd <span class="se">\</span>
+           --disk <span class="nv">path</span><span class="o">=</span><span class="nv">$CLOUDH</span>/focal-server-cloudimg-arm64.raw <span class="se">\</span>
+           --cpus <span class="nv">boot</span><span class="o">=</span><span class="m">4</span> <span class="se">\</span>
+           --memory <span class="nv">size</span><span class="o">=</span>4096M <span class="se">\</span>
+           --net <span class="nv">tap</span><span class="o">=</span>,mac<span class="o">=</span><span class="m">12</span>:34:56:78:90:01,ip<span class="o">=</span><span class="m">192</span>.168.1.1,mask<span class="o">=</span><span class="m">255</span>.255.255.0 <span class="se">\</span>
+           --serial tty <span class="se">\</span>
+           --console off
+$ <span class="nb">popd</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="direct-kernel-booting">
+<h2>Direct-kernel booting<a class="headerlink" href="#direct-kernel-booting" title="Permalink to this headline"></a></h2>
+<p>Alternativelly, you can build your own kernel for guest VM. This way, UEFI is
+not involved and ACPI cannot be enabled.</p>
+<section id="building-kernel">
+<h3>Building kernel<a class="headerlink" href="#building-kernel" title="Permalink to this headline"></a></h3>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ <span class="nb">pushd</span> <span class="nv">$CLOUDH</span>
+$ git clone --depth <span class="m">1</span> <span class="s2">&quot;https://github.com/cloud-hypervisor/linux.git&quot;</span> -b ch-5.12
+$ <span class="nb">cd</span> linux
+$ cp <span class="nv">$CLOUDH</span>/cloud-hypervisor/resources/linux-config-aarch64 .config
+$ make -j <span class="sb">`</span>nproc<span class="sb">`</span>
+$ <span class="nb">popd</span>
+</pre></div>
+</div>
+</section>
+<section id="id1">
+<h3>Booting the guest VM<a class="headerlink" href="#id1" title="Permalink to this headline"></a></h3>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ <span class="nb">pushd</span> <span class="nv">$CLOUDH</span>
+$ sudo <span class="nv">$CLOUDH</span>/cloud-hypervisor/target/debug/cloud-hypervisor <span class="se">\</span>
+           --api-socket /tmp/cloud-hypervisor.sock <span class="se">\</span>
+           --kernel <span class="nv">$CLOUDH</span>/linux/arch/arm64/boot/Image <span class="se">\</span>
+           --disk <span class="nv">path</span><span class="o">=</span>focal-server-cloudimg-arm64.raw <span class="se">\</span>
+           --cmdline <span class="s2">&quot;keep_bootcon console=ttyAMA0 reboot=k panic=1 root=/dev/vda1 rw&quot;</span> <span class="se">\</span>
+           --cpus <span class="nv">boot</span><span class="o">=</span><span class="m">4</span> <span class="se">\</span>
+           --memory <span class="nv">size</span><span class="o">=</span>4096M <span class="se">\</span>
+           --net <span class="nv">tap</span><span class="o">=</span>,mac<span class="o">=</span><span class="m">12</span>:34:56:78:90:01,ip<span class="o">=</span><span class="m">192</span>.168.1.1,mask<span class="o">=</span><span class="m">255</span>.255.255.0 <span class="se">\</span>
+           --serial tty <span class="se">\</span>
+           --console off
+$ <span class="nb">popd</span>
+</pre></div>
+</div>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="api.html" class="btn btn-neutral float-left" title="Cloud Hypervisor API" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="cpu.html" class="btn btn-neutral float-right" title="CPU" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, various.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
